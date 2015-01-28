@@ -1,3 +1,10 @@
+/*
+----------------------------------
+	~Moosey Chess Engine~
+	      pieces.cpp
+----------------------------------
+*/
+
 #include "pieces.h"
 
 pieceEntry piece[32] = {

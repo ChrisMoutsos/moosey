@@ -1,4 +1,12 @@
 /*
+----------------------------------
+	~Moosey Chess Engine~
+	   By Chris Moutsos
+	      main.cpp
+----------------------------------
+*/
+
+/*
  *	Encode moveFrom when I copy pieceMoveLists to global moveLists
  *
  *	Stalemates (check if implemented correctly), draw by material
@@ -13,29 +21,31 @@
 #include "board.h"
 #include "input.h"
 #include "move.h"
+#include "movegen.h"
 #include "pieces.h"
 #include "legal.h"
+#include "display.h"
 
 using namespace std;
 
-bool side = WHITE, //BLACK = 0, WHITE = 1 
-     exit = false;
-int ply = 0; //Half-moves
 vector<int> whiteMoveList, blackMoveList;
 
 int main() {
+	int moveFrom, moveTo, ply;
+	bool side = WHITE, exit = false;
+
 	emptyBoard();
 	initializePieces("0");
 	displayBoard();
 	while (!exit) {
-		userInput();
-		movePiece();
-		changeTurns();
+		userInput(moveFrom, moveTo, side);
+		movePiece(moveFrom, moveTo);
+		changeTurns(ply, side);
 		displayBoard();
-		moveInfo();
+		moveInfo(moveFrom, moveTo, side);
 		generateCompleteMoveLists();
-		checkCheck();
-		checkDraw();
+		exit = checkCheck(side);
+		exit = checkDraw();
 
 		for (int i = wqR; i <= wPh; i++) {
 			cout << piece[i].name << " moveList: ";
@@ -48,10 +58,6 @@ int main() {
 				}
 			}
 			cout << ", ";
-		}
-		cout << endl << "White movelist: ";
-		for (int i = 0; i < (int)whiteMoveList.size(); i++) {
-			cout << intToSquare(whiteMoveList[i]) << ", ";
 		}
 		cout << endl;
 	}

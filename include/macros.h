@@ -1,3 +1,10 @@
+/*
+----------------------------------
+	~Moosey Chess Engine~
+	      macros.h
+----------------------------------
+*/
+
 #ifndef GLOBAL_H
 #define GLOBAL_H
 

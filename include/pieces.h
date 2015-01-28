@@ -1,3 +1,10 @@
+/*
+----------------------------------
+	~Moosey Chess Engine~
+	      pieces.h
+----------------------------------
+*/
+
 #ifndef PIECES_H
 #define PIECES_H
 

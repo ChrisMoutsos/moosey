@@ -1,25 +1,33 @@
+/*
+----------------------------------
+	~Moosey Chess Engine~
+	      input.cpp
+----------------------------------
+*/
+
 #include <iostream>
 #include <string>
+#include "input.h"
 #include "macros.h"
 #include "board.h"
-#include "input.h"
 #include "pieces.h"
 #include "legal.h"
+#include "display.h"
 
 using namespace std;
 
-int moveFrom = 0, moveTo = 0; //SQUARE NUMBER ON BOARD64
+//int moveFrom = 0, moveTo = 0; //SQUARE NUMBER ON BOARD64
 
-void userInput() {
-	while (!getInput() || !legalMove()) {
+void userInput(int& moveFrom, int& moveTo, bool side) {
+	while (!getInput(moveFrom, moveTo, side) || !legalMove(moveFrom, moveTo, side)) {
 		displayBoard();
 		cout << "Illegal!" << endl;
-		if (inCheck()) 
+		if (inCheck(side)) 
 			side ? cout << "White is in check!\n" : "Black is in check!\n";
 	}
 }
 
-bool getInput() {
+bool getInput(int& moveFrom, int& moveTo, bool side) {
 	string input;
 
 	side ? cout << "White to move: \n\t" : cout << "Black to move: \n\t";

@@ -1,3 +1,10 @@
+/*
+----------------------------------
+	~Moosey Chess Engine~
+	      board.cpp
+----------------------------------
+*/
+
 #include "macros.h"
 #include "board.h"
 #include "move.h"
@@ -14,7 +21,6 @@ void initializePieces(std::string FEN) {
         }
         if (FEN=="0") placePiecesDefault();
 }
-
 
 void placePiecesDefault() {
 	for (int i = wqR; i <= wkR; i++) //White
@@ -43,51 +49,8 @@ void emptyBoard() {
 			board120[i*10+j] = -1;
 }
 
-void displayBoard() {
-	bool color = 0; //0 for white, 1 for black
-	int square = 57, counter = 0;
-	std::cout << "  .---------------------------------------------------------------.\n";
-	while (square > 0) {
-		emptyRow(color, counter);
-		std::cout << (int)(square/8)+1;
-		printRow(color, square);
-		emptyRow(color, counter);
-		if (square!=1) std::cout << "  |---------------------------------------------------------------|\n";
-		square -= 8;
-	}
-	std::cout << "  `---------------------------------------------------------------`\n";
-	std::cout << "      a       b       c       d       e       f       g       h \n\n";	
-}
-void printRow(bool& color, int startingSquare) {
-	int x;
-	char a;
-	std::cout << " ";
-	for (int i = 1; i < 9; i++) {
-	  	x = startingSquare+i-1;
-		a = piece[board64[x]].abbr;
-		color ? std::cout << "|**" : std::cout << "|  ";
-		board64[x] != empty ? pieceMoved == board64[x] ? std::cout<<"~"<<a<<"~" : std::cout<<" "<<a<<" " : pieceMovedFrom == x ? color ? std::cout<<" / " : std::cout<<" \\ " : color ? std::cout<<"***" : std::cout<<"   ";
-		color ? std::cout << "**" : std::cout << "  ";
-		color = color ? 0 : 1;
-	}
-	std::cout << "|\n";
-}
-void emptyRow (bool& color, int& counter) {
-	for (int i = 1; i < 9; i++) {
-		if (i == 1) std::cout << "  ";
-		color ? std::cout << "|*******" : std::cout << "|       ";
-		color = color ? 0 : 1;
-	}
-	std::cout << "|\n";
-	counter++;
-	if (!(counter%2)) {
-		color = (color) ? 0 : 1;
-		counter = 0;
-	}
-}
-
 int to64(int x) {
-	if (x < 98 && x > 21 && !(x%10 == 0 || x%10 || 9))
+	if (x < 98 && x > 21 && !(x%10 == 0 || x%10 == 9))
 			return x-20-2*((x-x%10)/10-2);
 	return 0;
 }

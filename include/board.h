@@ -1,4 +1,14 @@
-/* empty square = -1
+/*
+----------------------------------
+	~Moosey Chess Engine~
+	      board.h
+----------------------------------
+*/
+
+
+/*
+ * null square = 0
+ * empty square = -1
  * invalid square = -99
  */
 
@@ -15,14 +25,10 @@ void initializePieces(std::string FEN);	//Names & values all pieces
 int to64(int x); 			//Converts x from 120 to 64 index
 int from64(int x);			//Converts x from 64 to 120 index
 //int from64(int x);			//Converts x from 64 to 120 index
-std::string intToSquare(int square);		//Returns 'a1' for 1, ..., 'h8' for 64
+std::string intToSquare(int square);	//Returns 'a1' for 1, ..., 'h8' for 64
 
 void placePiece(int pieceNumber, int square);   //Puts piece at square,
 						//and updates the boards
-
-void displayBoard();
-void emptyRow(bool& color, int& counter);
-void printRow(bool& color, int startingSquare);
 
 enum square_t { empty = -1, null = 0, invalid = -99,
                 A1 = 1, B1, C1, D1, E1, F1, G1, H1,
@@ -46,8 +52,7 @@ enum square2_t { _A1 = 21, _B1, _C1, _D1, _E1, _F1, _G1, _H1,
 
 enum side_t { BLACK, WHITE, BOTH };
 
-extern int moveFrom, moveTo, ply, board120[120], board64[65];
-extern bool side, exit;
+extern int ply, board120[120], board64[65];
 extern std::vector<int> whiteMoveList, blackMoveList; 
 
 #endif

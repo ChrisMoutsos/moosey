@@ -1,14 +1,22 @@
+/*
+----------------------------------
+	~Moosey Chess Engine~
+	      legal.cpp
+----------------------------------
+*/
+
 #include <iostream>
+#include "cmath"
 #include "board.h"
 #include "legal.h"
 #include "pieces.h"
 #include "move.h"
-#include "cmath"
 
 using namespace std;
 
-bool legalMove(int mF, int mT, bool side) { //Checks moveFrom to moveTo by default
+bool legalMove(int mF, int mT, bool side) { 
 	bool isInCheck;
+//	cout << "Checking if it's legal to moveFrom " << mF << " to " << mT << " as " << side << endl;
 
 	if (!validateMove(mF, mT)) return false;
 	movePiece(mF, mT);
@@ -17,91 +25,41 @@ bool legalMove(int mF, int mT, bool side) { //Checks moveFrom to moveTo by defau
 	return isInCheck ? false : true;
 }
 
-void checkDraw() {
+bool checkDraw() {
 	if ((int)whiteMoveList.size() == 0 && (int)blackMoveList.size() == 0) {
 		cout << "Stalemate!" << endl;
-		exit = true;
+		return true;
 	}	
+	return false;
 }
 
-void checkCheck(bool side) {
-	if (inCheck()) {
-		if (inCheckmate()) { 
+bool checkCheck(bool side) {
+	if (inCheck(side)) {
+		if (inCheckmate(side)) { 
 			side ? cout << "White is in checkmate. Black wins!\n" : cout << "Black is in checkmate. White wins!\n";
-			exit = true;
+			return true;
 		}
 		else side ? cout << "White is in check!\n" : "Black is in check!\n";
 	}
+	return false;
 }
 
-bool inCheckmate(bool side) { //Default side = global side
+bool inCheckmate(bool side) { 
 	if (side && (int)whiteMoveList.size() == 0) return true;
 	else if (!side && (int)blackMoveList.size() == 0) return true;
 	else return false;
 }
 
-bool inCheck(bool side) { //Default side = global side
-	int d, i, kPos, posIndex, iPiece;
-	int startPiece, endPiece, enemyStartPiece, enemyEndPiece;
-	startPiece = side ? 0 : 16;
-	endPiece = side ? 15 : 31;
-	enemyStartPiece = side ? 16 : 0;
-	enemyEndPiece = side ? 31 : 15;
-	kPos = side ? piece[wK].pos : piece[bK].pos;
-
-	for (int c = 1; c <= 4; c++) { //Check left/right/up/down
-		d = (c==1) ? -1 : (c==2) ? 1 : (c==3) ? -8 : 8;
-		i = 1;
-		posIndex = kPos + d*i;
-
-		while (((posIndex-1)/8 == (kPos-1)/8) || ((posIndex)%8 == (kPos)%8)) {
-                        if (posIndex < 1 || posIndex > 64) break;
-			else iPiece = board64[posIndex];
-
-                        if (iPiece >= enemyStartPiece && iPiece <= enemyEndPiece) {
-				if (i==1 && piece[iPiece].value == K_VAL) return true;
-				if (piece[iPiece].value == R_VAL || piece[iPiece].value == Q_VAL) return true;	
-			}
-			else if (iPiece >= startPiece && iPiece <= endPiece) break;
-
-			i++;
-                        posIndex = kPos + d*i;
-                }
-	}
-	for (int c = 1; c <= 4; c++) { //Check diagonals
-		d = (c==1) ? -9 : (c==2) ? -7 : (c==3) ? 9 : 7;
-		i = 1;
-		posIndex = kPos + d*i;
-		
-		while (((from64(posIndex) - from64(kPos))%11 == 0 || (from64(posIndex) - from64(kPos))%9 == 0)) { 
-                        if (posIndex < 1 || posIndex > 64) break;
-			else iPiece = board64[posIndex];
-			
-			if (iPiece >= enemyStartPiece && iPiece <= enemyEndPiece) {
-				if (i==1 && piece[iPiece].value == P_VAL) return true;
-				if (piece[iPiece].value == B_VAL || piece[iPiece].value == Q_VAL) return true;
-			}
-			else if (iPiece >= startPiece && iPiece <= endPiece) break;
-			
-			i++;
-			posIndex = kPos + d*i;
-		}
-	}
-	kPos = from64(kPos);
-	for (int c = 1; c <= 8; c++) { //Check knights
-		d = (c==1) ? -19 : (c==2) ? -21 : (c==3) ? -8 : (c==4) ? -12 : (c==5) ? 12 : (c==6) ? 8 : (c==7) ? 21 : 19;
-		
-		if (piece[board120[kPos+d]].value == N_VAL && (board120[kPos+d] >= enemyStartPiece && board120[kPos+d] <= enemyEndPiece))
-			return true;
-	}	
+bool inCheck(bool side) {
 	return false;
 }
-
+	
 
 bool validateMove(int moveFrom, int moveTo) {
 	int value = piece[board64[moveFrom]].value, small, big, diff120 = abs(from64(moveFrom) - from64(moveTo)); 
 	small = moveFrom>moveTo ? moveTo : moveFrom;
 	big = moveFrom>moveTo ? moveFrom : moveTo;
+	diff120 = from64(big) - from64(small);
 	
 	if (moveFrom == moveTo) return false;
 	if (board64[moveFrom] <= wPh && board64[moveFrom] >= wqR && board64[moveTo] <= wPh && board64[moveTo] >= wqR) return false;
