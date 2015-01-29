@@ -9,7 +9,7 @@
 #define DISPLAY_H
 
 void displayBoard();
-void emptyRow(bool& color, int& counter);
-void printRow(bool& color, int startingSquare);
+void emptyRow(bool&, int&);
+void printRow(bool&, int);
 
 #endif

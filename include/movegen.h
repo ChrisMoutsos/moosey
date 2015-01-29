@@ -10,12 +10,12 @@
 
 #include <vector>
 
-void generateCompleteMoveLists(std::vector<int>& whiteMoveList, std::vector<int>& blackMoveList);
-void generateMoveListFor(int p);	
-void generateHozMoves(int p, int& counter);
-void generateDiagMoves(int p, int& counter);
-void generateKnightMoves(int p, int& counter);
-void generateKingMoves(int p, int& counter);
-void generatePawnMoves(int p, int& counter);
+void generateCompleteMoveLists(std::vector<int>&, std::vector<int>&);
+void generateMoveListFor(int);	
+void generateHozMoves(int, int&);
+void generateDiagMoves(int, int&);
+void generateKnightMoves(int, int&);
+void generateKingMoves(int, int&);
+void generatePawnMoves(int, int&);
 
 #endif

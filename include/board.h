@@ -20,8 +20,8 @@
 
 void emptyBoard();
 void placePiecesDefault();
-void initializePieces(std::string FEN);		//if FEN=="0", will placePiecesDefault
-void placePiece(int pieceNumber, int square);   //Places piece, updates boards
+void initializePieces(std::string);		//if FEN=="0", will placePiecesDefault
+void placePiece(int, int); 			//Places piece on square, update boards
 
 //INLINE CONVERSION FUNCTIONS
 inline int FR2SQ64(int file, int rank) {
