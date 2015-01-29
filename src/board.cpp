@@ -5,7 +5,6 @@
 ----------------------------------
 */
 
-#include "macros.h"
 #include "board.h"
 #include "move.h"
 #include "pieces.h"
@@ -47,25 +46,4 @@ void emptyBoard() {
 	for (int i = 2; i <= 9; i++) 
 		for (int j = 1; j <= 8; j++) 
 			board120[i*10+j] = -1;
-}
-
-int to64(int x) {
-	if (x < 98 && x > 21 && !(x%10 == 0 || x%10 == 9))
-			return x-20-2*((x-x%10)/10-2);
-	return 0;
-}
-
-int from64(int x) {
-	return x+20+((int)((x-1)/8))*2;
-}
-
-std::string intToSquare(int square) {
-	std::string squareName;
-	int fileNum, rankNum;
-	if (square==0) return "";
-	fileNum = (square-1)%8 + 1; //a=1, ..., h=8
-	rankNum = (square-1)/8+1; //rank 1=1, ..., 8=8 
-	squareName = (char) ((int)'a' + (fileNum-1));
-	squareName += (char)(rankNum + 48);
-	return squareName;
 }

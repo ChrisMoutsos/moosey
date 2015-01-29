@@ -19,17 +19,40 @@
 #include <vector>
 
 void emptyBoard();
-void placePiecesDefault();		//Places all pieces default
-void initializePieces(std::string FEN);	//Names & values all pieces
-					//if FEN=="0", will placePiecesDefault
-int to64(int x); 			//Converts x from 120 to 64 index
-int from64(int x);			//Converts x from 64 to 120 index
-//int from64(int x);			//Converts x from 64 to 120 index
-std::string intToSquare(int square);	//Returns 'a1' for 1, ..., 'h8' for 64
+void placePiecesDefault();
+void initializePieces(std::string FEN);		//if FEN=="0", will placePiecesDefault
+void placePiece(int pieceNumber, int square);   //Places piece, updates boards
 
-void placePiece(int pieceNumber, int square);   //Puts piece at square,
-						//and updates the boards
+//INLINE CONVERSION FUNCTIONS
+inline int FR2SQ64(int file, int rank) {
+	return ((rank-1)*8 + file);
+}
+inline int SQ642R (int sq64) {
+	return ((int)(sq64-1)/8 + 1);
+}
+inline int SQ642F(int sq64) {
+	return (sq64 - ((sq64-1)/8)*8);
+}
+inline int to64(int x) {
+	if (x < 98 && x > 21 && !(x%10 == 0 || x%10 == 9))
+			return x-20-2*((x-x%10)/10-2);
+	return 0;
+}
+inline int from64(int x) {
+	return x+20+((int)((x-1)/8))*2;
+}
+inline std::string intToSquare(int square) {
+	std::string squareName;
+	int fileNum, rankNum;
+	if (square==0) return "";
+	fileNum = (square-1)%8 + 1; //a=1, ..., h=8
+	rankNum = (square-1)/8+1; //rank 1=1, ..., 8=8 
+	squareName = (char) ((int)'a' + (fileNum-1));
+	squareName += (char)(rankNum + 48);
+	return squareName;
+}
 
+//ENUMERATIONS
 enum square_t { empty = -1, null = 0, invalid = -99,
                 A1 = 1, B1, C1, D1, E1, F1, G1, H1,
                 A2 = 9, B2, C2, D2, E2, F2, G2, H2,
@@ -52,7 +75,7 @@ enum square2_t { _A1 = 21, _B1, _C1, _D1, _E1, _F1, _G1, _H1,
 
 enum side_t { BLACK, WHITE, BOTH };
 
-extern int ply, board120[120], board64[65];
+extern int board120[120], board64[65];
 extern std::vector<int> whiteMoveList, blackMoveList; 
 
 #endif

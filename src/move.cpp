@@ -5,7 +5,6 @@
 ----------------------------------
 */
 
-#include "macros.h"
 #include "board.h"
 #include "pieces.h"
 #include "legal.h"

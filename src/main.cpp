@@ -17,7 +17,6 @@
  */
 
 #include <iostream>
-#include "macros.h"
 #include "board.h"
 #include "input.h"
 #include "move.h"
