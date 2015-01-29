@@ -5,6 +5,7 @@
 ----------------------------------
 */
 
+#include <iomanip>
 #include "display.h"
 #include "board.h"
 #include "move.h"
@@ -12,18 +13,28 @@
 
 void displayBoard() {
 	bool color = 0; //0 for white, 1 for black
-	int square = 57, counter = 0;
-	std::cout << "  .---------------------------------------------------------------.\n";
+	int square = 57, counter = 0, oldprecision = std::cout.precision();
+	char oldfill = std::cout.fill();
+	std::ios_base::fmtflags oldflags = std::cout.flags();
+
+	std::cout << "  ." <<std::setfill('-') << std::setw(65) << ".\n";
 	while (square > 0) {
 		emptyRow(color, counter);
 		std::cout << (int)(square/8)+1;
 		printRow(color, square);
 		emptyRow(color, counter);
-		if (square!=1) std::cout << "  |---------------------------------------------------------------|\n";
+		if (square!=1) std::cout << "  |" << std::setw(65) << "|\n";
 		square -= 8;
 	}
-	std::cout << "  `---------------------------------------------------------------`\n";
-	std::cout << "      a       b       c       d       e       f       g       h \n\n";	
+	std::cout << "  `" << std::setw(65) << "`\n";
+	std::cout << std::setfill(' ') << std::setw(6) << "";
+	for (int i = (int)'a'; i <= (int)'h'; i++)
+		std::cout << std::setfill(' ') << std::left << std::setw(8) << (char)i;
+	std::cout << '\n';
+	
+	std::cout.precision(oldprecision);
+	std::cout.fill(oldfill);
+	std::cout.flags(oldflags);
 }
 
 void printRow(bool& color, int startingSquare) {
