@@ -25,7 +25,7 @@ bool legalMove(int mF, int mT, bool side) {
 	return isInCheck ? false : true;
 }
 
-bool checkDraw() {
+bool checkDraw(vector<int> whiteMoveList, vector<int> blackMoveList) {
 	if ((int)whiteMoveList.size() == 0 && (int)blackMoveList.size() == 0) {
 		cout << "Stalemate!" << endl;
 		return true;
@@ -33,9 +33,9 @@ bool checkDraw() {
 	return false;
 }
 
-bool checkCheck(bool side) {
+bool checkCheck(vector<int> whiteMoveList, vector<int> blackMoveList, bool side) {
 	if (inCheck(side)) {
-		if (inCheckmate(side)) { 
+		if (inCheckmate(whiteMoveList, blackMoveList, side)) { 
 			side ? cout << "White is in checkmate. Black wins!\n" : cout << "Black is in checkmate. White wins!\n";
 			return true;
 		}
@@ -44,13 +44,15 @@ bool checkCheck(bool side) {
 	return false;
 }
 
-bool inCheckmate(bool side) { 
+bool inCheckmate(vector<int> whiteMoveList, vector<int> blackMoveList, bool side) { 
 	if (side && (int)whiteMoveList.size() == 0) return true;
 	else if (!side && (int)blackMoveList.size() == 0) return true;
 	else return false;
 }
 
 bool inCheck(bool side) {
+	
+
 	return false;
 }
 	
@@ -125,7 +127,6 @@ bool validateDiagMove(int small, int big, int diff120) {
 
 bool validateKnightMove(int diff120, int moveFrom, int moveTo) {
 	int side = board64[moveFrom] <= wkN ? 1 : 0;
-
 	if (diff120 == 8 || diff120 == 12 || diff120 == 19 || diff120 == 21) {
 		if ((side && (board64[moveTo] == empty || board64[moveTo] >= bqR)) || (!side && (board64[moveTo] <= wPh))) 
 			return true;

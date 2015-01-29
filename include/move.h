@@ -13,8 +13,6 @@ void unmovePiece(int mF, int mT);	//Unmoves piece on mT to mF
 void moveInfo(int moveFrom, int moveTo, bool side);					//Outputs in form of "White moved Pawn from a2 to b3( and captured a Knight)"
 void changeTurns(int& ply, bool& side);				
 
-extern int pieceMoved;
-extern int pieceMovedFrom;
-extern int prevOnMoveTo;
+extern int pieceMoved, pieceMovedFrom, prevOnMoveTo;
 
 #endif

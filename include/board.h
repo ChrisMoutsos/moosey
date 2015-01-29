@@ -76,6 +76,5 @@ enum square2_t { _A1 = 21, _B1, _C1, _D1, _E1, _F1, _G1, _H1,
 enum side_t { BLACK, WHITE, BOTH };
 
 extern int board120[120], board64[65];
-extern std::vector<int> whiteMoveList, blackMoveList; 
 
 #endif

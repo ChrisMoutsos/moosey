@@ -10,7 +10,7 @@
 #include "pieces.h"
 #include "legal.h"
 
-void generateCompleteMoveLists() {	
+void generateCompleteMoveLists(std::vector<int>& whiteMoveList, std::vector<int>& blackMoveList) {	
 	for (int i = wqR; i <= bPh; i++)
 		generateMoveListFor(i);
 	whiteMoveList.clear();

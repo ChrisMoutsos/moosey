@@ -13,7 +13,6 @@
 using namespace std;
 
 int pieceMoved = -1, pieceMovedFrom = 0, prevOnMoveTo = -1;
-bool validateMove(int moveFrom, int moveTo);
 
 void movePiece(int mF, int mT) { //Moves moveFrom to moveTo by default
 	prevOnMoveTo = board64[mT];

@@ -8,12 +8,14 @@
 #ifndef LEGAL_H
 #define LEGAL_H
 
+#include <vector>
+
 bool legalMove(int mF, int mT, bool side); //Verifies move is valid and legal
 
-bool checkDraw();		   //If draw, outputs correct message and ends game
-bool checkCheck(bool side); //Calls inCheck and inCheckmate, outputs correct message and ends game if appropriate
+bool checkDraw(std::vector<int> whiteMoveList, std::vector<int> blackMoveList);		   //If draw, outputs correct message and ends game
+bool checkCheck(std::vector<int> whiteMoveList, std::vector<int> blackMoveList, bool side); 
 bool inCheck(bool side);
-bool inCheckmate(bool side);
+bool inCheckmate(std::vector<int> whiteMoveList, std::vector<int> blackMoveList, bool side);
 
 bool validateMove(int moveFrom, int moveTo);	//Uses the below function to validate moves
 bool validatePawnMove(int diff120, int moveFrom, int moveTo);
