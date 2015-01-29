@@ -17,9 +17,9 @@ bool inCheckmate(bool side);
 
 bool validateMove(int moveFrom, int moveTo);	//Uses the below function to validate moves
 bool validatePawnMove(int diff120, int moveFrom, int moveTo);
-bool validateHozMove(int small, int big, int diff120, int moveFrom, int moveTo);
-bool validateDiagMove(int small, int big, int diff120, int moveFrom, int moveTo);
+bool validateHozMove(int small, int big, int moveFrom, int moveTo);
+bool validateDiagMove(int small, int big, int diff120);
 bool validateKnightMove(int diff120, int moveFrom, int moveTo);
-bool validateKingMove(int diff120, int moveFrom, int moveTo);
+bool validateKingMove(int diff120);
 
 #endif

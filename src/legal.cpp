@@ -65,15 +65,15 @@ bool validateMove(int moveFrom, int moveTo) {
 	if (board64[moveFrom] <= wPh && board64[moveFrom] >= wqR && board64[moveTo] <= wPh && board64[moveTo] >= wqR) return false;
 	if (board64[moveFrom] >= bqR && board64[moveTo] >= bqR) return false;
 
-	if (value == R_VAL)		return validateHozMove(small, big, diff120, moveFrom, moveTo);
+	if (value == R_VAL)		return validateHozMove(small, big, moveFrom, moveTo);
 	else if (value == N_VAL)	return validateKnightMove(diff120, moveFrom, moveTo);
-	else if (value == B_VAL)	return validateDiagMove(small, big, diff120, moveFrom, moveTo);
+	else if (value == B_VAL)	return validateDiagMove(small, big, diff120);
 	else if (value == Q_VAL) {
-		if (validateHozMove(small, big, diff120, moveFrom, moveTo)) return true;
-		else if (validateDiagMove(small, big, diff120, moveFrom, moveTo)) return true;
+		if (validateHozMove(small, big, moveFrom, moveTo)) return true;
+		else if (validateDiagMove(small, big, diff120)) return true;
 		else return false;
 	}
-	else if (value == K_VAL) 	return validateKingMove(diff120, moveFrom, moveTo);
+	else if (value == K_VAL) 	return validateKingMove(diff120);
 	else if (value == P_VAL) 	return validatePawnMove(diff120, moveFrom, moveTo);
 
 	return false;
@@ -100,7 +100,7 @@ bool validatePawnMove(int diff120, int moveFrom, int moveTo) {
 	else return false;
 }
 
-bool validateHozMove(int small, int big, int diff120, int moveFrom, int moveTo) {
+bool validateHozMove(int small, int big, int moveFrom, int moveTo) {
 	if ((moveTo - moveFrom)%8 == 0) { //Moving up/down file
 		for (int i = small+8; i < big; i+=8)
 			if (board64[i] != -1) return false;
@@ -114,7 +114,7 @@ bool validateHozMove(int small, int big, int diff120, int moveFrom, int moveTo) 
 	else return false;	
 }
 
-bool validateDiagMove(int small, int big, int diff120, int moveFrom, int moveTo) {
+bool validateDiagMove(int small, int big, int diff120) {
 	int temp;
 	temp = diff120%11 == 0 ? 11 : diff120%9 == 0 ? 9 : 0;
 	if (!temp) return false;
@@ -133,7 +133,7 @@ bool validateKnightMove(int diff120, int moveFrom, int moveTo) {
 	return false;
 }
 
-bool validateKingMove(int diff120, int moveFrom, int moveTo) {
+bool validateKingMove(int diff120) {
 	return (diff120 == 1 || diff120 == 10 || diff120 == 9 || diff120 == 11) ? true : false;
 }
 

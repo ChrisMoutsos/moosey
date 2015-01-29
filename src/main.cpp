@@ -7,6 +7,8 @@
 */
 
 /*
+ *	Write inCheck function
+ * 
  *	Encode moveFrom when I copy pieceMoveLists to global moveLists
  *
  *	Stalemates (check if implemented correctly), draw by material
