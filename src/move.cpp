@@ -10,7 +10,11 @@
 
 using namespace std;
 
-void Board::movePiece(int mF, int mT) { //Moves moveFrom to moveTo by default
+void Board::movePiece() {
+	movePiece(moveFrom, moveTo);
+}
+
+void Board::movePiece(int mF, int mT) {
 	prevOnMoveTo = board64[mT];
 	pieceMovedFrom = mF;
 	pieceMoved = board64[mF];
@@ -27,6 +31,10 @@ void Board::movePiece(int mF, int mT) { //Moves moveFrom to moveTo by default
 
 	piece[board64[mT]].moved++;
 	ply++;
+}
+
+void Board::unmovePiece() {
+	unmovePiece(moveFrom, moveTo);
 }
 
 void Board::unmovePiece(int mF, int mT) {

@@ -11,9 +11,12 @@
 
 using namespace std;
 
-bool Board::legalMove(int mF, int mT) { 
+bool Board::legalMove(int mF, int mT, bool v) { 
 	bool isInCheck;
-	if (!validateMove(mF, mT)) return false;
+	if (!validateMove(mF, mT)) {
+		if (v) cout << "Illegal move.\n";
+		return false;
+	}
 	movePiece(mF, mT);
 	isInCheck = inCheck();
 	unmovePiece(mF, mT);
@@ -50,7 +53,6 @@ bool Board::inCheck() const {
 
 	return false;
 }
-	
 
 bool Board::validateMove(int mF, int mT) const {
 	int value = piece[board64[mF]].value, small, big, diff120 = abs(from64(mF) - from64(mT)); 
@@ -59,8 +61,14 @@ bool Board::validateMove(int mF, int mT) const {
 	diff120 = from64(big) - from64(small);
 	
 	if (mF == mT) return false;
-	if (board64[mF] <= wPh && board64[mF] >= wqR && board64[mT] <= wPh && board64[mT] >= wqR) return false;
-	if (board64[mF] >= bqR && board64[mT] >= bqR) return false;
+	if (side) {
+		if (board64[mF] >= bqR) return false;
+		if (board64[mT] >= wqR && board64[mT] <= wPh) return false;
+	}
+	else {
+		if (board64[mF] >= wqR && board64[mF] <= wPh) return false;
+		if (board64[mT] >= bqR) return false;
+	}
 
 	if (value == R_VAL)
 		return validateHozMove(small, big, mF, mT);

@@ -5,52 +5,46 @@
 	      main.cpp
 ----------------------------------
 */
-
 /*
  *	Write inCheck function
- * 
  *	Encode moveFrom when I copy pieceMoveLists to global moveLists
- *
  *	Stalemates (check if implemented correctly), draw by material
-
- *	prevOnMoveTo needs to be a vector
- *	
+ *	Vectors for prevOnMoveTo, pieceMoved, pieceMovedFrom
  * 	Castling, en passants, promotions
+ *	SDL
  */
 
 #include <iostream>
 #include "board.h"
+#include "input.h"
 
 using namespace std;
 
 int main() {
 	bool exit = false;
+	int mF = 0, mT = 0;
 
 	Board board;
 	board.displayBoard();
-
+	
 	while (!exit) {
-		board.userInput();
-		board.movePiece(board.getMoveFrom(), board.getMoveTo());
+		do {
+			board.getSide() ? cout << "White" : cout << "Black";
+			cout << " to move:\n\t";
+		} while (!getInput(mF, mT) || !board.legalMove(mF, mT, 1));
+
+		if (board.inCheck()) {
+			board.getSide() ? cout << "White" : cout << "Black";
+			cout << " is in check!";
+		}
+
+		board.setMove(mF, mT);
+		board.movePiece();
 		board.changeTurn();
 		board.displayBoard();
 		board.moveInfo();
 		board.generateMoveLists();
-/*
-		for (int i = wqR; i <= wPh; i++) {
-			cout << board.piece[i].name << " moveList: ";
-			for (int j = 0; j < board.piece[i].moveListSize; j++) {
-				cout << intToSquare(board.piece[i].moveList[j]);
-				if (j < board.piece[i].moveListSize-1) {
-					if (board.piece[i].moveList[j+1] != 0) {
-						cout << ", ";
-					}
-				}
-			}
-			cout << ", ";
-		}
-		cout << endl;
-*/
+	
 		exit = (board.checkCheck() | board.checkDraw());
 	}
 

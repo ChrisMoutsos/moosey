@@ -22,17 +22,13 @@ public:
 	//MUTATORSS
 	void setMove(int, int);
 
-	//INPUT.CPP	
-	void userInput();
-	bool getInput();
-
 	//DISPLAY.CPP
 	void displayBoard() const;
 	void printRow(bool&, int) const;
 	void emptyRow(bool&, int&) const;
 	
 	//LEGAL.CPP
-	bool legalMove(int, int);
+	bool legalMove(int, int, bool v = false);
 	bool validateMove(int, int) const;
 	bool validatePawnMove(int, int, int) const;
 	bool validateHozMove(int, int, int, int) const;
@@ -45,7 +41,9 @@ public:
 	bool inCheck() const;
 
 	//MOVE.CPP
+	void movePiece();
 	void movePiece(int, int);
+	void unmovePiece();
 	void unmovePiece(int, int);
 	void changeTurn();
 	void moveInfo() const;
