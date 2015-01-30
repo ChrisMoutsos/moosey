@@ -5,13 +5,11 @@
 ----------------------------------
 */
 
+#include <iostream>
 #include <iomanip>
-#include "display.h"
 #include "board.h"
-#include "move.h"
-#include "pieces.h"
 
-void displayBoard() {
+void Board::displayBoard() const {
 	bool color = 0; //0 for white, 1 for black
 	int square = 57, counter = 0, oldprecision = std::cout.precision();
 	char oldfill = std::cout.fill();
@@ -37,7 +35,7 @@ void displayBoard() {
 	std::cout.flags(oldflags);
 }
 
-void printRow(bool& color, int startingSquare) {
+void Board::printRow(bool& color, int startingSquare) const {
 	int x;
 	char a;
 	std::cout << " ";
@@ -60,7 +58,7 @@ void printRow(bool& color, int startingSquare) {
 	std::cout << "|\n";
 }
 
-void emptyRow (bool& color, int& counter) {
+void Board::emptyRow (bool& color, int& counter) const {
 	for (int i = 1; i < 9; i++) {
 		if (i == 1) std::cout << "  ";
 		color ? std::cout << "|*******" : std::cout << "|       ";

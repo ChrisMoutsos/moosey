@@ -1,46 +1,107 @@
-/*
-----------------------------------
-	~Moosey Chess Engine~
-	      board.h
-----------------------------------
-*/
-
-
-/*
- * null square = 0
- * empty square = -1
- * invalid square = -99
- */
-
 #ifndef BOARD_H
-#define BOARD_H
-#include <iostream>
+#define BOARD_h
+
 #include <string>
 #include <vector>
 
-void emptyBoard();
-void placePiecesDefault();
-void initializePieces(std::string);		//if FEN=="0", will placePiecesDefault
-void placePiece(int, int); 			//Places piece on square, update boards
+class Board {
+
+public:
+	//BOARD.CPP
+	Board();
+	Board(std::string FEN);
+	void emptyBoard();
+	void placePiece(int, int);
+	void placePiecesDefault();	
+	void initializePieces();
+	//ACCESSOR FUNCTIONS
+	int getMoveFrom() const;
+	int getMoveTo() const;
+	int getPly() const;
+	bool getSide() const;
+
+	//INPUT.CPP	
+	void userInput();
+	bool getInput();
+
+	//DISPLAY.CPP
+	void displayBoard() const;
+	void printRow(bool&, int) const;
+	void emptyRow(bool&, int&) const;
+	
+	//LEGAL.CPP
+	bool legalMove(int, int);
+	bool validateMove(int, int) const;
+	bool validatePawnMove(int, int, int) const;
+	bool validateHozMove(int, int, int, int) const;
+	bool validateDiagMove(int, int, int) const;
+	bool validateKnightMove(int, int, int) const;
+	bool validateKingMove(int) const;
+	bool checkDraw() const;
+	bool checkCheck() const;
+	bool inCheckmate() const;
+	bool inCheck() const;
+
+	//MOVE.CPP
+	void movePiece(int, int);
+	void unmovePiece(int, int);
+	void changeTurn();
+	void moveInfo() const;
+
+	//MOVEGEN.CPP
+	void generateMoveLists();
+	void generateMoveListFor(int);
+	void generateHozMoves(int, int&);
+	void generateDiagMoves(int, int&);
+	void generateKnightMoves(int, int&);
+	void generateKingMoves(int, int&);
+	void generatePawnMoves(int, int&);
+
+	//DATA	
+	struct pieceEntry {
+        	std::string name;	//"Pawn", "Rook", etc.
+        	char abbr;		//'P' (white), 'p' (black)
+        	int value;      
+        	int pos;        	//Board64 position
+        	int moved;      	//Number of times moved (>=0)
+        	bool alive;    
+        	int promoted;   	//0 = none, 1 = rook, 2 = knight, 3 = bishop, 4 = queen
+        	int* moveList;  	//Will point at a moveList for the piece
+		int moveListSize;	//Size of the array pointed at by moveList
+	} piece[32];
+
+	int board64[65], board120[120];
+	std::vector<int> whiteMoveList, blackMoveList;
+	
+private:
+	int moveFrom, moveTo, ply;
+	int pieceMoved, pieceMovedFrom, prevOnMoveTo;
+	bool side;
+};
 
 //INLINE CONVERSION FUNCTIONS
 inline int FR2SQ64(int file, int rank) {
 	return ((rank-1)*8 + file);
 }
+
 inline int SQ642R (int sq64) {
 	return ((int)(sq64-1)/8 + 1);
 }
+
 inline int SQ642F(int sq64) {
 	return (sq64 - ((sq64-1)/8)*8);
 }
+
 inline int to64(int x) {
 	if (x < 98 && x > 21 && !(x%10 == 0 || x%10 == 9))
 			return x-20-2*((x-x%10)/10-2);
 	return 0;
 }
+
 inline int from64(int x) {
 	return x+20+((int)((x-1)/8))*2;
 }
+
 inline std::string intToSquare(int square) {
 	std::string squareName;
 	int fileNum, rankNum;
@@ -73,8 +134,14 @@ enum square2_t { _A1 = 21, _B1, _C1, _D1, _E1, _F1, _G1, _H1,
                  _A8 = 91, _B8, _C8, _D8, _E8, _F8, _G8, _H8
 };
 
-enum side_t { BLACK, WHITE, BOTH };
+enum piece_t { wqR = 0, wqN, wqB, wQ, wK, wkB, wkN, wkR,
+               wPa, wPb, wPc, wPd, wPe, wPf, wPg, wPh,
+               bqR, bqN, bqB, bQ, bK, bkB, bkN, bkR,
+               bPa, bPb, bPc, bPd, bPe, bPf, bPg, bPh
+};
 
-extern int board120[120], board64[65];
+enum pieceValues_t { P_VAL = 100, N_VAL = 300, B_VAL = 310,
+                     R_VAL = 500, Q_VAL = 1000, K_VAL = 9999
+};
 
 #endif

@@ -7,26 +7,22 @@
 
 #include <iostream>
 #include <string>
-#include "input.h"
 #include "board.h"
-#include "pieces.h"
-#include "legal.h"
-#include "display.h"
 
 using namespace std;
 
 //int moveFrom = 0, moveTo = 0; //SQUARE NUMBER ON BOARD64
 
-void userInput(int& moveFrom, int& moveTo, bool side) {
-	while (!getInput(moveFrom, moveTo, side) || !legalMove(moveFrom, moveTo, side)) {
+void Board::userInput() {
+	while (!getInput() || !legalMove(moveFrom, moveTo)) {
 		displayBoard();
 		cout << "Illegal!" << endl;
-		if (inCheck(side)) 
+		if (inCheck()) 
 			side ? cout << "White is in check!\n" : "Black is in check!\n";
 	}
 }
 
-bool getInput(int& moveFrom, int& moveTo, bool side) {
+bool Board::getInput() {
 	string input;
 
 	side ? cout << "White to move: \n\t" : cout << "Black to move: \n\t";

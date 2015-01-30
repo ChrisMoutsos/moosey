@@ -5,16 +5,12 @@
 ----------------------------------
 */
 
+#include <iostream>
 #include "board.h"
-#include "pieces.h"
-#include "legal.h"
-#include "move.h"
 
 using namespace std;
 
-int pieceMoved = -1, pieceMovedFrom = 0, prevOnMoveTo = -1;
-
-void movePiece(int mF, int mT) { //Moves moveFrom to moveTo by default
+void Board::movePiece(int mF, int mT) { //Moves moveFrom to moveTo by default
 	prevOnMoveTo = board64[mT];
 
 	pieceMovedFrom = mF;
@@ -32,9 +28,10 @@ void movePiece(int mF, int mT) { //Moves moveFrom to moveTo by default
 
 	piece[board64[mT]].pos = mT;
 	piece[board64[mT]].moved++;
+	ply++;
 }
 
-void unmovePiece(int mF, int mT) {
+void Board::unmovePiece(int mF, int mT) {
 	board64[mF] = pieceMoved;
 	board120[from64(mF)] = pieceMoved;
 	piece[board64[mF]].moved--;
@@ -46,15 +43,15 @@ void unmovePiece(int mF, int mT) {
 		piece[board64[mT]].pos = mT;
 		piece[board64[mT]].alive = true;
 	}
+	ply--;
 }
 
-void moveInfo(int moveFrom, int moveTo, bool side) {
-	!side ? cout << "White" : cout << "Black";
-	cout << " moved " << piece[pieceMoved].name << " from " << intToSquare(moveFrom) << " to " << intToSquare(moveTo);
-	prevOnMoveTo != -1 ? cout << " and captured a " << piece[prevOnMoveTo].name << endl << endl : cout << endl << endl;
+void Board::moveInfo() const {
+	!side ? std::cout << "White" : std::cout << "Black";
+	std::cout << " moved " << piece[pieceMoved].name << " from " << intToSquare(moveFrom) << " to " << intToSquare(moveTo);
+	prevOnMoveTo != -1 ? std::cout << " and captured a " << piece[prevOnMoveTo].name << "\n\n" : cout << "\n\n";
 }	
 
-void changeTurns(int& ply, bool& side) {
+void Board::changeTurn() {
 	side = side ? 0 : 1;
-	ply++;
 }
