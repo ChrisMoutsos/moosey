@@ -16,7 +16,7 @@ Board::Board() {
 
 Board::Board(std::string FEN) {
 	emptyBoard();
-	//initializePieces();
+	initializePieces();
 	//FEN stuff
 }
 
@@ -75,6 +75,11 @@ void Board::initializePieces() {
                 piece[i].moveListSize = v==K_VAL ? 8 : v==R_VAL ? 14 : v==N_VAL ? 8 : v==P_VAL ? 4 : v==B_VAL ? 13:27;
                 piece[i].moveList = new int[piece[i].moveListSize];
         }
+}
+
+void Board::setMove(int mF, int mT) {
+	if (mF > 0 && mF < 64) moveFrom = mF;
+	if (mT > 0 && mT < 64) moveTo = mT;
 }
 
 int Board::getMoveFrom() const {

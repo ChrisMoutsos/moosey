@@ -14,11 +14,13 @@ public:
 	void placePiece(int, int);
 	void placePiecesDefault();	
 	void initializePieces();
-	//ACCESSOR FUNCTIONS
+	//ACCESSORS
 	int getMoveFrom() const;
 	int getMoveTo() const;
 	int getPly() const;
 	bool getSide() const;
+	//MUTATORSS
+	void setMove(int, int);
 
 	//INPUT.CPP	
 	void userInput();
