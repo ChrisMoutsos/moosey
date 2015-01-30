@@ -1,6 +1,12 @@
+/*
+----------------------------------
+	~Moosey Chess Engine~
+	      board.cpp
+----------------------------------
+*/
+
 #include <string>
 #include "board.h"
-
 
 Board::Board() {
 	emptyBoard();
