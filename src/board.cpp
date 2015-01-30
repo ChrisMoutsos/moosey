@@ -66,7 +66,7 @@ void Board::initializePieces() {
 
 	for (int i = wqR; i <= bPh; i++) {
                 v = piece[i].value;
-                piece[i].moveListSize = v==K_VAL ? 8 : v==R_VAL ? 14 : v==N_VAL ? 8 : v==P_VAL ? 4 : v==B_VAL ? 13 : 27;
+                piece[i].moveListSize = v==K_VAL ? 8 : v==R_VAL ? 14 : v==N_VAL ? 8 : v==P_VAL ? 4 : v==B_VAL ? 13:27;
                 piece[i].moveList = new int[piece[i].moveListSize];
         }
 }
