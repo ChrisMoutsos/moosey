@@ -61,7 +61,6 @@ void Board::generateHozMoves(int p, int& counter) {
                         if (posIndex < 1 || posIndex > 64 || (board64[posIndex] >= startPiece && board64[posIndex] <= endPiece)) break;
                         
 			if (legalMove(piece[p].pos, posIndex)) {
-				//cout << "Moving from " << piece[p].pos << " to " << posIndex << " is legal as " << side << endl;
 				piece[p].moveList[counter] = posIndex;
                         	counter++;
 			}

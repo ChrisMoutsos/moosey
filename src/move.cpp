@@ -12,10 +12,8 @@ using namespace std;
 
 void Board::movePiece(int mF, int mT) { //Moves moveFrom to moveTo by default
 	prevOnMoveTo = board64[mT];
-
 	pieceMovedFrom = mF;
 	pieceMoved = board64[mF];
-
 	if (board64[mT] != empty) {
 		piece[board64[mT]].alive = false;
 		piece[board64[mT]].pos = null;
@@ -25,8 +23,8 @@ void Board::movePiece(int mF, int mT) { //Moves moveFrom to moveTo by default
 	board64[mF] = empty;
 	board120[from64((int)mT)] = board64[mF];
 	board120[from64((int)mF)] = empty;
-
 	piece[board64[mT]].pos = mT;
+
 	piece[board64[mT]].moved++;
 	ply++;
 }

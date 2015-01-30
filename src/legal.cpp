@@ -13,8 +13,6 @@ using namespace std;
 
 bool Board::legalMove(int mF, int mT) { 
 	bool isInCheck;
-//	cout << "Checking if it's legal to moveFrom " << mF << " to " << mT << " as " << side << endl;
-
 	if (!validateMove(mF, mT)) return false;
 	movePiece(mF, mT);
 	isInCheck = inCheck();
@@ -64,16 +62,18 @@ bool Board::validateMove(int mF, int mT) const {
 	if (board64[mF] <= wPh && board64[mF] >= wqR && board64[mT] <= wPh && board64[mT] >= wqR) return false;
 	if (board64[mF] >= bqR && board64[mT] >= bqR) return false;
 
-	if (value == R_VAL)		return validateHozMove(small, big, mF, mT);
-	else if (value == N_VAL)	return validateKnightMove(diff120, mF, mT);
-	else if (value == B_VAL)	return validateDiagMove(small, big, diff120);
-	else if (value == Q_VAL) {
-		if (validateHozMove(small, big, mF, mT)) return true;
-		else if (validateDiagMove(small, big, diff120)) return true;
-		else return false;
-	}
-	else if (value == K_VAL) 	return validateKingMove(diff120);
-	else if (value == P_VAL) 	return validatePawnMove(diff120, mF, mT);
+	if (value == R_VAL)
+		return validateHozMove(small, big, mF, mT);
+	else if (value == N_VAL)
+		return validateKnightMove(diff120, mF, mT);
+	else if (value == B_VAL)
+		return validateDiagMove(small, big, diff120);
+	else if (value == Q_VAL) 
+		return (validateHozMove(small, big, mF, mT) | (validateDiagMove(small, big, diff120)));
+	else if (value == K_VAL)
+		return validateKingMove(diff120);
+	else if (value == P_VAL)
+		return validatePawnMove(diff120, mF, mT);
 
 	return false;
 }
@@ -85,9 +85,8 @@ bool Board::validatePawnMove(int diff120, int mF, int mT) const {
 
 	if ((side && mF > mT) || (!side && mF < mT)) return false; //Ensures correct direction
 
-	if (diff120 == 10 && board64[mT] == empty)  {
+	if (diff120 == 10 && board64[mT] == empty) 
 		return true;
-	}
 	else if (diff120 == 20 && board64[mT] == empty) {
 		if (board120[from64(mF)+extra] == empty && piece[board64[mF]].moved == 0) return true;
 		else return false;
