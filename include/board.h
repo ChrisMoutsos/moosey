@@ -79,15 +79,15 @@ private:
 
 //INLINE CONVERSION FUNCTIONS
 inline int FR2SQ64(int file, int rank) {
-	return ((rank-1)*8 + file);
+	return (rank-1)*8 + file;
 }
 
-inline int SQ642R (int sq64) {
-	return ((int)(sq64-1)/8 + 1);
+inline int SQ642R (int sq64) { 
+	return (sq64-1)/8 + 1; 
 }
 
-inline int SQ642F(int sq64) {
-	return (sq64 - ((sq64-1)/8)*8);
+inline int SQ642F(int sq64) { 
+	return sq64 - ((sq64-1)/8)*8;
 }
 
 inline int to64(int x) {
@@ -97,24 +97,21 @@ inline int to64(int x) {
 }
 
 inline int from64(int x) {
-	return x+20+((int)((x-1)/8))*2;
+	return x+20+(((x-1)/8))*2;
 }
 
 inline std::string intToSquare(int square) {
 	std::string squareName;
-	int fileNum, rankNum;
 	if (square==0) return "";
-	fileNum = (square-1)%8 + 1; //a=1, ..., h=8
-	rankNum = (square-1)/8+1; //rank 1=1, ..., 8=8 
-	squareName = (char) ((int)'a' + (fileNum-1));
-	squareName += (char)(rankNum + 48);
+	squareName = char(int('a') + ((square-1)%8));
+	squareName += char((square-1)/8 + 49);
 	return squareName;
 }
 
 //ENUMERATIONS
 
 enum side_t { BLACK = 0, WHITE = 1 
-	};
+};
 
 enum square_t { empty = -1, null = 0, invalid = -99,
                 A1 = 1, B1, C1, D1, E1, F1, G1, H1,
