@@ -9,15 +9,27 @@
 #include "board.h"
 
 Board::Board() {
+	initializeVars();
 	emptyBoard();
 	initializePieces();
 	placePiecesDefault();	
 }
 
 Board::Board(std::string FEN) {
+	initializeVars();
 	emptyBoard();
 	initializePieces();
 	//FEN stuff
+}
+
+void Board::initializeVars() {
+	moveFrom = 0;
+	moveTo = 0;
+	ply = 0;
+	side = WHITE;
+	pieceMoved = -1;
+	pieceMovedFrom = 0;
+	prevOnMoveTo = -1;
 }
 
 void Board::emptyBoard() {
@@ -80,20 +92,4 @@ void Board::initializePieces() {
 void Board::setMove(int mF, int mT) {
 	if (mF > 0 && mF < 64) moveFrom = mF;
 	if (mT > 0 && mT < 64) moveTo = mT;
-}
-
-int Board::getMoveFrom() const {
-	return moveFrom;
-}
-
-int Board::getMoveTo() const {
-	return moveTo;
-}
-
-int Board::getPly() const {
-	return ply;
-}
-
-bool Board::getSide() const {
-	return side;
 }

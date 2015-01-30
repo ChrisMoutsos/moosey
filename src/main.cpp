@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include "board.h"
+#include "display.h"
 #include "input.h"
 
 using namespace std;
@@ -25,7 +26,7 @@ int main() {
 	int mF = 0, mT = 0;
 
 	Board board;
-	board.displayBoard();
+	displayBoard(board);
 	
 	while (!exit) {
 		do {
@@ -41,7 +42,7 @@ int main() {
 		board.setMove(mF, mT);
 		board.movePiece();
 		board.changeTurn();
-		board.displayBoard();
+		displayBoard(board);
 		board.moveInfo();
 		board.generateMoveLists();
 	

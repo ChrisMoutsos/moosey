@@ -6,27 +6,25 @@
 
 class Board {
 
+friend void printRow(Board, bool&, int);
+
 public:
 	//BOARD.CPP
 	Board();
 	Board(std::string FEN);
+	void initializeVars();
 	void emptyBoard();
 	void placePiece(int, int);
 	void placePiecesDefault();	
 	void initializePieces();
 	//ACCESSORS
-	int getMoveFrom() const;
-	int getMoveTo() const;
-	int getPly() const;
-	bool getSide() const;
+	int getMoveFrom() const { return moveFrom; };
+	int getMoveTo() const { return moveTo; };
+	int getPly() const { return ply; };
+	bool getSide() const { return side; };
 	//MUTATORSS
 	void setMove(int, int);
 
-	//DISPLAY.CPP
-	void displayBoard() const;
-	void printRow(bool&, int) const;
-	void emptyRow(bool&, int&) const;
-	
 	//LEGAL.CPP
 	bool legalMove(int, int, bool v = false);
 	bool validateMove(int, int) const;
@@ -63,11 +61,11 @@ public:
         	char abbr;		//'P' (white), 'p' (black)
         	int value;      
         	int pos;        	//Board64 position
-        	int moved;      	//Number of times moved (>=0)
+        	int moved;      	//>=0
         	bool alive;    
-        	int promoted;   	//0 = none, 1 = rook, 2 = knight, 3 = bishop, 4 = queen
-        	int* moveList;  	//Will point at a moveList for the piece
-		int moveListSize;	//Size of the array pointed at by moveList
+        	int promoted;   	//0:none, 1:B, 2:R, 3:K, 4:Q
+        	int* moveList;  	
+		int moveListSize;
 	} piece[32];
 
 	int board64[65], board120[120];
@@ -114,6 +112,10 @@ inline std::string intToSquare(int square) {
 }
 
 //ENUMERATIONS
+
+enum side_t { BLACK = 0, WHITE = 1 
+	};
+
 enum square_t { empty = -1, null = 0, invalid = -99,
                 A1 = 1, B1, C1, D1, E1, F1, G1, H1,
                 A2 = 9, B2, C2, D2, E2, F2, G2, H2,
@@ -122,7 +124,7 @@ enum square_t { empty = -1, null = 0, invalid = -99,
                 A5 = 33, B5, C5, D5, E5, F5, G5, H5,
                 A6 = 41, B6, C6, D6, E6, F6, G6, H6,
                 A7 = 49, B7, C7, D7, E7, F7, G7, H7,
-                A8 = 57, B8, C8, D8, E8, F8, G8, H8
+                A8 = 57, B8, C8, D8, E8, F8, G8, H8 
 };
 enum square2_t { _A1 = 21, _B1, _C1, _D1, _E1, _F1, _G1, _H1,
                  _A2 = 31, _B2, _C2, _D2, _E2, _F2, _G2, _H2,
@@ -131,17 +133,17 @@ enum square2_t { _A1 = 21, _B1, _C1, _D1, _E1, _F1, _G1, _H1,
                  _A5 = 61, _B5, _C5, _D5, _E5, _F5, _G5, _H5,
                  _A6 = 71, _B6, _C6, _D6, _E6, _F6, _G6, _H6,
                  _A7 = 81, _B7, _C7, _D7, _E7, _F7, _G7, _H7,
-                 _A8 = 91, _B8, _C8, _D8, _E8, _F8, _G8, _H8
+                 _A8 = 91, _B8, _C8, _D8, _E8, _F8, _G8, _H8 
 };
 
 enum piece_t { wqR = 0, wqN, wqB, wQ, wK, wkB, wkN, wkR,
                wPa, wPb, wPc, wPd, wPe, wPf, wPg, wPh,
                bqR, bqN, bqB, bQ, bK, bkB, bkN, bkR,
-               bPa, bPb, bPc, bPd, bPe, bPf, bPg, bPh
+               bPa, bPb, bPc, bPd, bPe, bPf, bPg, bPh 
 };
 
 enum pieceValues_t { P_VAL = 100, N_VAL = 300, B_VAL = 310,
-                     R_VAL = 500, Q_VAL = 1000, K_VAL = 9999
+                     R_VAL = 500, Q_VAL = 1000, K_VAL = 9999 
 };
 
 #endif

@@ -8,8 +8,9 @@
 #include <iostream>
 #include <iomanip>
 #include "board.h"
+#include "display.h"
 
-void Board::displayBoard() const {
+void displayBoard(Board board) {
 	bool color = 0; //0 for white, 1 for black
 	int square = 57, counter = 0, oldprecision = std::cout.precision();
 	char oldfill = std::cout.fill();
@@ -19,7 +20,7 @@ void Board::displayBoard() const {
 	while (square > 0) {
 		emptyRow(color, counter);
 		std::cout << (int)(square/8)+1;
-		printRow(color, square);
+		printRow(board, color, square);
 		emptyRow(color, counter);
 		if (square!=1) std::cout << "  |" << std::setw(65) << "|\n";
 		square -= 8;
@@ -35,21 +36,21 @@ void Board::displayBoard() const {
 	std::cout.flags(oldflags);
 }
 
-void Board::printRow(bool& color, int startingSquare) const {
+void printRow(Board b, bool& color, int startingSquare) {
 	int x;
 	char a;
 	std::cout << " ";
 	for (int i = 1; i < 9; i++) {
 	  	x = startingSquare+i-1;
-		a = piece[board64[x]].abbr;
+		a = b.piece[b.board64[x]].abbr;
 		if (color) std::cout << "|**"; 
 		else std::cout << "|  ";
-		if (board64[x] != empty) {
-			if (pieceMoved == board64[x]) std::cout << "~" << a << "~";
+		if (b.board64[x] != empty) {
+			if (b.pieceMoved == b.board64[x]) std::cout << "~" << a << "~";
 			else std::cout << " " << a << " ";
 		}
 		else {
-			if (pieceMovedFrom == x ) color ? std::cout << " / " : std::cout << " \\ ";
+			if (b.pieceMovedFrom == x ) color ? std::cout << " / " : std::cout << " \\ ";
 			else color ? std::cout << "***" : std::cout << "   ";
 		}
 		color ? std::cout << "**" : std::cout << "  ";
@@ -58,7 +59,7 @@ void Board::printRow(bool& color, int startingSquare) const {
 	std::cout << "|\n";
 }
 
-void Board::emptyRow (bool& color, int& counter) const {
+void emptyRow (bool& color, int& counter) {
 	for (int i = 1; i < 9; i++) {
 		if (i == 1) std::cout << "  ";
 		color ? std::cout << "|*******" : std::cout << "|       ";
