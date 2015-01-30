@@ -33,12 +33,10 @@ int main() {
 			board.getSide() ? cout << "White" : cout << "Black";
 			cout << " to move:\n\t";
 		} while (!getInput(mF, mT) || !board.legalMove(mF, mT, 1));
-
 		if (board.inCheck()) {
 			board.getSide() ? cout << "White" : cout << "Black";
 			cout << " is in check!";
 		}
-
 		board.setMove(mF, mT);
 		board.movePiece();
 		board.changeTurn();

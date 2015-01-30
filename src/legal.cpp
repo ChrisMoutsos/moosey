@@ -60,15 +60,12 @@ bool Board::validateMove(int mF, int mT) const {
 	big = mF>mT ? mF : mT;
 	diff120 = from64(big) - from64(small);
 	
-	if (mF == mT) return false;
-	if (side) {
-		if (board64[mF] >= bqR) return false;
-		if (board64[mT] >= wqR && board64[mT] <= wPh) return false;
-	}
-	else {
-		if (board64[mF] >= wqR && board64[mF] <= wPh) return false;
-		if (board64[mT] >= bqR) return false;
-	}
+	if (board64[mF] == -1) 
+		return false;
+	if (board64[mT] != empty && (piece[board64[mF]].color == piece[board64[mT]].color)) 
+		return false;
+	if (piece[board64[mF]].color != side) 
+		return false;
 
 	if (value == R_VAL)
 		return validateHozMove(small, big, mF, mT);
@@ -88,8 +85,8 @@ bool Board::validateMove(int mF, int mT) const {
 
 
 bool Board::validatePawnMove(int diff120, int mF, int mT) const {
-	int extra = (board64[mF] <= wPh) ? 10 : -10;
-	bool side = board64[mF] <= wPh ? 1 : 0;	
+	int extra = piece[board64[mF]].color ? 10 : -10;
+	bool side = piece[board64[mF]].color ? 1 : 0;	
 
 	if ((side && mF > mT) || (!side && mF < mT)) return false; //Ensures correct direction
 
@@ -100,7 +97,7 @@ bool Board::validatePawnMove(int diff120, int mF, int mT) const {
 		else return false;
 	}
 	else if (diff120 == 9 || diff120 == 11) {
-		if ((side && board64[mT] >= bqR) || (!side && board64[mT] <= wPh && board64[mT] >= wqR))  return true;
+		if ((side && !piece[board64[mT]].color) || (!side && piece[board64[mT]].color))  return true;
 		else return false;
 	}
 	else return false;
@@ -109,12 +106,12 @@ bool Board::validatePawnMove(int diff120, int mF, int mT) const {
 bool Board::validateHozMove(int small, int big, int mF, int mT) const {
 	if ((mT - mF)%8 == 0) { //Moving up/down file
 		for (int i = small+8; i < big; i+=8)
-			if (board64[i] != -1) return false;
+			if (board64[i] != empty) return false;
 		return true;
 	}
 	else if ((mF-1)/8 == (mT-1)/8) { //Move left/right across rank
 		for (int i = small+1; i < big; i++)
-			if (board64[i] != -1) return false;
+			if (board64[i] != empty) return false;
 		return true;
 	}
 	else return false;	
@@ -125,14 +122,14 @@ bool Board::validateDiagMove(int small, int big, int diff120) const {
 	temp = diff120%11 == 0 ? 11 : diff120%9 == 0 ? 9 : 0;
 	if (!temp) return false;
 	for (int j = from64(small)+temp; j < from64(big); j+=temp)
-		if (board120[j] != -1) return false;
+		if (board120[j] != empty) return false;
 	return true;
 }
 
 bool Board::validateKnightMove(int diff120, int mF, int mT) const {
-	int side = board64[mF] <= wkN ? 1 : 0;
+	int side = piece[board64[mF]].color ? 1 : 0;
 	if (diff120 == 8 || diff120 == 12 || diff120 == 19 || diff120 == 21) {
-		if ((side && (board64[mT] == empty || board64[mT] >= bqR)) || (!side && (board64[mT] <= wPh))) 
+		if (board64[mT] == empty || !side != !piece[board64[mT]].color)
 			return true;
 	}
 	return false;

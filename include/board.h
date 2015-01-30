@@ -64,6 +64,7 @@ public:
         	int moved;      	//>=0
         	bool alive;    
         	int promoted;   	//0:none, 1:B, 2:R, 3:K, 4:Q
+		bool color;
         	int* moveList;  	
 		int moveListSize;
 	} piece[32];

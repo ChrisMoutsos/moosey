@@ -48,9 +48,8 @@ void Board::generateMoveListFor(int p) {
 }
 
 void Board::generateHozMoves(int p, int& counter) {
-	bool side = (p <= wPh);
+	bool side = piece[board64[p]].color;
 	int d, i, posIndex;
-	int startPiece = 0+(15*!side), endPiece = 31-(15*side), enemyStartPiece = 0+(16*side), enemyEndPiece = 15+(16*side);
 
 	for (int c = 1; c <= 4; c++) {
 		d = (c==1) ? -1 : (c==2) ? 1 : (c==3) ? -8 : 8;
@@ -58,14 +57,15 @@ void Board::generateHozMoves(int p, int& counter) {
 		posIndex = piece[p].pos+d*i;
 		
 		while (((posIndex-1)/8 == (piece[p].pos-1)/8) || ((posIndex)%8 == (piece[p].pos)%8)) { 
-                        if (posIndex < 1 || posIndex > 64 || (board64[posIndex] >= startPiece && board64[posIndex] <= endPiece)) break;
+			if (posIndex < 1 || posIndex > 64) break;
+			if (board64[posIndex] != empty && piece[board64[posIndex]].color == side) break;
                         
 			if (legalMove(piece[p].pos, posIndex)) {
 				piece[p].moveList[counter] = posIndex;
                         	counter++;
 			}
 			i++;
-                        if (board64[posIndex] >= enemyStartPiece && board64[posIndex] <= enemyEndPiece) break;
+			if (board64[posIndex] != empty && piece[board64[posIndex]].color != side) break;
                         posIndex = piece[p].pos+d*i;
                 }
 	}
@@ -74,9 +74,8 @@ void Board::generateHozMoves(int p, int& counter) {
 
 
 void Board::generateDiagMoves(int p, int& counter) {
-	bool side = (p <= wPh);
+	bool side = piece[board64[p]].color;
 	int d, i, posIndex;
-	int startPiece = 0+(15*!side), endPiece = 31-(15*side), enemyStartPiece = 0+(16*side), enemyEndPiece = 15+(16*side);
 
 	for (int c = 1; c <= 4; c++) {
 		d = (c==1) ? -9 : (c==2) ? -7 : (c==3) ? 9 : 7;
@@ -84,13 +83,15 @@ void Board::generateDiagMoves(int p, int& counter) {
 		posIndex = piece[p].pos+d*i;
 		
 		while (((from64(posIndex) - from64(piece[p].pos))%11 == 0 || (from64(posIndex) - from64(piece[p].pos))%9 == 0)) { 
-                        if (posIndex < 1 || posIndex > 64 || (board64[posIndex] >= startPiece && board64[posIndex] <= endPiece)) break;
-                        if (legalMove(piece[p].pos, posIndex)) {
+                        if (posIndex < 1 || posIndex > 64) break;
+			if (board64[posIndex] != empty && piece[board64[posIndex]].color == side) break;
+                        
+			if (legalMove(piece[p].pos, posIndex)) {
 				piece[p].moveList[counter] = posIndex;
                         	counter++;
 			}
 			i++;
-                        if (board64[posIndex] >= enemyStartPiece && board64[posIndex] <= enemyEndPiece) break;
+			if (board64[posIndex] != empty && piece[board64[posIndex]].color != side) break;
                         posIndex = piece[p].pos+d*i;
                 }
 	}

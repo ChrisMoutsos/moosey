@@ -62,22 +62,22 @@ void Board::placePiecesDefault() {
 void Board::initializePieces() {
         int v;
 	pieceEntry pieceTemp[32] = {
-		{"Rook", 'R', R_VAL, 0, 0, 1, 0},{"Knight", 'N', N_VAL, 0, 0, 1, 0}, 
-		{"Bishop", 'B', B_VAL, 0, 0, 1, 0}, {"Queen", 'Q', Q_VAL, 0, 0, 1, 0}, 
-		{"King", 'K', K_VAL, 0, 0, 1, 0}, {"Bishop", 'B', B_VAL, 0, 0, 1, 0},
-        	{"Knight", 'N', N_VAL, 0, 0, 1, 0}, {"Rook", 'R', R_VAL, 0, 0, 1, 0}, 
-		{"Pawn", 'P', P_VAL, 0, 0, 1, 0}, {"Pawn", 'P', P_VAL, 0, 0, 1, 0}, 
-		{"Pawn", 'P', P_VAL, 0, 0, 1, 0}, {"Pawn", 'P', P_VAL, 0, 0, 1, 0}, 
-		{"Pawn", 'P', P_VAL, 0, 0, 1, 0}, {"Pawn", 'P', P_VAL, 0, 0, 1, 0}, 
-		{"Pawn", 'P', P_VAL, 0, 0, 1, 0}, {"Pawn", 'P', P_VAL, 0, 0, 1, 0}, 
-		{"Rook", 'r', R_VAL, 0, 0, 1, 0}, {"Knight", 'n', N_VAL, 0, 0, 1, 0}, 
-		{"Bishop", 'b', B_VAL, 0, 0, 1, 0}, {"Queen", 'q', Q_VAL, 0, 0, 1, 0}, 
-		{"King", 'k', K_VAL, 0, 0, 1, 0}, {"Bishop", 'b', B_VAL, 0, 0, 1, 0}, 
-		{"Knight", 'n', N_VAL, 0, 0, 1, 0}, {"Rook", 'r', R_VAL, 0, 0, 1, 0}, 
-		{"Pawn", 'p', P_VAL, 0, 0, 1, 0}, {"Pawn", 'p', P_VAL, 0, 0, 1, 0}, 
-		{"Pawn", 'p', P_VAL, 0, 0, 1, 0}, {"Pawn", 'p', P_VAL, 0, 0, 1, 0},
-		{"Pawn", 'p', P_VAL, 0, 0, 1, 0}, {"Pawn", 'p', P_VAL, 0, 0, 1, 0}, 
-		{"Pawn", 'p', P_VAL, 0, 0, 1, 0}, {"Pawn", 'p', P_VAL, 0, 0, 1, 0}
+		{"Rook", 'R', R_VAL, 0, 0, 1, 0, 1},{"Knight", 'N', N_VAL, 0, 0, 1, 0, 1}, 
+		{"Bishop", 'B', B_VAL, 0, 0, 1, 0, 1}, {"Queen", 'Q', Q_VAL, 0, 0, 1, 0, 1}, 
+		{"King", 'K', K_VAL, 0, 0, 1, 0, 1}, {"Bishop", 'B', B_VAL, 0, 0, 1, 0, 1},
+        	{"Knight", 'N', N_VAL, 0, 0, 1, 0, 1}, {"Rook", 'R', R_VAL, 0, 0, 1, 0, 1}, 
+		{"Pawn", 'P', P_VAL, 0, 0, 1, 0, 1}, {"Pawn", 'P', P_VAL, 0, 0, 1, 0, 1}, 
+		{"Pawn", 'P', P_VAL, 0, 0, 1, 0,1 }, {"Pawn", 'P', P_VAL, 0, 0, 1, 0, 1}, 
+		{"Pawn", 'P', P_VAL, 0, 0, 1, 0, 1}, {"Pawn", 'P', P_VAL, 0, 0, 1, 0, 1}, 
+		{"Pawn", 'P', P_VAL, 0, 0, 1, 0, 1}, {"Pawn", 'P', P_VAL, 0, 0, 1, 0, 1}, 
+		{"Rook", 'r', R_VAL, 0, 0, 1, 0, 0}, {"Knight", 'n', N_VAL, 0, 0, 1, 0, 0}, 
+		{"Bishop", 'b', B_VAL, 0, 0, 1, 0, 0}, {"Queen", 'q', Q_VAL, 0, 0, 1, 0, 0}, 
+		{"King", 'k', K_VAL, 0, 0, 1, 0, 0}, {"Bishop", 'b', B_VAL, 0, 0, 1, 0, 0}, 
+		{"Knight", 'n', N_VAL, 0, 0, 1, 0, 0}, {"Rook", 'r', R_VAL, 0, 0, 1, 0, 0}, 
+		{"Pawn", 'p', P_VAL, 0, 0, 1, 0, 0}, {"Pawn", 'p', P_VAL, 0, 0, 1, 0, 0}, 
+		{"Pawn", 'p', P_VAL, 0, 0, 1, 0, 0}, {"Pawn", 'p', P_VAL, 0, 0, 1, 0, 0},
+		{"Pawn", 'p', P_VAL, 0, 0, 1, 0, 0}, {"Pawn", 'p', P_VAL, 0, 0, 1, 0, 0}, 
+		{"Pawn", 'p', P_VAL, 0, 0, 1, 0, 0}, {"Pawn", 'p', P_VAL, 0, 0, 1, 0, 0}
         };
 	for (int i = 0; i < 32; i++)
 		piece[i] = pieceTemp[i];
