@@ -48,7 +48,7 @@ void Board::generateMoveListFor(int p) {
 }
 
 void Board::generateHozMoves(int p, int& counter) {
-	bool side = piece[board64[p]].color;
+	bool side = piece[p].color;
 	int d, i, posIndex;
 
 	for (int c = 1; c <= 4; c++) {
@@ -74,7 +74,7 @@ void Board::generateHozMoves(int p, int& counter) {
 
 
 void Board::generateDiagMoves(int p, int& counter) {
-	bool side = piece[board64[p]].color;
+	bool side = piece[p].color;
 	int d, i, posIndex;
 
 	for (int c = 1; c <= 4; c++) {

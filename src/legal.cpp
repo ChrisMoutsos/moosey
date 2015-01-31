@@ -11,10 +11,10 @@
 
 using namespace std;
 
-bool Board::legalMove(int mF, int mT, bool v) { 
+bool Board::legalMove(int mF, int mT, bool verbose) { 
 	bool isInCheck;
 	if (!validateMove(mF, mT)) {
-		if (v) cout << "Illegal move.\n";
+		if (verbose) cout << "Illegal move.\n";
 		return false;
 	}
 	movePiece(mF, mT);
@@ -59,8 +59,8 @@ bool Board::validateMove(int mF, int mT) const {
 	small = mF>mT ? mT : mF;
 	big = mF>mT ? mF : mT;
 	diff120 = from64(big) - from64(small);
-	
-	if (board64[mF] == -1) 
+
+	if (board64[mF] == -1 || mT == 0) 
 		return false;
 	if (board64[mT] != empty && (piece[board64[mF]].color == piece[board64[mT]].color)) 
 		return false;
