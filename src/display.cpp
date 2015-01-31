@@ -7,10 +7,10 @@
 
 #include <iostream>
 #include <iomanip>
-#include "board.h"
 #include "display.h"
+#include "board.h"
 
-void displayBoard(Board board) {
+void displayBoard(Board& board) {
 	bool color = 0; //0 for white, 1 for black
 	int square = 57, counter = 0, oldprecision = std::cout.precision();
 	char oldfill = std::cout.fill();
@@ -36,7 +36,7 @@ void displayBoard(Board board) {
 	std::cout.flags(oldflags);
 }
 
-void printRow(Board b, bool& color, int startingSquare) {
+void printRow(Board& b, bool& color, int startingSquare) {
 	int x;
 	char a;
 	std::cout << " ";
