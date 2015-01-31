@@ -24,12 +24,38 @@ public:
 	int getPieceMovedFrom() const { return pieceMovedFrom; };
 	int getPrevOnMoveTo() const { return prevOnMoveTo; };	
 	int getBoard64(int x) const { return board64[x]; };
+	int getBoard120(int x) const { return board120[x]; };
 	int getPieceAbbr(int x) const { return piece[x].abbr; };
+	int getFromMovelist(bool, int) const;
+	int getTimesMoved(int x) const { return piece[x].moved; };
+	std::string getName(int x) const { return piece[x].name; };
 	//MUTATORSS
 	void setMove(int, int);
+	void setPly(int);
+	void setSide(bool);
+	void setPieceMoved(int);
+	void setPieceMovedFrom(int);
+	void setPrevOnMoveTo(int);
+	void setBoard64(int, int);
+	void setBoard120(int, int);
+	void addToMovelist(bool, int);	
+	void clearMoveList(bool);
+	void killPiece(int);
+	void unkillPiece(int);
+	void setPiecePos(int, int);
+	void incrMoved(int);
+	void decrMoved(int);
+
+	//MOVE.CPP 
+	void movePiece();
+	void movePiece(int, int);
+	void unmovePiece();
+	void unmovePiece(int, int);
+	void changeTurn();
+	void moveInfo() const;
 
 	//LEGAL.CPP
-	bool legalMove(int, int, bool v = false);
+	bool legalMove(int, int, bool verbose = false);
 	bool validateMove(int, int) const;
 	bool validatePawnMove(int, int, int) const;
 	bool validateHozMove(int, int, int, int) const;
@@ -40,14 +66,6 @@ public:
 	bool checkCheck() const;
 	bool inCheckmate() const;
 	bool inCheck() const;
-
-	//MOVE.CPP
-	void movePiece();
-	void movePiece(int, int);
-	void unmovePiece();
-	void unmovePiece(int, int);
-	void changeTurn();
-	void moveInfo() const;
 
 	//MOVEGEN.CPP
 	void generateMoveLists();
