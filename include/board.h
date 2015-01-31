@@ -6,8 +6,6 @@
 
 class Board {
 
-friend void printRow(Board, bool&, int);
-
 public:
 	//BOARD.CPP
 	Board();
@@ -22,6 +20,11 @@ public:
 	int getMoveTo() const { return moveTo; };
 	int getPly() const { return ply; };
 	bool getSide() const { return side; };
+	int getPieceMoved() const { return pieceMoved; };
+	int getPieceMovedFrom() const { return pieceMovedFrom; };
+	int getPrevOnMoveTo() const { return prevOnMoveTo; };	
+	int getBoard64(int x) const { return board64[x]; };
+	int getPieceAbbr(int x) const { return piece[x].abbr; };
 	//MUTATORSS
 	void setMove(int, int);
 

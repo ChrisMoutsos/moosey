@@ -42,15 +42,15 @@ void printRow(Board b, bool& color, int startingSquare) {
 	std::cout << " ";
 	for (int i = 1; i < 9; i++) {
 	  	x = startingSquare+i-1;
-		a = b.piece[b.board64[x]].abbr;
+		a = b.getPieceAbbr(b.getBoard64(x));
 		if (color) std::cout << "|**"; 
 		else std::cout << "|  ";
-		if (b.board64[x] != empty) {
-			if (b.pieceMoved == b.board64[x]) std::cout << "~" << a << "~";
+		if (b.getBoard64(x) != empty) {
+			if (b.getPieceMoved() == b.getBoard64(x)) std::cout << "~" << a << "~";
 			else std::cout << " " << a << " ";
 		}
 		else {
-			if (b.pieceMovedFrom == x ) color ? std::cout << " / " : std::cout << " \\ ";
+			if (b.getPieceMovedFrom() == x ) color ? std::cout << " / " : std::cout << " \\ ";
 			else color ? std::cout << "***" : std::cout << "   ";
 		}
 		color ? std::cout << "**" : std::cout << "  ";
