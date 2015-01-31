@@ -5,6 +5,7 @@
 ----------------------------------
 */
 
+#include <iostream>
 #include <string>
 #include "board.h"
 
@@ -92,4 +93,111 @@ void Board::initializePieces() {
 void Board::setMove(int mF, int mT) {
 	if (mF > 0 && mF < 64) moveFrom = mF;
 	if (mT > 0 && mT < 64) moveTo = mT;
+}
+
+void Board::setPly(int newPly) {
+	if (ply >= 0)  {
+		ply = newPly;
+		return;
+	}
+	std::cout << "Invalid setPly\n";
+}
+
+void Board::setSide(bool newSide) {
+	side = newSide;
+}
+
+void Board::setPieceMoved(int newPM) {
+	if (newPM >= empty && newPM <= bPh) {
+		pieceMoved = newPM;
+	}
+	std::cout << "Invalid setPieceMoved\n";
+}
+
+void Board::setPieceMovedFrom(int newPMF) {
+	if (newPMF >= 1 && newPMF <= 64) {
+		pieceMovedFrom = newPMF;
+		return;
+	}
+	std::cout << "Invalid setPieceMovedFrom\n";
+}
+
+void Board::setPrevOnMoveTo(int newPOMT) {
+	if (newPOMT >= empty && newPOMT <= bPh) {
+		prevOnMoveTo = newPOMT;
+		return;
+	}
+	std::cout << "Invalid setPrevOnMoveTo\n";
+}
+
+void Board::setBoard64(int i, int v) {
+	if (i >=0 && i < 65) 
+		if (v >= empty && v <= bPh) {
+			board64[i] = v;
+			return;
+		}
+	std::cout << "Invalid setBoard64\n";
+}
+
+void Board::setBoard120(int i, int v) {
+	if (i >= 0 && i < 120) 
+		if (v >= invalid && v <= bPh) {
+			board120[i] = v;
+			return;
+		}
+	std::cout << "Invalid setBoard120\n"; 
+}
+
+void Board::addToMovelist(bool side, int v) {
+	if (side) whiteMoveList.push_back(v);
+	else blackMoveList.push_back(v);
+}
+
+void Board::clearMoveList(bool side) {
+	if (side) whiteMoveList.clear();
+	else blackMoveList.clear();
+}
+
+void Board::killPiece(int i) {
+	if (i >= wqR && i <= bPh) {
+		piece[i].alive = false;
+		return;
+	}
+	std::cout << "Invalid killPiece\n";
+}
+
+void Board::unkillPiece(int i) {
+	if (i >= wqR && i <= bPh) {
+		piece[i].alive = true;
+		return;
+	}
+	std::cout << "Invalid unkillPiece\n";
+}
+
+void Board::setPiecePos(int p, int position) {
+	if (!(p >= wqR && p <= bPh)) {
+		std::cout << "Bad piece in setPiecePos\n";
+		return;
+	}
+	if (!(position >= 0 && position <= 64)) {
+		std::cout << "Bad pos in setPiecePos\n";
+		return;
+	}
+	piece[p].pos = position;
+}
+
+void Board::incrMoved(int p) {
+	if (!(p >= wqR && p <= bPh)) {
+		std::cout << "Bad piece in incrMoved\n";
+		return;
+	}
+	piece[p].moved++;
+}
+
+void Board::decrMoved(int p) {
+	if (!(p >= wqR && p <= bPh)) {
+		std::cout << "Bad piece in decrMoved\n";
+		return;
+	}
+	piece[p].moved--;
 }
