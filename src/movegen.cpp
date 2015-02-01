@@ -9,8 +9,15 @@
 #include "board.h"
 
 void Board::generateMoveLists() {	
-	for (int i = wqR; i <= bPh; i++)
+	bool realSide = side;
+	side = WHITE;
+	for (int i = wqR; i <= wPh; i++)
 		generateMoveListFor(i);
+	side = BLACK;
+	for (int i = bqR; i <= bPh; i++)
+		generateMoveListFor(i);
+	side = realSide;
+
 	whiteMoveList.clear();
 	blackMoveList.clear();
 	for (int i = wqR; i <= wPh; i++) {
@@ -124,6 +131,7 @@ void Board::generatePawnMoves(int p, int& counter) {
 	int extra;
         for (int i = 1; i <= 4; i++) {
                 extra = i==1 ? 8 : (i==2 ? 16 : (i==3 ? 7 : 9));
+		extra = side ? extra : -extra;
                 if (legalMove(piece[p].pos, piece[p].pos+extra)) {
                         piece[p].moveList[counter] = piece[p].pos + extra;
                         counter++;

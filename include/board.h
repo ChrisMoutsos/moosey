@@ -57,11 +57,11 @@ public:
 	//LEGAL.CPP
 	bool legalMove(int, int, bool verbose = false);
 	bool validateMove(int, int) const;
-	bool validatePawnMove(int, int, int) const;
-	bool validateHozMove(int, int, int, int) const;
-	bool validateDiagMove(int, int, int) const;
-	bool validateKnightMove(int, int, int) const;
-	bool validateKingMove(int) const;
+	bool validatePawnMove(int, int) const;
+	bool validateHozMove(int, int) const;
+	bool validateDiagMove(int, int) const;
+	bool validateKnightMove(int, int) const;
+	bool validateKingMove(int, int) const;
 	bool checkDraw() const;
 	bool checkCheck() const;
 	bool inCheckmate() const;
