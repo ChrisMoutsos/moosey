@@ -59,7 +59,7 @@ void Board::generateHozMoves(int p, int& counter) {
 	int d, i, posIndex;
 
 	for (int c = 1; c <= 4; c++) {
-		d = (c==1) ? -1 : (c==2) ? 1 : (c==3) ? -8 : 8;
+		d = c==1 ? -1 : c==2 ? 1 : c==3 ? -8 : 8;
 		i = 1;
 		posIndex = piece[p].pos+d*i;
 		
@@ -85,7 +85,7 @@ void Board::generateDiagMoves(int p, int& counter) {
 	int d, i, posIndex;
 
 	for (int c = 1; c <= 4; c++) {
-		d = (c==1) ? -9 : (c==2) ? -7 : (c==3) ? 9 : 7;
+		d = c==1 ? -9 : c==2 ? -7 : c==3 ? 9 : 7;
 		i = 1;
 		posIndex = piece[p].pos+d*i;
 		
@@ -130,7 +130,7 @@ void Board::generateKingMoves(int p, int& counter) {
 void Board::generatePawnMoves(int p, int& counter) {
 	int extra;
         for (int i = 1; i <= 4; i++) {
-                extra = i==1 ? 8 : (i==2 ? 16 : (i==3 ? 7 : 9));
+                extra = i==1 ? 8 : i==2 ? 16 : i==3 ? 7 : 9;
 		extra = side ? extra : -extra;
                 if (legalMove(piece[p].pos, piece[p].pos+extra)) {
                         piece[p].moveList[counter] = piece[p].pos + extra;
