@@ -9,12 +9,10 @@
 #include "cmath"
 #include "board.h"
 
-using namespace std;
-
 bool Board::legalMove(int mF, int mT, bool verbose) { 
 	bool isInCheck;
 	if (!validateMove(mF, mT)) {
-		if (verbose) cout << "Illegal move.\n";
+		if (verbose) std::cout << "Illegal move.\n";
 		return false;
 	}
 	movePiece(mF, mT);
@@ -25,7 +23,7 @@ bool Board::legalMove(int mF, int mT, bool verbose) {
 
 bool Board::checkDraw() const {
 	if ((int)whiteMoveList.size() == 0 && (int)blackMoveList.size() == 0) {
-		cout << "Stalemate!" << endl;
+		std::cout << "Stalemate!\n";
 		return true;
 	}	
 	return false;
@@ -34,18 +32,22 @@ bool Board::checkDraw() const {
 bool Board::checkCheck() const {
 	if (inCheck()) {
 		if (inCheckmate()) { 
-			side ? cout << "White is in checkmate. Black wins!\n" : cout << "Black is in checkmate. White wins!\n";
+			side ? std::cout << "White" : std::cout << "Black";
+			std::cout << " is in checkmate. ";
+			side ? std::cout << "Black wins!\n" : std::cout << "White wins!\n";
 			return true;
 		}
-		else side ? cout << "White is in check!\n" : "Black is in check!\n";
+		else side ? std::cout << "White is in check!\n" : "Black is in check!\n";
 	}
 	return false;
 }
 
 bool Board::inCheckmate() const { 
-	if (side && (int)whiteMoveList.size() == 0) return true;
-	else if (!side && (int)blackMoveList.size() == 0) return true;
-	else return false;
+	if (side && (int)whiteMoveList.size() == 0) 
+		return true;
+	else if (!side && (int)blackMoveList.size() == 0) 
+		return true;
+	return false;
 }
 
 bool Board::inCheck() const {
@@ -86,7 +88,8 @@ bool Board::validatePawnMove(int mF, int mT) const {
 	int onMF = board64[mF], onMT = board64[mT];
 	int diff120 = abs(from64(mF) - from64(mT));
 
-	if ((side && mF > mT) || (!side && mF < mT)) return false; //Ensures correct direction
+	if ((side && mF > mT) || (!side && mF < mT)) //Ensures correct direction
+		return false;
 
 	if (diff120 == 10 && onMT == empty) 
 		return true;

@@ -8,8 +8,6 @@
 #include <iostream>
 #include "board.h"
 
-using namespace std;
-
 void Board::movePiece() {
 	movePiece(moveFrom, moveTo);
 }
@@ -54,8 +52,13 @@ void Board::unmovePiece(int mF, int mT) {
 
 void Board::moveInfo() const {
 	!side ? std::cout << "White" : std::cout << "Black";
-	std::cout << " moved " << piece[pieceMoved].name << " from " << intToSquare(moveFrom) << " to " << intToSquare(moveTo);
-	prevOnMoveTo != -1 ? std::cout << " and captured a " << piece[prevOnMoveTo].name << "\n\n" : cout << "\n\n";
+	std::cout << " moved " << piece[pieceMoved].name;
+	std::cout << " from " << intToSquare(moveFrom) << " to " << intToSquare(moveTo);
+	if (prevOnMoveTo != empty) {
+		std::cout << " and captured a ";
+		std::cout << piece[prevOnMoveTo].name;
+	}
+	std::cout << "\n\n";
 }	
 
 void Board::changeTurn() {
