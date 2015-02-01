@@ -51,14 +51,16 @@ void Board::unmovePiece(int mF, int mT) {
 }
 
 void Board::moveInfo() const {
-	!side ? std::cout << "White" : std::cout << "Black";
-	std::cout << " moved " << piece[pieceMoved].name;
-	std::cout << " from " << intToSquare(moveFrom) << " to " << intToSquare(moveTo);
+	using namespace std;
+	
+	!side ? cout << "White" : cout << "Black";
+	cout << " moved " << piece[pieceMoved].name;
+	cout << " from " << intToSquare(moveFrom) << " to " << intToSquare(moveTo);
 	if (prevOnMoveTo != empty) {
-		std::cout << " and captured a ";
-		std::cout << piece[prevOnMoveTo].name;
+		cout << " and captured a ";
+		cout << piece[prevOnMoveTo].name;
 	}
-	std::cout << "\n\n";
+	cout << "\n\n";
 }	
 
 void Board::changeTurn() {

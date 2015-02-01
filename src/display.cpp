@@ -11,61 +11,71 @@
 #include "board.h"
 
 void displayBoard(const Board& board) {
-	bool color = 0; //0 for white, 1 for black
-	int square = 57, counter = 0, oldprecision = std::cout.precision();
-	char oldfill = std::cout.fill();
-	std::ios_base::fmtflags oldflags = std::cout.flags();
+	using namespace std;
 
-	std::cout << "  ." <<std::setfill('-') << std::setw(65) << ".\n";
+	bool color = 0; //0 for white, 1 for black
+	int square = 57, counter = 0, oldprecision = cout.precision();
+	char oldfill = cout.fill();
+	ios_base::fmtflags oldflags = cout.flags();
+
+	cout << "  ." << setfill('-') << setw(65) << ".\n";
 	while (square > 0) {
 		emptyRow(color, counter);
-		std::cout << (int)(square/8)+1;
+		cout << (int)(square/8)+1;
 		printRow(board, color, square);
 		emptyRow(color, counter);
-		if (square!=1) std::cout << "  |" << std::setw(65) << "|\n";
+		if (square!=1) cout << "  |" << setw(65) << "|\n";
 		square -= 8;
 	}
-	std::cout << "  `" << std::setw(65) << "`\n";
-	std::cout << std::setfill(' ') << std::setw(6) << "";
+	cout << "  `" << setw(65) << "`\n";
+	cout << setfill(' ') << setw(6) << "";
 	for (int i = (int)'a'; i <= (int)'h'; i++)
-		std::cout << std::setfill(' ') << std::left << std::setw(8) << (char)i;
-	std::cout << '\n';
+		cout << setfill(' ') << left << setw(8) << (char)i;
+	cout << '\n';
 	
-	std::cout.precision(oldprecision);
-	std::cout.fill(oldfill);
-	std::cout.flags(oldflags);
+	cout.precision(oldprecision);
+	cout.fill(oldfill);
+	cout.flags(oldflags);
 }
 
 void printRow(const Board& b, bool& color, int startingSquare) {
+	using namespace std;
+
 	int x;
 	char a;
-	std::cout << " ";
+	cout << " ";
 	for (int i = 1; i < 9; i++) {
 	  	x = startingSquare+i-1;
 		a = b.getPieceAbbr(b.getBoard64(x));
-		if (color) std::cout << "|**"; 
-		else std::cout << "|  ";
+		if (color) cout << "|**"; 
+		else cout << "|  ";
 		if (b.getBoard64(x) != empty) {
-			if (b.getPieceMoved() == b.getBoard64(x)) std::cout << "~" << a << "~";
-			else std::cout << " " << a << " ";
+			if (b.getPieceMoved() == b.getBoard64(x)) 
+				cout << "~" << a << "~";
+			else 
+				cout << " " << a << " ";
 		}
 		else {
-			if (b.getPieceMovedFrom() == x ) color ? std::cout << " / " : std::cout << " \\ ";
-			else color ? std::cout << "***" : std::cout << "   ";
+			if (b.getPieceMovedFrom() == x) 
+				color ? cout << " / " : cout << " \\ ";
+			else 
+				color ? cout << "***" : cout << "   ";
 		}
-		color ? std::cout << "**" : std::cout << "  ";
+		color ? cout << "**" : cout << "  ";
 		color = color ? 0 : 1;
 	}
-	std::cout << "|\n";
+	cout << "|\n";
 }
 
 void emptyRow (bool& color, int& counter) {
+	using namespace std;
+
 	for (int i = 1; i < 9; i++) {
-		if (i == 1) std::cout << "  ";
-		color ? std::cout << "|*******" : std::cout << "|       ";
+		if (i == 1) cout << "  ";
+		color ? cout << "|*******" : cout << "|       ";
 		color = color ? 0 : 1;
 	}
-	std::cout << "|\n";
+	cout << "|\n";
 	counter++;
 	if (!(counter%2)) {
 		color = (color) ? 0 : 1;
