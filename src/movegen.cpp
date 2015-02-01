@@ -89,7 +89,7 @@ void Board::generateDiagMoves(int p, int& counter) {
 		i = 1;
 		posIndex = piece[p].pos+d*i;
 		
-		while (((from64(posIndex) - from64(piece[p].pos))%11 == 0 || (from64(posIndex) - from64(piece[p].pos))%9 == 0)) { 
+		while (!(from64(posIndex)-from64(piece[p].pos))%11 || !(from64(posIndex)-from64(piece[p].pos))%9) { 
                         if (posIndex < 1 || posIndex > 64) break;
 			if (board64[posIndex] != empty && piece[board64[posIndex]].color == side) break;
                         
