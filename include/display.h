@@ -3,8 +3,8 @@
 
 class Board;
 
-void displayBoard(Board&);
-void printRow(Board&, bool&, int);
+void displayBoard(const Board&);
+void printRow(const Board&, bool&, int);
 void emptyRow(bool&, int&);
 
 #endif
