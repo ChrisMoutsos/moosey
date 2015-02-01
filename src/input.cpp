@@ -32,3 +32,14 @@ bool getInput(int& moveFrom, int& moveTo) {
 	
 	return true;
 }
+
+void userInput(Board& board, int& mF, int& mT) {	
+	do {
+		board.getSide() ? cout << "White" : cout << "Black";
+		cout << " to move:\n\t";
+	} while (!getInput(mF, mT) || !board.legalMove(mF, mT, 1));
+	if (board.inCheck()) {
+		board.getSide() ? cout << "White" : cout << "Black";
+		cout << " is in check!";
+	}
+}

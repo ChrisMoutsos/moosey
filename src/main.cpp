@@ -27,20 +27,14 @@ int main() {
 	Board board;
 	displayBoard(board);
 	while (!exit) {
-		do {
-			board.getSide() ? cout << "White" : cout << "Black";
-			cout << " to move:\n\t";
-		} while (!getInput(mF, mT) || !board.legalMove(mF, mT, 1));
-		if (board.inCheck()) {
-			board.getSide() ? cout << "White" : cout << "Black";
-			cout << " is in check!";
-		}
+		userInput(board, mF, mT);
 		board.setMove(mF, mT);
 		board.movePiece();
 		board.changeTurn();
 		displayBoard(board);
 		board.moveInfo();
 		board.generateMoveLists();
+		showMoveLists(board);
 
 		exit = (board.checkCheck() | board.checkDraw());
 	}
