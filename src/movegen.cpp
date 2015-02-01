@@ -118,7 +118,7 @@ void Board::generateKnightMoves(int p, int& counter) {
 void Board::generateKingMoves(int p, int& counter) {
 	int extra;
         for (int i = 1; i <= 8; i++) {
-                extra = i==1 ? 1 : (i==2 ? -1 : (i==3 ? 10 : (i==4 ? -10 : (i==5 ? 11 : (i==6 ? -11 : (i==7 ? 9 : -9))))));
+                extra = i==1 ? 1 : i==2 ? -1 : i==3 ? 10 : i==4 ? -10 : i==5 ? 11 : i==6 ? -11 : i==7 ? 9 : -9;
                 if (legalMove(piece[p].pos, to64(from64(piece[p].pos)+extra))) {
                         piece[p].moveList[counter] = to64(from64(piece[p].pos) + extra);
                         counter++;
