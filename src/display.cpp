@@ -14,18 +14,18 @@ void displayBoard(const Board& board) {
 	using namespace std;
 
 	bool color = 0; //0 for white, 1 for black
-	int square = 57, counter = 0, oldprecision = cout.precision();
+	int square = _A8, counter = 0, oldprecision = cout.precision();
 	char oldfill = cout.fill();
 	ios_base::fmtflags oldflags = cout.flags();
 
 	cout << "  ." << setfill('-') << setw(65) << ".\n";
-	while (square > 0) {
+	while (square >= _A1) {
 		emptyRow(color, counter);
-		cout << (int)(square/8)+1;
+		cout << (int)(square/10)-1;
 		printRow(board, color, square);
 		emptyRow(color, counter);
-		if (square!=1) cout << "  |" << setw(65) << "|\n";
-		square -= 8;
+		if (square!=_A1) cout << "  |" << setw(65) << "|\n";
+		square -= 10;
 	}
 	cout << "  `" << setw(65) << "`\n";
 	cout << setfill(' ') << setw(6) << "";
@@ -46,11 +46,11 @@ void printRow(const Board& b, bool& color, int startingSquare) {
 	cout << " ";
 	for (int i = 1; i < 9; i++) {
 	  	x = startingSquare+i-1;
-		a = b.getPieceAbbr(b.getBoard64(x));
+		a = b.getPieceAbbr(b.getBoard120(x));
 		if (color) cout << "|**"; 
 		else cout << "|  ";
-		if (b.getBoard64(x) != empty) {
-			if (b.getPieceMoved() == b.getBoard64(x)) 
+		if (b.getBoard120(x) != empty) {
+			if (b.getPieceMoved() == b.getBoard120(x)) 
 				cout << "~" << a << "~";
 			else 
 				cout << " " << a << " ";

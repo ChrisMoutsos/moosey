@@ -27,8 +27,8 @@ bool getInput(int& moveFrom, int& moveTo) {
 			return false;
 		}
 
-	moveFrom = FR2SQ64((int)input[0]-96, (int)input[1]-48);
-	moveTo = FR2SQ64((int)input[3]-96, (int)input[4]-48);
+	moveFrom = int(input[0])-96 + ((int(input[1])-47))*10;
+	moveTo = int(input[3])-96 +  ((int(input[4])-47))*10;
 	
 	return true;
 }

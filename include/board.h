@@ -15,7 +15,6 @@ public:
 	void placePiece(int, int);
 	void placePiecesDefault();	
 	void initializePieces();
-	void cleanMovelists();
 	//ACCESSORS
 	int getMoveFrom() const { return moveFrom; };
 	int getMoveTo() const { return moveTo; };
@@ -24,7 +23,6 @@ public:
 	int getPieceMoved() const { return pieceMoved; };
 	int getPieceMovedFrom() const { return pieceMovedFrom; };
 	int getPrevOnMoveTo() const { return prevOnMoveTo; };	
-	int getBoard64(int x) const { return board64[x]; };
 	int getBoard120(int x) const { return board120[x]; };
 	int getPieceAbbr(int x) const { return piece[x].abbr; };
 	int getFromMovelist(bool, int) const;
@@ -37,7 +35,6 @@ public:
 	void setPieceMoved(int);
 	void setPieceMovedFrom(int);
 	void setPrevOnMoveTo(int);
-	void setBoard64(int, int);
 	void setBoard120(int, int);
 	void addToMovelist(bool, int);	
 	void clearMoveList(bool);
@@ -70,6 +67,7 @@ public:
 
 	//MOVEGEN.CPP
 	void generateMoveLists();
+	void cleanMoveLists();
 	void generateMoveListFor(int);
 	void generateHozMoves(int, int&);
 	void generateDiagMoves(int, int&);
@@ -91,7 +89,7 @@ public:
 		int moveListSize;
 	} piece[32];
 
-	int board64[65], board120[120];
+	int board120[120];
 	std::vector<int> whiteMoveList, blackMoveList;
 	
 private:
@@ -101,18 +99,6 @@ private:
 };
 
 //INLINE CONVERSION FUNCTIONS
-inline int FR2SQ64(int file, int rank) {
-	return (rank-1)*8 + file;
-}
-
-inline int SQ642R (int sq64) { 
-	return (sq64-1)/8 + 1; 
-}
-
-inline int SQ642F(int sq64) { 
-	return sq64 - ((sq64-1)/8)*8;
-}
-
 inline int to64(int x) {
 	if (x < 98 && x > 21 && !(x%10 == 0 || x%10 == 9))
 			return x-20-2*((x-x%10)/10-2);
@@ -126,8 +112,8 @@ inline int from64(int x) {
 inline std::string intToSquare(int square) {
 	std::string squareName;
 	if (square==0) return "";
-	squareName = char(int('a') + ((square-1)%8));
-	squareName += char((square-1)/8 + 49);
+	squareName = char(int('a') + ((square)%10)-1);
+	squareName += char((square)/10 + 49 - 2);
 	return squareName;
 }
 

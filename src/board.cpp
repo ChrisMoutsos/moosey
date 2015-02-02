@@ -34,30 +34,30 @@ void Board::initializeVars() {
 }
 
 void Board::emptyBoard() {
-	for (int i = null; i <= H8; i++) 
-		board64[i] = -1;
-	for (int i = 0; i < 120; i++)
-		board120[i] = -99;
-	for (int i = 2; i <= 9; i++)
-		for (int j = 1; j <= 8; j++) 
-			board120[i*10+j] = -1;
+	for (int i = 0; i < 120; i++) {
+		if (i < 21 || i > 98)
+			board120[i] = invalid;
+		else if (i%10 == 0 || i%10 == 9)
+			board120[i] = invalid;
+		else
+			board120[i] = empty;
+	}
 }
 
 void Board::placePiece(int pieceNumber, int square) {
 	piece[pieceNumber].pos = square;
-	board64[square] = pieceNumber;
-	board120[from64(square)] = pieceNumber;
+	board120[square] = pieceNumber;
 }
 
 void Board::placePiecesDefault() {
-	for (int i = wqR; i <= wkR; i++) //White
-		placePiece(i, i+1);
-	for (int i = wPa; i <= wPh; i++) 
-		placePiece(i, A2+(i-wPa));
-	for (int i = bPa; i <= bPh; i++) //Black
-		placePiece(i, A7 +(i-bPa));
-	for (int i = bqR; i <= bkR; i++) 
-		placePiece(i, A8+(i-bqR));
+	for (int i = _A1; i <= _H1; i++)
+		placePiece(i-_A1, i);
+	for (int i = _A2; i <= _H2; i++) 
+		placePiece(i-_A2+8, i);
+	for (int i = _A8; i <= _H8; i++) 
+		placePiece(i-_A8+16, i);
+	for (int i = _A7; i <= _H7; i++) 
+		placePiece(i-_A7+24, i);
 }
 
 void Board::initializePieces() {
@@ -91,8 +91,8 @@ void Board::initializePieces() {
 }
 
 void Board::setMove(int mF, int mT) {
-	if (mF > 0 && mF < 64) moveFrom = mF;
-	if (mT > 0 && mT < 64) moveTo = mT;
+	if (mF > 20 && mF < 99) moveFrom = mF;
+	if (mT > 20 && mT < 99) moveTo = mT;
 }
 
 void Board::setPly(int newPly) {
@@ -129,15 +129,6 @@ void Board::setPrevOnMoveTo(int newPOMT) {
 		return;
 	}
 	std::cout << "Invalid setPrevOnMoveTo\n";
-}
-
-void Board::setBoard64(int i, int v) {
-	if (i >=0 && i < 65) 
-		if (v >= empty && v <= bPh) {
-			board64[i] = v;
-			return;
-		}
-	std::cout << "Invalid setBoard64\n";
 }
 
 void Board::setBoard120(int i, int v) {

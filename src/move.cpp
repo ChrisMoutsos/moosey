@@ -13,21 +13,19 @@ void Board::movePiece() {
 }
 
 void Board::movePiece(int mF, int mT) {
-	prevOnMoveTo = board64[mT];
+	prevOnMoveTo = board120[mT];
 	pieceMovedFrom = mF;
-	pieceMoved = board64[mF];
-	if (board64[mT] != empty) {
-		piece[board64[mT]].alive = false;
-		piece[board64[mT]].pos = null;
+	pieceMoved = board120[mF];
+	if (board120[mT] != empty) {
+		piece[board120[mT]].alive = false;
+		piece[board120[mT]].pos = null;
 	}
 
-	board64[mT] = board64[mF];
-	board64[mF] = empty;
-	board120[from64((int)mT)] = board64[mF];
-	board120[from64((int)mF)] = empty;
-	piece[board64[mT]].pos = mT;
+	board120[mT] = board120[mF];
+	board120[mF] = empty;
+	piece[board120[mT]].pos = mT;
 
-	piece[board64[mT]].moved++;
+	piece[board120[mT]].moved++;
 	ply++;
 }
 
@@ -36,16 +34,14 @@ void Board::unmovePiece() {
 }
 
 void Board::unmovePiece(int mF, int mT) {
-	board64[mF] = pieceMoved;
-	board120[from64(mF)] = pieceMoved;
-	piece[board64[mF]].moved--;
-	piece[board64[mF]].pos = mF;
+	board120[mF] = pieceMoved;
+	piece[board120[mF]].moved--;
+	piece[board120[mF]].pos = mF;
 
-	board64[mT] = prevOnMoveTo;
-	board120[from64(mT)] = prevOnMoveTo;
-	if (board64[mT] != empty) {
-		piece[board64[mT]].pos = mT;
-		piece[board64[mT]].alive = true;
+	board120[mT] = prevOnMoveTo;
+	if (board120[mT] != empty) {
+		piece[board120[mT]].pos = mT;
+		piece[board120[mT]].alive = true;
 	}
 	ply--;
 }
@@ -55,7 +51,8 @@ void Board::moveInfo() const {
 	
 	!side ? cout << "White" : cout << "Black";
 	cout << " moved " << piece[pieceMoved].name;
-	cout << " from " << intToSquare(moveFrom) << " to " << intToSquare(moveTo);
+	cout << " from " << intToSquare(moveFrom);
+	cout  << " to " << intToSquare(moveTo);
 	if (prevOnMoveTo != empty) {
 		cout << " and captured a ";
 		cout << piece[prevOnMoveTo].name;

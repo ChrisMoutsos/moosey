@@ -29,12 +29,9 @@ bool Board::checkStalemate() const {
 	return false;
 }
 
-void Board::cleanMovelists() {
-	
-}
-
 bool Board::checkCheck(bool side) {
 	if (inCheck(side)) {
+		cleanMoveLists();
 		if (inCheckmate(side)) { 
 			side ? std::cout << "White" : std::cout << "Black";
 			std::cout << " is in checkmate. ";
@@ -62,7 +59,7 @@ bool Board::inCheck(bool side) {
 	kingPos = side ? piece[wK].pos : piece[bK].pos;
 	
 	for (int d = -1; d <= 1; d+=2) {
-
+		
 	}
 	for (int d = -10; d <= 10; d+=20) {
 
@@ -81,9 +78,9 @@ bool Board::inCheck(bool side) {
 }
 
 bool Board::validateMove(int mF, int mT) const {
-	int value = piece[board64[mF]].value, onMF = board64[mF], onMT = board64[mT];
+	int value = piece[board120[mF]].value, onMF = board120[mF], onMT = board120[mT];
 	//std::cout << "validating " << mF << " to " << mT << std::endl;
-	if (onMF == -1 || mT == 0) 
+	if (onMF == -1 || mT == 0 || board120[mT] == invalid) 
 		return false;
 	if (onMT != empty && piece[onMF].color == piece[onMT].color) 
 		return false;
@@ -110,20 +107,20 @@ bool Board::validateMove(int mF, int mT) const {
 
 
 bool Board::validatePawnMove(int mF, int mT) const {
-	int extra = piece[board64[mF]].color ? 10 : -10;
-	int onMF = board64[mF], onMT = board64[mT];
-	int diff120 = abs(from64(mF) - from64(mT));
+	int extra = piece[board120[mF]].color ? 10 : -10;
+	int onMF = board120[mF], onMT = board120[mT];
+	int diff = abs(mF - mT);
 
 	if ((side && mF > mT) || (!side && mF < mT)) //Ensures correct direction
 		return false;
 
-	if (diff120 == 10 && onMT == empty) 
+	if (diff == 10 && onMT == empty) 
 		return true;
-	if (diff120 == 20 && onMT == empty) {
-		if (board120[from64(mF)+extra] == empty && piece[onMF].moved == 0) return true;
+	if (diff == 20 && onMT == empty) {
+		if (board120[mF+extra] == empty && piece[onMF].moved == 0) return true;
 		else return false;
 	}
-	if (diff120 == 9 || diff120 == 11) {
+	if (diff == 9 || diff == 11) {
 		if (onMT == empty) return false;
 		if (!side != !piece[onMT].color) return true;
 		else return false;
@@ -134,14 +131,14 @@ bool Board::validatePawnMove(int mF, int mT) const {
 bool Board::validateHozMove(int mF, int mT) const {
 	int small = mF>mT ? mT : mF, big = mF>mT ? mF : mT;	
 
-	if ((mT - mF)%8 == 0) { //Moving up/down file
-		for (int i = small+8; i < big; i+=8)
-			if (board64[i] != empty) return false;
+	if ((mT - mF)%10 == 0) { //Moving up/down file
+		for (int i = small+10; i < big; i+=10)
+			if (board120[i] != empty) return false;
 		return true;
 	}
-	else if ((mF-1)/8 == (mT-1)/8) { //Move left/right across rank
+	else if (mF/10 == mT/10) { //Move left/right across rank
 		for (int i = small+1; i < big; i++)
-			if (board64[i] != empty) return false;
+			if (board120[i] != empty) return false;
 		return true;
 	}
 	else return false;	
@@ -149,20 +146,20 @@ bool Board::validateHozMove(int mF, int mT) const {
 
 bool Board::validateDiagMove(int mF, int mT) const {
 	int temp, small = mF>mT ? mT : mF, big = mF>mT ? mF : mT;	
-	int diff120 = from64(big) - from64(small);
+	int diff = big - small;
 
-	temp = diff120%11 == 0 ? 11 : diff120%9 == 0 ? 9 : 0;
+	temp = diff%11 == 0 ? 11 : diff%9 == 0 ? 9 : 0;
 	if (!temp) return false;
-	for (int j = from64(small)+temp; j < from64(big); j+=temp)
+	for (int j = small+temp; j < big; j+=temp)
 		if (board120[j] != empty) return false;
 	return true;
 }
 
 bool Board::validateKnightMove(int mF, int mT) const {
-	int onMT = board120[from64(mT)], onMF = board120[from64(mF)];
-	int diff120 = abs(from64(mF) - from64(mT));
+	int onMT = board120[mT], onMF = board120[mF];
+	int diff = abs(mF - mT);
 	
-	if (diff120 == 8 || diff120 == 12 || diff120 == 19 || diff120 == 21) {
+	if (diff == 8 || diff == 12 || diff == 19 || diff == 21) {
 		if (onMT == empty) 
 			return true;
 		if (!piece[onMF].color != !piece[onMT].color)
@@ -172,7 +169,7 @@ bool Board::validateKnightMove(int mF, int mT) const {
 }
 
 bool Board::validateKingMove(int mF, int mT) const {
-	int diff120 = abs(from64(mF) - from64(mT));
-	return (diff120 == 1 || diff120 == 10 || diff120 == 9 || diff120 == 11) ? true : false;
+	int diff = abs(mF - mT);
+	return (diff == 1 || diff == 10 || diff == 9 || diff == 11) ? true : false;
 }
 
