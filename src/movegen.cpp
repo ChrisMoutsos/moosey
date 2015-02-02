@@ -24,22 +24,16 @@ void Board::generateMoveLists() {
 
 	whiteMoveList.clear();
 	blackMoveList.clear();
-	for (int i = wqR; i <= wPh; i++) {
+	for (int i = wqR; i <= bPh; i++) 
 		for (int j = 0; j < piece[i].moveListSize; j++) 
 			if (piece[i].moveList[j] != null) {
 				mF = piece[i].pos;
 				mT = piece[i].moveList[j];
-				whiteMoveList.push_back(mF*100 + mT);
+				if (piece[i].color) 
+					whiteMoveList.push_back(mF*100 + mT);
+				else
+					blackMoveList.push_back(mF*100 + mT);
 			}
-	}
-	for (int i = bqR; i <= bPh; i++) {
-		for (int j = 0; j < piece[i].moveListSize; j++) 
-			if (piece[i].moveList[j] != null) {
-				mF = piece[i].pos;
-				mT = piece[i].moveList[j];
-				blackMoveList.push_back(mF*100 + mT);
-			}
-	}
 
 	side = realSide;	
 	pieceMoved = realPieceMoved;
@@ -47,14 +41,17 @@ void Board::generateMoveLists() {
 	prevOnMoveTo = realPrevOnMoveTo;
 }
 
-void Board::cleanMoveLists() {
+void Board::cleanMoveList(bool s) {
 	int mF, mT, size;
-	size = (int)whiteMoveList.size();
+	size = side ? (int)whiteMoveList.size() : (int)blackMoveList.size();
 	for (int i = 0; i < size; i++) {
-		mT = whiteMoveList[i]%100;
-		mF = (whiteMoveList[i] - mT)/100;
-		if (!legalMove(mF, mT, 1)) {
-			whiteMoveList.erase(whiteMoveList.begin()+i);
+		mT = s ? whiteMoveList[i]%100 : blackMoveList[i]%100;
+		mF = s ? (whiteMoveList[i]-mT)/100 : (blackMoveList[i]-mT)/100;
+		if (!legalMove(mF, mT, side)) {
+			if (side) 
+				whiteMoveList.erase(whiteMoveList.begin()+i);
+			else
+				blackMoveList.erase(blackMoveList.begin()+i);
 			size--;
 			i--;
 		}

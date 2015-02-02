@@ -31,7 +31,7 @@ bool Board::checkStalemate() const {
 
 bool Board::checkCheck(bool side) {
 	if (inCheck(side)) {
-		cleanMoveLists();
+		cleanMoveList(side);
 		if (inCheckmate(side)) { 
 			side ? std::cout << "White" : std::cout << "Black";
 			std::cout << " is in checkmate. ";
@@ -55,23 +55,35 @@ bool Board::inCheckmate(bool side) const {
 }
 
 bool Board::inCheck(bool side) {
-	int kingPos, small, big, diff120, diff2, dir;
-	kingPos = side ? piece[wK].pos : piece[bK].pos;
-	
-	for (int d = -1; d <= 1; d+=2) {
-		
-	}
-	for (int d = -10; d <= 10; d+=20) {
+	int kPos, pIndex, i, v, d;
+	kPos = side ? piece[wK].pos : piece[bK].pos;
 
-	}
-	for (int d = -11; d <= 11; d+=22) {
-
-	}
-	for (int d = -9; d <= 9; d+=18) {
-
+	for (int c = 1; c <= 8; c++) {
+		d = c==1 ? -1 : c==2 ? 1 : c==3 ? -10 : c==4 ? -10 : c==5 ? -11 : c==6 ? 11 : c==7 ? -9 : 9;
+		i = 1;
+		pIndex = kPos+d*i;
+		while (board120[pIndex] != invalid) {
+			if (board120[pIndex] != empty) {
+				if (piece[board120[pIndex]].color != side) {
+					v = piece[board120[pIndex]].value;
+					if (v == Q_VAL) return true;
+					if (c >= 1 && c <= 4 && v == R_VAL) return true;
+					else if (v == B_VAL) return true;
+				}
+				else break;
+			}
+			i++;
+			pIndex = kPos+d*i;
+		}
 	}
 	for (int c = 1; c <= 8; c++) {
-
+		d = c==1 ? 8 : c==2 ? -8 : i==3 ? 12 : i==4 ? -12 : i==5 ? -19 : 1==6 ? -19 : i==7 ? 21 : -21;
+		pIndex = kPos + d;
+		if (board120[pIndex] != empty) {
+			if (piece[board120[pIndex]].color == !side) {
+				if (piece[board120[pIndex]].value == N_VAL) return true;
+			}
+		}
 	}
 
 	return false;
@@ -79,15 +91,12 @@ bool Board::inCheck(bool side) {
 
 bool Board::validateMove(int mF, int mT) const {
 	int value = piece[board120[mF]].value, onMF = board120[mF], onMT = board120[mT];
-	//std::cout << "validating " << mF << " to " << mT << std::endl;
 	if (onMF == -1 || mT == 0 || board120[mT] == invalid) 
 		return false;
 	if (onMT != empty && piece[onMF].color == piece[onMT].color) 
 		return false;
-	if (piece[onMF].color != side) {
-		//std::cout << "not your piece" << std::endl;
+	if (piece[onMF].color != side) 
 		return false;
-	}
 
 	if (value == R_VAL)
 		return validateHozMove(mF, mT);

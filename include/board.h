@@ -67,7 +67,7 @@ public:
 
 	//MOVEGEN.CPP
 	void generateMoveLists();
-	void cleanMoveLists();
+	void cleanMoveList(bool);
 	void generateMoveListFor(int);
 	void generateHozMoves(int, int&);
 	void generateDiagMoves(int, int&);

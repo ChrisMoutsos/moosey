@@ -24,10 +24,8 @@ using namespace std;
 int main() {
 	bool exit = false;
 	int mF = 0, mT = 0;
-
 	Board board;
 	displayBoard(board);
-
 	while (!exit) {
 		userInput(board, mF, mT);
 		board.setMove(mF, mT);

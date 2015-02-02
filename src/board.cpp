@@ -91,8 +91,8 @@ void Board::initializePieces() {
 }
 
 void Board::setMove(int mF, int mT) {
-	if (mF > 20 && mF < 99) moveFrom = mF;
-	if (mT > 20 && mT < 99) moveTo = mT;
+	moveFrom = mF;
+	moveTo = mT;
 }
 
 void Board::setPly(int newPly) {
