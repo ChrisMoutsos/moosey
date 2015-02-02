@@ -37,11 +37,8 @@ void userInput(Board& board, int& mF, int& mT) {
 	using namespace std;
 	
 	do {
+		board.checkCheck(board.getSide());
 		board.getSide() ? cout << "White" : cout << "Black";
 		cout << " to move:\n\t";
-	} while (!getInput(mF, mT) || !board.legalMove(mF, mT, 1));
-	if (board.inCheck()) {
-		board.getSide() ? cout << "White" : cout << "Black";
-		cout << " is in check!";
-	}
+	} while (!getInput(mF, mT) || !board.legalMove(mF, mT, board.getSide(), 1));
 }

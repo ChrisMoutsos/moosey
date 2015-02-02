@@ -9,19 +9,19 @@
 #include "cmath"
 #include "board.h"
 
-bool Board::legalMove(int mF, int mT, bool verbose) { 
+bool Board::legalMove(int mF, int mT, bool s, bool verbose) { 
 	bool isInCheck;
 	if (!validateMove(mF, mT)) {
 		if (verbose) std::cout << "Illegal move.\n";
 		return false;
 	}
 	movePiece(mF, mT);
-	isInCheck = inCheck();
+	isInCheck = inCheck(s);
 	unmovePiece(mF, mT);
 	return isInCheck ? false : true;
 }
 
-bool Board::checkDraw() const {
+bool Board::checkStalemate() const {
 	if ((int)whiteMoveList.size() == 0 && (int)blackMoveList.size() == 0) {
 		std::cout << "Stalemate!\n";
 		return true;
@@ -29,20 +29,27 @@ bool Board::checkDraw() const {
 	return false;
 }
 
-bool Board::checkCheck() const {
-	if (inCheck()) {
-		if (inCheckmate()) { 
+void Board::cleanMovelists() {
+	
+}
+
+bool Board::checkCheck(bool side) {
+	if (inCheck(side)) {
+		if (inCheckmate(side)) { 
 			side ? std::cout << "White" : std::cout << "Black";
 			std::cout << " is in checkmate. ";
 			side ? std::cout << "Black wins!\n" : std::cout << "White wins!\n";
 			return true;
 		}
-		else side ? std::cout << "White is in check!\n" : "Black is in check!\n";
+		else {
+			side ? std::cout << "White is in check!\n\n" : std::cout << "Black is in check!\n\n";
+			return false;
+		}
 	}
 	return false;
 }
 
-bool Board::inCheckmate() const { 
+bool Board::inCheckmate(bool side) const { 
 	if (side && (int)whiteMoveList.size() == 0) 
 		return true;
 	else if (!side && (int)blackMoveList.size() == 0) 
@@ -50,21 +57,40 @@ bool Board::inCheckmate() const {
 	return false;
 }
 
-bool Board::inCheck() const {
+bool Board::inCheck(bool side) {
+	int kingPos, small, big, diff120, diff2, dir;
+	kingPos = side ? piece[wK].pos : piece[bK].pos;
 	
+	for (int d = -1; d <= 1; d+=2) {
+
+	}
+	for (int d = -10; d <= 10; d+=20) {
+
+	}
+	for (int d = -11; d <= 11; d+=22) {
+
+	}
+	for (int d = -9; d <= 9; d+=18) {
+
+	}
+	for (int c = 1; c <= 8; c++) {
+
+	}
 
 	return false;
 }
 
 bool Board::validateMove(int mF, int mT) const {
 	int value = piece[board64[mF]].value, onMF = board64[mF], onMT = board64[mT];
-
+	//std::cout << "validating " << mF << " to " << mT << std::endl;
 	if (onMF == -1 || mT == 0) 
 		return false;
 	if (onMT != empty && piece[onMF].color == piece[onMT].color) 
 		return false;
-	if (piece[onMF].color != side) 
+	if (piece[onMF].color != side) {
+		//std::cout << "not your piece" << std::endl;
 		return false;
+	}
 
 	if (value == R_VAL)
 		return validateHozMove(mF, mT);
@@ -93,17 +119,16 @@ bool Board::validatePawnMove(int mF, int mT) const {
 
 	if (diff120 == 10 && onMT == empty) 
 		return true;
-	else if (diff120 == 20 && onMT == empty) {
+	if (diff120 == 20 && onMT == empty) {
 		if (board120[from64(mF)+extra] == empty && piece[onMF].moved == 0) return true;
 		else return false;
 	}
-	else if (diff120 == 9 || diff120 == 11) {
+	if (diff120 == 9 || diff120 == 11) {
 		if (onMT == empty) return false;
 		if (!side != !piece[onMT].color) return true;
 		else return false;
 	}
-	else 
-		return false;
+	return false;
 }
 
 bool Board::validateHozMove(int mF, int mT) const {
@@ -134,10 +159,13 @@ bool Board::validateDiagMove(int mF, int mT) const {
 }
 
 bool Board::validateKnightMove(int mF, int mT) const {
-	int onMT = board64[mT], diff120 = abs(from64(mF) - from64(mT));
+	int onMT = board120[from64(mT)], onMF = board120[from64(mF)];
+	int diff120 = abs(from64(mF) - from64(mT));
 	
 	if (diff120 == 8 || diff120 == 12 || diff120 == 19 || diff120 == 21) {
-		if (onMT == empty || !side != !piece[onMT].color)
+		if (onMT == empty) 
+			return true;
+		if (!piece[onMF].color != !piece[onMT].color)
 			return true;
 	}
 	return false;

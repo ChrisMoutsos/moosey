@@ -21,6 +21,8 @@
 
 using namespace std;
 
+void showMoveLists(Board board);
+
 int main() {
 	bool exit = false;
 	int mF = 0, mT = 0;
@@ -36,8 +38,48 @@ int main() {
 		board.generateMoveLists();
 		showMoveLists(board);
 
-		exit = (board.checkCheck() | board.checkDraw());
+		if (board.inCheckmate(board.getSide())) 
+			exit = true;
 	}
 
 	return 0;
+}
+
+void showMoveLists(Board board) {
+	int mF, mT;
+
+	cout << "White movelist\n";
+	for (int i = 0; i < (int)board.whiteMoveList.size(); i++) {
+		cout << board.whiteMoveList[i] << " ";
+	}
+	cout << "\nWhite piece moves\n";
+	for (int i = wqR; i <= wPh; i++) {
+		cout << board.piece[i].name << ": ";
+		for (int j = 0; j < board.piece[i].moveListSize; j++) {
+			if (board.piece[i].moveList[j] != 0) {
+				mT = board.piece[i].moveList[j]%100;
+				mF = (board.piece[i].moveList[j] - mT) / 100;
+				cout << intToSquare(mF) << " to " << intToSquare(mT) << ", ";
+			}
+		}
+		cout <<"... ";
+	}
+	cout << endl;
+	cout << "\nBlack movelist\n";
+	for (int i = 0; i < (int)board.blackMoveList.size(); i++) {
+		cout << board.blackMoveList[i] << " ";
+	}
+	cout << "\nBlack piece moves\n";
+	for (int i = bqR; i <= bPh; i++) {
+		cout << board.piece[i].name << ": ";
+		for (int j = 0; j < board.piece[i].moveListSize; j++) {
+			if (board.piece[i].moveList[j] != 0) {
+				mT = board.piece[i].moveList[j]%100;
+				mF = (board.piece[i].moveList[j] - mT) / 100;
+				cout << intToSquare(mF) << " to " << intToSquare(mT) << ", ";
+			}
+		}
+		cout << "... ";
+	}
+	cout << endl;	
 }

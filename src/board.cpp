@@ -34,7 +34,7 @@ void Board::initializeVars() {
 }
 
 void Board::emptyBoard() {
-	for (int i = A1; i <= H8; i++) 
+	for (int i = null; i <= H8; i++) 
 		board64[i] = -1;
 	for (int i = 0; i < 120; i++)
 		board120[i] = -99;
@@ -110,6 +110,7 @@ void Board::setSide(bool newSide) {
 void Board::setPieceMoved(int newPM) {
 	if (newPM >= empty && newPM <= bPh) {
 		pieceMoved = newPM;
+		return;
 	}
 	std::cout << "Invalid setPieceMoved\n";
 }

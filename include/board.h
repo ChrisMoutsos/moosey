@@ -15,6 +15,7 @@ public:
 	void placePiece(int, int);
 	void placePiecesDefault();	
 	void initializePieces();
+	void cleanMovelists();
 	//ACCESSORS
 	int getMoveFrom() const { return moveFrom; };
 	int getMoveTo() const { return moveTo; };
@@ -55,17 +56,17 @@ public:
 	void moveInfo() const;
 
 	//LEGAL.CPP
-	bool legalMove(int, int, bool verbose = false);
+	bool legalMove(int, int, bool, bool verbose = false);
 	bool validateMove(int, int) const;
 	bool validatePawnMove(int, int) const;
 	bool validateHozMove(int, int) const;
 	bool validateDiagMove(int, int) const;
 	bool validateKnightMove(int, int) const;
 	bool validateKingMove(int, int) const;
-	bool checkDraw() const;
-	bool checkCheck() const;
-	bool inCheckmate() const;
-	bool inCheck() const;
+	bool checkStalemate() const;
+	bool checkCheck(bool);
+	bool inCheckmate(bool) const;
+	bool inCheck(bool);
 
 	//MOVEGEN.CPP
 	void generateMoveLists();
