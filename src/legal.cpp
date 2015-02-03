@@ -11,6 +11,7 @@
 
 bool Board::legalMove(int mF, int mT, bool s, bool verbose) { 
 	bool isInCheck;
+
 	if (!validateMove(mF, mT, s)) {
 		if (verbose) std::cout << "Illegal move.\n";
 		return false;
@@ -73,15 +74,11 @@ bool Board::inCheck(bool s) {
 					if (c >= 1 && c <= 4) {
 						if (v == R_VAL) return true;
 					} 
-					else {
+					else 
 						if (v == B_VAL) return true;
-					}
-					if (i == 1 && c >= 5) {
-						if (s && (d == UL || d == UR))
+					if (i == 1 && c >= 5) 
+						if (!s != (d==UL || d==UR))
 							return true;
-						if (!s && (d == DL || d == DR))
-							return true;
-					}
 				}
 				else break;
 			}
@@ -145,7 +142,7 @@ bool Board::validatePawnMove(int mF, int mT, bool s) const {
 	}
 	if (diff == 9 || diff == 11) {
 		if (onMT == empty) return false;
-		if (!s != !piece[onMT].color) return true;
+		if (s != piece[onMT].color) return true;
 		else return false;
 	}
 	return false;
