@@ -29,7 +29,7 @@ bool Board::checkStalemate() const {
 	return false;
 }
 
-bool Board::checkCheck(bool side) {
+bool Board::checkCheck(bool side, bool v) {
 	if (inCheck(side)) {
 		cleanMoveList(side);
 		if (inCheckmate(side)) { 
@@ -39,7 +39,10 @@ bool Board::checkCheck(bool side) {
 			return true;
 		}
 		else {
-			side ? std::cout << "White is in check!\n\n" : std::cout << "Black is in check!\n\n";
+			if (v) {
+				side ? std::cout << "White" : std::cout << "Black";
+				std::cout << " is in check!\n\n";
+			}
 			return false;
 		}
 	}
@@ -59,7 +62,7 @@ bool Board::inCheck(bool side) {
 	kPos = side ? piece[wK].pos : piece[bK].pos;
 
 	for (int c = 1; c <= 8; c++) {
-		d = c==1 ? -1 : c==2 ? 1 : c==3 ? -10 : c==4 ? -10 : c==5 ? -11 : c==6 ? 11 : c==7 ? -9 : 9;
+		d = c==1 ? L : c==2 ? R : c==3 ? U : c==4 ? D : c==5 ? UL : c==6 ? UR : c==7 ? DL : DR;
 		i = 1;
 		pIndex = kPos+d*i;
 		while (board120[pIndex] != invalid) {
@@ -77,7 +80,7 @@ bool Board::inCheck(bool side) {
 		}
 	}
 	for (int c = 1; c <= 8; c++) {
-		d = c==1 ? 8 : c==2 ? -8 : i==3 ? 12 : i==4 ? -12 : i==5 ? -19 : 1==6 ? -19 : i==7 ? 21 : -21;
+		d = c==1 ? K1 : c==2 ? K2 : i==3 ? K3 : i==4 ? K4 : i==5 ? K5 : 1==6 ? K6 : i==7 ? K7 : K8;
 		pIndex = kPos + d;
 		if (board120[pIndex] != empty) {
 			if (piece[board120[pIndex]].color == !side) {
