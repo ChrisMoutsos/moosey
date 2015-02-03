@@ -54,8 +54,8 @@ public:
 
 	//LEGAL.CPP
 	bool legalMove(int, int, bool, bool verbose = false);
-	bool validateMove(int, int) const;
-	bool validatePawnMove(int, int) const;
+	bool validateMove(int, int, bool) const;
+	bool validatePawnMove(int, int, bool) const;
 	bool validateHozMove(int, int) const;
 	bool validateDiagMove(int, int) const;
 	bool validateKnightMove(int, int) const;

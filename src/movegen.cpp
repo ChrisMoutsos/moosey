@@ -43,12 +43,12 @@ void Board::generateMoveLists() {
 
 void Board::cleanMoveList(bool s) {
 	int mF, mT, size;
-	size = side ? (int)whiteMoveList.size() : (int)blackMoveList.size();
+	size = s ? (int)whiteMoveList.size() : (int)blackMoveList.size();
 	for (int i = 0; i < size; i++) {
 		mT = s ? whiteMoveList[i]%100 : blackMoveList[i]%100;
 		mF = s ? (whiteMoveList[i]-mT)/100 : (blackMoveList[i]-mT)/100;
-		if (!legalMove(mF, mT, side)) {
-			if (side) 
+		if (!legalMove(mF, mT, s, 1)) {
+			if (s) 
 				whiteMoveList.erase(whiteMoveList.begin()+i);
 			else
 				blackMoveList.erase(blackMoveList.begin()+i);
@@ -81,7 +81,7 @@ void Board::generateMoveListFor(int p) {
 }
 
 void Board::generateHozMoves(int p, int& counter) {
-	bool side = piece[p].color;
+	bool s = piece[p].color;
 	int i, d, posIndex;
 
 	for (int c = 1; c <= 4; c++) {
@@ -89,14 +89,14 @@ void Board::generateHozMoves(int p, int& counter) {
 		i = 1;
 		posIndex = piece[p].pos+d*i;
 		while (board120[posIndex] != invalid) {	
-			if (board120[posIndex] != empty && piece[board120[posIndex]].color == side) break;
+			if (board120[posIndex] != empty && piece[board120[posIndex]].color == s) break;
                        
-			if (validateMove(piece[p].pos, posIndex)) {
+			if (validateMove(piece[p].pos, posIndex, s)) {
 				piece[p].moveList[counter] = posIndex;
                         	counter++;
 			}
 			i++;
-			if (board120[posIndex] != empty && piece[board120[posIndex]].color != side) break;
+			if (board120[posIndex] != empty && piece[board120[posIndex]].color != s) break;
                         posIndex = piece[p].pos+d*i;
                 }
 	}
@@ -104,7 +104,7 @@ void Board::generateHozMoves(int p, int& counter) {
 
 
 void Board::generateDiagMoves(int p, int& counter) {
-	bool side = piece[p].color;
+	bool s = piece[p].color;
 	int d, i, posIndex;
 
 	for (int c = 1; c <= 4; c++) {
@@ -113,24 +113,25 @@ void Board::generateDiagMoves(int p, int& counter) {
 		posIndex = piece[p].pos+d*i;
 		
 		while (board120[posIndex] != invalid) { 
-			if (board120[posIndex] != empty && piece[board120[posIndex]].color == side) break;
+			if (board120[posIndex] != empty && piece[board120[posIndex]].color == s) break;
                         
-			if (validateMove(piece[p].pos, posIndex)) {
+			if (validateMove(piece[p].pos, posIndex, s)) {
 				piece[p].moveList[counter] = posIndex;
                         	counter++;
 			}
 			i++;
-			if (board120[posIndex] != empty && piece[board120[posIndex]].color != side) break;
+			if (board120[posIndex] != empty && piece[board120[posIndex]].color != s) break;
                         posIndex = piece[p].pos+d*i;
                 }
 	}
 }
 
 void Board::generateKnightMoves(int p, int& counter) {
+	bool s = piece[p].color;
 	int extra;
 	for (int i = 1; i <= 8; i++) {
 		extra = i==1 ? 8 : i==2 ? -8 : i==3 ? 12 : i==4 ? -12 : i==5 ? 19 : i==6 ? -19 : i==7 ? 21 : -21;
-		if (validateMove(piece[p].pos, piece[p].pos + extra)) {
+		if (validateMove(piece[p].pos, piece[p].pos + extra, s)) {
 			piece[p].moveList[counter] = piece[p].pos + extra;
 			counter++;
 		}
@@ -138,10 +139,11 @@ void Board::generateKnightMoves(int p, int& counter) {
 }
 
 void Board::generateKingMoves(int p, int& counter) {
+	bool s = piece[p].color;
 	int extra;
         for (int i = 1; i <= 8; i++) {
                 extra = i==1 ? 1 : i==2 ? -1 : i==3 ? 10 : i==4 ? -10 : i==5 ? 11 : i==6 ? -11 : i==7 ? 9 : -9;
-                if (validateMove(piece[p].pos, piece[p].pos+extra)) {
+                if (validateMove(piece[p].pos, piece[p].pos+extra, s)) {
                         piece[p].moveList[counter] = piece[p].pos + extra;
                         counter++;
                 }
@@ -150,11 +152,12 @@ void Board::generateKingMoves(int p, int& counter) {
 }
 
 void Board::generatePawnMoves(int p, int& counter) {
+	bool s = piece[p].color;
 	int extra;
         for (int i = 1; i <= 4; i++) {
                 extra = i==1 ? 10 : i==2 ? 20 : i==3 ? 11 : 9;
 		extra = side ? extra : -extra;
-                if (validateMove(piece[p].pos, piece[p].pos+extra)) {
+                if (validateMove(piece[p].pos, piece[p].pos+extra, s)) {
                         piece[p].moveList[counter] = piece[p].pos + extra;
                         counter++;
                 }

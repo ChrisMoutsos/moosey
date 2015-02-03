@@ -1,13 +1,11 @@
 /*
-----------------------------------
+ ---------------------------------
 	~Moosey Chess Engine~
 	   By Chris Moutsos
 	      main.cpp
-----------------------------------
+ ---------------------------------
 */
 /*
- *	Write inCheck function
- *	Encode moveFrom when I copy pieceMoveLists to global moveLists
  *	Stalemates (check if implemented correctly), draw by material
  * 	Castling, en passants, promotions
  *	Vectors for prevOnMoveTo, pieceMoved, pieceMovedFrom

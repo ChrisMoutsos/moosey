@@ -11,7 +11,7 @@
 
 bool Board::legalMove(int mF, int mT, bool s, bool verbose) { 
 	bool isInCheck;
-	if (!validateMove(mF, mT)) {
+	if (!validateMove(mF, mT, s)) {
 		if (verbose) std::cout << "Illegal move.\n";
 		return false;
 	}
@@ -57,9 +57,9 @@ bool Board::inCheckmate(bool side) const {
 	return false;
 }
 
-bool Board::inCheck(bool side) {
+bool Board::inCheck(bool s) {
 	int kPos, pIndex, i, v, d;
-	kPos = side ? piece[wK].pos : piece[bK].pos;
+	kPos = s ? piece[wK].pos : piece[bK].pos;
 
 	for (int c = 1; c <= 8; c++) {
 		d = c==1 ? L : c==2 ? R : c==3 ? U : c==4 ? D : c==5 ? UL : c==6 ? UR : c==7 ? DL : DR;
@@ -67,11 +67,21 @@ bool Board::inCheck(bool side) {
 		pIndex = kPos+d*i;
 		while (board120[pIndex] != invalid) {
 			if (board120[pIndex] != empty) {
-				if (piece[board120[pIndex]].color != side) {
+				if (piece[board120[pIndex]].color != s) {
 					v = piece[board120[pIndex]].value;
 					if (v == Q_VAL) return true;
-					if (c >= 1 && c <= 4 && v == R_VAL) return true;
-					else if (v == B_VAL) return true;
+					if (c >= 1 && c <= 4) {
+						if (v == R_VAL) return true;
+					} 
+					else {
+						if (v == B_VAL) return true;
+					}
+					if (i == 1 && c >= 5) {
+						if (s && (d == UL || d == UR))
+							return true;
+						if (!s && (d == DL || d == DR))
+							return true;
+					}
 				}
 				else break;
 			}
@@ -83,7 +93,7 @@ bool Board::inCheck(bool side) {
 		d = c==1 ? K1 : c==2 ? K2 : i==3 ? K3 : i==4 ? K4 : i==5 ? K5 : 1==6 ? K6 : i==7 ? K7 : K8;
 		pIndex = kPos + d;
 		if (board120[pIndex] != empty) {
-			if (piece[board120[pIndex]].color == !side) {
+			if (piece[board120[pIndex]].color == !s) {
 				if (piece[board120[pIndex]].value == N_VAL) return true;
 			}
 		}
@@ -92,13 +102,14 @@ bool Board::inCheck(bool side) {
 	return false;
 }
 
-bool Board::validateMove(int mF, int mT) const {
+bool Board::validateMove(int mF, int mT, bool s) const {
 	int value = piece[board120[mF]].value, onMF = board120[mF], onMT = board120[mT];
+
 	if (onMF == -1 || mT == 0 || board120[mT] == invalid) 
 		return false;
 	if (onMT != empty && piece[onMF].color == piece[onMT].color) 
 		return false;
-	if (piece[onMF].color != side) 
+	if (piece[onMF].color != s) 
 		return false;
 
 	if (value == R_VAL)
@@ -112,18 +123,18 @@ bool Board::validateMove(int mF, int mT) const {
 	else if (value == K_VAL)
 		return validateKingMove(mF, mT);
 	else if (value == P_VAL)
-		return validatePawnMove(mF, mT);
+		return validatePawnMove(mF, mT, s);
 
 	return false;
 }
 
 
-bool Board::validatePawnMove(int mF, int mT) const {
-	int extra = piece[board120[mF]].color ? 10 : -10;
+bool Board::validatePawnMove(int mF, int mT, bool s) const {
+	int extra = s ? 10 : -10;
 	int onMF = board120[mF], onMT = board120[mT];
 	int diff = abs(mF - mT);
 
-	if ((side && mF > mT) || (!side && mF < mT)) //Ensures correct direction
+	if ((s && mF > mT) || (!s && mF < mT)) //Ensures correct direction
 		return false;
 
 	if (diff == 10 && onMT == empty) 
@@ -134,7 +145,7 @@ bool Board::validatePawnMove(int mF, int mT) const {
 	}
 	if (diff == 9 || diff == 11) {
 		if (onMT == empty) return false;
-		if (!side != !piece[onMT].color) return true;
+		if (!s != !piece[onMT].color) return true;
 		else return false;
 	}
 	return false;
