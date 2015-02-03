@@ -142,6 +142,12 @@ enum square2_t { _A1 = 21, _B1, _C1, _D1, _E1, _F1, _G1, _H1,
                  _A8 = 91, _B8, _C8, _D8, _E8, _F8, _G8, _H8 
 };
 
+enum dir_t { LEFT = -1, RIGHT = 1, UP = 10, DOWN = -10, 
+	     UPLEFT = 9, UPRIGHT = 11, DOWNLEFT = -11, DOWNRIGHT = -9, 
+	     K1 = 8, K2 = -8, K3 = 12, K4 = -12, 
+	     K5 = 19, K6 = -19, K7 = 21, K8 = -21
+};
+
 enum piece_t { wqR = 0, wqN, wqB, wQ, wK, wkB, wkN, wkR,
                wPa, wPb, wPc, wPd, wPe, wPf, wPg, wPh,
                bqR, bqN, bqB, bQ, bK, bkB, bkN, bkR,
