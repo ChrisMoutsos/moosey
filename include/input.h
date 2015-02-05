@@ -3,7 +3,7 @@
 
 class Board;
 
-bool getInput(int&, int&);
-void userInput(Board&, int&, int&);
+bool getInput(Board& b, int& mF, int& mT);
+void userInput(Board& b, int& mF, int& mT);
 
 #endif
