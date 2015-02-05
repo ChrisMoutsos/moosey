@@ -1,1 +1,26 @@
-Work in progress.
+	This is a work in progress.
+
+	The chess board is stored as a 10x12 board, as opposed to an 8x8 board. This lets us utilize sentinal files and ranks. So the chess board is in the 'middle', with an invalid file on either side, and two invalid ranks both above and below the board. Such a representation with sentinal files/ranks is necessary for validating certain moves of certain pieces.
+
+	The pieces are enumerated as (w=White, b=Black, q=Queenside, k=Kingside, the rest is clear):
+	wqR = 0, wqN = 1, wqB = 2, wQ = 3, wK = 4, wkB = 5, wkN = 6, wkR = 7,
+	wPa through wPh = 8 through 15,
+	bqR = 16, bqN = 17, bqB = 18, bQ = 19, bK = 20, bkB = 21, bkN = 22, bkR = 23,
+	bPa through wPh = 24 through 31.
+ 
+So, the default starting position can be imagined as (from White's perspective):
+
+-99 -99 -99 -99 -99 -99 -99 -99 -99 -99
+-99 -99 -99 -99 -99 -99 -99 -99 -99 -99
+-99  16  17  18  19  20  21  22  23 -99
+-99  24  25  26  27  28  29  30  31 -99
+-99  -1  -1  -1  -1  -1  -1  -1  -1 -99
+-99  -1  -1  -1  -1  -1  -1  -1  -1 -99
+-99  -1  -1  -1  -1  -1  -1  -1  -1 -99
+-99  -1  -1  -1  -1  -1  -1  -1  -1 -99
+-99   8   9  10  11  12  13  14  15 -99
+-99   0   1   2   3   4   5   6   7 -99
+-99 -99 -99 -99 -99 -99 -99 -99 -99 -99
+-99 -99 -99 -99 -99 -99 -99 -99 -99 -99
+
+
