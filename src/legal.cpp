@@ -11,6 +11,8 @@
 
 bool Board::legalMove(int mF, int mT, bool s, bool v) { 
 	bool isInCheck;
+	int realEpSq = epSq;
+
 	if (!validateMove(mF, mT, s)) {
 		if (v) std::cout << "Illegal move..\n";
 		return false;
@@ -18,8 +20,10 @@ bool Board::legalMove(int mF, int mT, bool s, bool v) {
 	movePiece(mF, mT);
 	isInCheck = inCheck(s);
 	unmovePiece(mF, mT);
+
+	epSq = realEpSq;
 	if (isInCheck) {
-		std::cout << "Don't put yourself in check!\n";
+		if (v) std::cout << "Illegal move.\n";
 		return false;
 	}
 	else {
@@ -76,12 +80,15 @@ bool Board::inCheck(bool s) {
 			if (board120[pIndex] != empty) { 
 				if (piece[board120[pIndex]].color != s) { 
 					v = piece[board120[pIndex]].value;
-					if (v == Q_VAL) return true;
+					if (v == Q_VAL) 
+						return true;
 					if (c >= 1 && c <= 4) {
-						if (v == R_VAL) return true;
+						if (v == R_VAL)
+							return true;
 					} 
 					else 
-						if (v == B_VAL)return true;
+						if (v == B_VAL)
+							return true;
 					if (i == 1 && c >= 5) 
 						if (!s != (d==UL || d==UR))
 							return true;

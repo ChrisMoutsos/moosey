@@ -30,7 +30,7 @@ void Board::movePiece(int mF, int mT, bool castling) {
 		//Set potential en passant square
 		if (piece[board120[mF]].value == P_VAL && abs(mF-mT) == 20)
 			epSq = s ? mF+10 : mF-10;
-		else epSq = 0;
+		else epSq = null;
 
 
 		prevOnMoveTo = board120[mT];

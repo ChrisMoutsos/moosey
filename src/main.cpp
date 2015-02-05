@@ -6,9 +6,7 @@
  ---------------------------------
 */
 /*
- *	Labels
- *	Stalemates (check if implemented correctly), draw by material
- * 	Castling, en passants, promotions
+ * 	Promotions
  *	SDL
  *	FEN parsing
  *	Vectors for prevOnMoveTo, pieceMoved, pieceMovedFrom

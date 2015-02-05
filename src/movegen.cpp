@@ -57,7 +57,7 @@ void Board::cleanMoveList(bool s) {
 	for (int i = 0; i < size; i++) {
 		mT = s ? whiteMoveList[i]%100 : blackMoveList[i]%100;
 		mF = s ? (whiteMoveList[i]-mT)/100 : (blackMoveList[i]-mT)/100;
-		if (!legalMove(mF, mT, s, 1)) {
+		if (!legalMove(mF, mT, s)) {
 			if (s) 
 				whiteMoveList.erase(whiteMoveList.begin()+i);
 			else
