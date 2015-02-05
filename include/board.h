@@ -12,7 +12,7 @@ public:
 	Board(std::string FEN);
 	void initializeVars();
 	void emptyBoard();
-	void placePiece(int, int);
+	void placePiece(int p, int sq);
 	void placePiecesDefault();	
 	void initializePieces();
 	//ACCESSORS
@@ -28,52 +28,54 @@ public:
 	int getFromMovelist(bool, int) const;
 	int getTimesMoved(int x) const { return piece[x].moved; };
 	std::string getName(int x) const { return piece[x].name; };
+	int getPos(int x) const { return piece[x].pos; };
 	//MUTATORSS
-	void setMove(int, int);
-	void setPly(int);
-	void setSide(bool);
-	void setPieceMoved(int);
-	void setPieceMovedFrom(int);
-	void setPrevOnMoveTo(int);
-	void setBoard120(int, int);
-	void addToMovelist(bool, int);	
-	void clearMoveList(bool);
-	void killPiece(int);
-	void unkillPiece(int);
-	void setPiecePos(int, int);
-	void incrMoved(int);
-	void decrMoved(int);
+	void setMove(int mF, int mT) { moveFrom = mF; moveTo = mT; };
+	void setPly(int newPly) { ply = newPly; };
+	void setSide(bool newSide) { side = newSide; };
+	void setPieceMoved(int p) { pieceMoved = p; };
+	void setPieceMovedFrom(int sq) { pieceMovedFrom = sq; };
+	void setPrevOnMoveTo(int p) { prevOnMoveTo = p; };
+	void setBoard120(int i, int v) { board120[i] = v; };
+	void addToMovelist(bool s, int v);
+	void clearMoveList(bool s);
+	void killPiece(int p) { piece[p].alive = false; };
+	void unkillPiece(int p) { piece[p].alive = true; };
+	void setPiecePos(int p, int newPos) { piece[p].pos = newPos; };
+	void incrMoved(int p) { piece[p].moved++; };
+	void decrMoved(int p) { piece[p].moved--; };
 
 	//MOVE.CPP 
 	void movePiece();
-	void movePiece(int, int);
+	void movePiece(int mF, int mT, bool castling = false);
 	void unmovePiece();
-	void unmovePiece(int, int);
+	void unmovePiece(int mF, int mT, bool castling = false);
 	void changeTurn();
 	void moveInfo() const;
 
 	//LEGAL.CPP
-	bool legalMove(int, int, bool, bool verbose = false);
-	bool validateMove(int, int, bool) const;
-	bool validatePawnMove(int, int, bool) const;
-	bool validateHozMove(int, int) const;
-	bool validateDiagMove(int, int) const;
-	bool validateKnightMove(int, int) const;
-	bool validateKingMove(int, int) const;
+	bool legalMove(int mF, int mT, bool s, bool v = false);
+	bool validateMove(int mF, int mT, bool s);
+	bool validatePawnMove(int mF, int mT, bool s) const;
+	bool validateHozMove(int mF, int mT) const;
+	bool validateDiagMove(int mF, int mT) const;
+	bool validateKnightMove(int mF, int mT) const;
+	bool validateKingMove(int mF, int mT, bool s);
+	bool canCastle(bool dir, bool s);
 	bool checkStalemate() const;
-	bool checkCheck(bool, bool v = false);
-	bool inCheckmate(bool) const;
-	bool inCheck(bool);
+	bool checkCheck(bool s, bool v = false);
+	bool inCheckmate(bool s) const;
+	bool inCheck(bool s);
 
 	//MOVEGEN.CPP
 	void generateMoveLists();
-	void cleanMoveList(bool);
-	void generateMoveListFor(int);
-	void generateHozMoves(int, int&);
-	void generateDiagMoves(int, int&);
-	void generateKnightMoves(int, int&);
-	void generateKingMoves(int, int&);
-	void generatePawnMoves(int, int&);
+	void cleanMoveList(bool s);
+	void generateMoveListFor(int p);
+	void generateHozMoves(int p, int& counter);
+	void generateDiagMoves(int p, int& counter);
+	void generateKnightMoves(int p, int& counter);
+	void generateKingMoves(int p, int& counter);
+	void generatePawnMoves(int p, int& counter);
 
 	//DATA	
 	struct pieceEntry {
@@ -156,6 +158,9 @@ enum piece_t { wqR = 0, wqN, wqB, wQ, wK, wkB, wkN, wkR,
 
 enum pieceValues_t { P_VAL = 100, N_VAL = 300, B_VAL = 310,
                      R_VAL = 500, Q_VAL = 1000, K_VAL = 9999 
+};
+
+enum sides_t { QUEENSIDE = 0, KINGSIDE = 1
 };
 
 #endif
