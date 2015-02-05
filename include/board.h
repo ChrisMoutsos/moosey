@@ -21,20 +21,24 @@ public:
 	int getPly() const { return ply; };
 	bool getSide() const { return side; };
 	int getPieceMoved() const { return pieceMoved; };
-	int getPieceMovedFrom() const { return pieceMovedFrom; };
+	int getMovedFrom() const { return movedFrom; };
+	int getMovedTo() const { return movedTo; };
 	int getPrevOnMoveTo() const { return prevOnMoveTo; };	
-	int getBoard120(int x) const { return board120[x]; };
-	int getPieceAbbr(int x) const { return piece[x].abbr; };
-	int getFromMovelist(bool, int) const;
-	int getTimesMoved(int x) const { return piece[x].moved; };
-	std::string getName(int x) const { return piece[x].name; };
-	int getPos(int x) const { return piece[x].pos; };
+	int getBoard120(int sq) const { return board120[sq]; };
+	int getPieceAbbr(int p) const { return piece[p].abbr; };
+	int getFromMovelist(bool s, int i) const;
+	int getTimesMoved(int p) const { return piece[p].moved; };
+	std::string getName(int p) const { return piece[p].name; };
+	int getValue(int p) const{ return piece[p].value; };
+	int getPos(int p) const { return piece[p].pos; };
+	int getEpSq() const { return epSq; };
 	//MUTATORSS
 	void setMove(int mF, int mT) { moveFrom = mF; moveTo = mT; };
 	void setPly(int newPly) { ply = newPly; };
 	void setSide(bool newSide) { side = newSide; };
 	void setPieceMoved(int p) { pieceMoved = p; };
-	void setPieceMovedFrom(int sq) { pieceMovedFrom = sq; };
+	void setMovedFrom(int sq) { movedFrom = sq; };
+	void setMovedTo(int sq) { movedTo = sq; };
 	void setPrevOnMoveTo(int p) { prevOnMoveTo = p; };
 	void setBoard120(int i, int v) { board120[i] = v; };
 	void addToMovelist(bool s, int v);
@@ -44,6 +48,7 @@ public:
 	void setPiecePos(int p, int newPos) { piece[p].pos = newPos; };
 	void incrMoved(int p) { piece[p].moved++; };
 	void decrMoved(int p) { piece[p].moved--; };
+	void setEpSq(int sq) { epSq = sq; };
 
 	//MOVE.CPP 
 	void movePiece();
@@ -96,7 +101,8 @@ public:
 	
 private:
 	int moveFrom, moveTo, ply;
-	int pieceMoved, pieceMovedFrom, prevOnMoveTo;
+	int pieceMoved, movedFrom, movedTo, prevOnMoveTo;
+	int epSq, pieceKilled;
 	bool side;
 };
 

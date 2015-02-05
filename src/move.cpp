@@ -10,29 +10,52 @@
 
 void Board::movePiece() {
 	bool c = false;
-	if (side) {
-		if (moveFrom == _E1) 
-			if (moveTo == _G1 || moveTo == _B1)
-				c = true;
-	}
-	else {
-		if (moveFrom == _E8) 
-			if (moveTo == _G8 || moveTo == _B8)
-				c = true;
-	}
+	if (side) 
+		c = (moveFrom == _E1 && (moveTo == _G1 || moveTo == _B1)); 
+	else 
+		c = (moveFrom == _E8 && (moveTo == _G8 || moveTo == _B8)) 
 	movePiece(moveFrom, moveTo, c);
 }
 
 void Board::movePiece(int mF, int mT, bool castling) {
-	int rExtra, kExtra, eExtra;
+	int rExtra, kExtra, eExtra, killSquare = mT;
+	bool s = piece[board120[mF]].color, passanting = false;
 
 	if (!castling) {
+		if (piece[board120[mF]].value == P_VAL && mT == epSq)
+			passanting = true;
+
+		//Set potential en passant square
+		if (piece[board120[mF]].value == P_VAL && abs(mF-mT) == 20)
+			epSq = s ? mF+10 : mF-10;
+		else epSq = null;
+
+
 		prevOnMoveTo = board120[mT];
-		pieceMovedFrom = mF;
+		movedFrom = mF;
+		movedTo = mT;
 		pieceMoved = board120[mF];
-		if (board120[mT] != empty) {
-			piece[board120[mT]].alive = false;
-			piece[board120[mT]].pos = null;
+		
+		pieceKilled = board120[killSquare];
+		if (!passanting) {
+			if (board120[mT] != empty) {
+				piece[board120[mT]].alive = false;
+				piece[board120[mT]].pos = null;
+			}
+		}
+		else {
+			if (s) {
+				std::cout << "EP KILLING " << board120[mT-10] << "\n";
+				piece[board120[mT-10]].alive = false;
+				piece[board120[mT-10]].pos = null;
+				board120[mT-10] = empty;
+			}
+			else {
+				std::cout << "EP KILLING " << board120[mT+10] << "\n";
+				piece[board120[mT+10]].alive = false;
+				piece[board120[mT+10]].pos = null;
+				board120[mT+10] = empty;
+			}
 		}
 	
 		board120[mT] = board120[mF];
@@ -54,7 +77,7 @@ void Board::movePiece(int mF, int mT, bool castling) {
 		}
 	
 		prevOnMoveTo = empty;
-		pieceMovedFrom = mF;
+		movedFrom = mF;
 		pieceMoved = board120[mF];
 		
 		board120[mF+kExtra] = board120[mF];
@@ -73,31 +96,48 @@ void Board::movePiece(int mF, int mT, bool castling) {
 
 void Board::unmovePiece() {
 	bool c = false;
-	if (side) {
-		if (moveFrom == _E1) 
-			if (moveTo == _G1 || moveTo == _B1)
-				c = true;
-	}
-	else {
-		if (moveFrom == _E8) 
-			if (moveTo == _G8 || moveTo == _B8)
-				c = true;
-	}
+	if (side)
+		c = (moveFrom == _E1 && (moveTo == _G1 || moveTo == _B1));
+	else
+		c = (moveFrom == _E8 && (moveTo == _G8 || moveTo == _B8)); 
 	unmovePiece(moveFrom, moveTo, c);
 }
 
 void Board::unmovePiece(int mF, int mT, bool castling) {
 	int rExtra, kExtra, eExtra;
+	int diffMTMF = abs(mT-mF);
+	bool s = piece[board120[mT]].color, unpassanting = false;
 
 	if (!castling) {
+		if (piece[pieceMoved].value == P_VAL && prevOnMoveTo == empty) {
+			if (diffMTMF == 11 || diffMTMF == 9)
+				unpassanting = true;
+		}
 		board120[mF] = pieceMoved;
 		piece[board120[mF]].pos = mF;
 		piece[board120[mF]].moved--;
 	
 		board120[mT] = prevOnMoveTo;
-		if (board120[mT] != empty) {
-			piece[board120[mT]].pos = mT;
-			piece[board120[mT]].alive = true;
+		
+		if (!unpassanting) {
+			if (board120[mT] != empty) {
+				piece[board120[mT]].pos = mT;
+				piece[board120[mT]].alive = true;
+			}
+		}
+		else {
+			if (s) {
+				board120[mT-10] = pieceKilled;
+				std::cout << "EP KILLING " << board120[mT-10] << "\n";
+				piece[board120[mT-10]].pos = mT-10;
+				piece[board120[mT-10]].alive = true;
+			}
+			else {
+				board120[mT+10] = pieceKilled;
+				std::cout << "EP KILLING " << board120[mT-10] << "\n";
+				piece[board120[mT+10]].pos = mT+10;
+				piece[board120[mT+10]].alive = true;
+			}
 		}
 	}
 	else {

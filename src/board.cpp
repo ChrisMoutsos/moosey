@@ -28,9 +28,11 @@ void Board::initializeVars() {
 	moveTo = 0;
 	ply = 0;
 	side = WHITE;
-	pieceMoved = -1;
-	pieceMovedFrom = 0;
-	prevOnMoveTo = -1;
+	pieceMoved = empty;
+	movedFrom = null;
+	movedTo = null;
+	prevOnMoveTo = empty;
+	epSq = null;
 }
 
 void Board::emptyBoard() {

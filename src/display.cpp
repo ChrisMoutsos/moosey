@@ -56,7 +56,7 @@ void printRow(const Board& b, bool& color, int startingSquare) {
 				cout << " " << a << " ";
 		}
 		else {
-			if (b.getPieceMovedFrom() == x) 
+			if (b.getMovedFrom() == x) 
 				color ? cout << " / " : cout << " \\ ";
 			else 
 				color ? cout << "***" : cout << "   ";

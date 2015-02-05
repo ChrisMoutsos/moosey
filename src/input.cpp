@@ -16,7 +16,6 @@ bool getInput(Board& b, int& mF, int& mT) {
 	string input;
 	getline(cin, input);
 
-
 	if (input == "o-o" || input == "O-O" || input == "0-0") {
 		if (b.canCastle(KINGSIDE, b.getSide())) {
 			mF = b.getSide() ? b.getPos(wK) : b.getPos(bK);

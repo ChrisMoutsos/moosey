@@ -18,7 +18,14 @@ bool Board::legalMove(int mF, int mT, bool s, bool v) {
 	movePiece(mF, mT);
 	isInCheck = inCheck(s);
 	unmovePiece(mF, mT);
-	return isInCheck ? false : true;
+	if (isInCheck) {
+		std::cout << "Don't put yourself in check!\n";
+		return false;
+	}
+	else {
+		std::cout << "You're good\n";
+		return true;
+	}
 }
 
 bool Board::checkStalemate() const {
@@ -75,12 +82,12 @@ bool Board::inCheck(bool s) {
 						if (v == R_VAL) return true;
 					} 
 					else 
-						if (v == B_VAL) return true;
+						if (v == B_VAL)return true;
 					if (i == 1 && c >= 5) 
 						if (!s != (d==UL || d==UR))
 							return true;
 				}
-				else break;
+				break;
 			}
 			i++;
 			pIndex = kPos+d*i;
@@ -93,7 +100,7 @@ bool Board::inCheck(bool s) {
 		pIndex = kPos + d;
 		if (board120[pIndex] != empty && board120[pIndex] != invalid)
 			if (piece[board120[pIndex]].color == !s)
-				if (piece[board120[pIndex]].value == N_VAL) 
+				if (piece[board120[pIndex]].value == N_VAL)
 					return true;
 		
 	}
@@ -150,7 +157,11 @@ bool Board::validatePawnMove(int mF, int mT, bool s) const {
 		else return false;
 	}
 	if (diff == 9 || diff == 11) {		//Attacking
-		if (onMT == empty) return false;
+		if (onMT == empty) { 	
+			if (mT == epSq) 	//En passanting
+				return true;
+			return false;	
+		}
 		if (s != piece[onMT].color) return true;
 		else return false;
 	}
