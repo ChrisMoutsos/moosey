@@ -93,7 +93,7 @@ void Board::unmovePiece() {
 }
 
 void Board::unmovePiece(int mF, int mT, bool castling) {
-	int rExtra, kExtra, eExtra;
+	int rExtra, kExtra, eExtra, epExtra = 0;
 	int diffMTMF = abs(mT-mF);
 	bool s = piece[board120[mT]].color, unpassanting = false;
 
@@ -102,6 +102,7 @@ void Board::unmovePiece(int mF, int mT, bool castling) {
 			if (diffMTMF == 11 || diffMTMF == 9) {
 				unpassanting = true;
 				epSq = mT;
+				epExtra = s ? -10 : 10;
 			}
 		}
 		board120[mF] = pieceMoved;
@@ -109,24 +110,12 @@ void Board::unmovePiece(int mF, int mT, bool castling) {
 		piece[board120[mF]].moved--;
 	
 		board120[mT] = prevOnMoveTo;
-		
-		if (!unpassanting) {
-			if (board120[mT] != empty) {
-				piece[board120[mT]].pos = mT;
-				piece[board120[mT]].alive = true;
-			}
-		}
-		else {
-			if (s) {
-				board120[mT-10] = pieceKilled;
-				piece[board120[mT-10]].pos = mT-10;
-				piece[board120[mT-10]].alive = true;
-			}
-			else {
-				board120[mT+10] = pieceKilled;
-				piece[board120[mT+10]].pos = mT+10;
-				piece[board120[mT+10]].alive = true;
-			}
+		if (unpassanting)
+			board120[mT+epExtra] = pieceKilled;
+
+		if (unpassanting || board120[mT] != empty) {
+			piece[board120[mT+epExtra]].pos = mT+epExtra;
+			piece[board120[mT+epExtra]].alive = true;
 		}
 	}
 	else {
