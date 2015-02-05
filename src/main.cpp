@@ -6,10 +6,12 @@
  ---------------------------------
 */
 /*
+ *	Labels
  *	Stalemates (check if implemented correctly), draw by material
  * 	Castling, en passants, promotions
- *	Vectors for prevOnMoveTo, pieceMoved, pieceMovedFrom
  *	SDL
+ *	FEN parsing
+ *	Vectors for prevOnMoveTo, pieceMoved, pieceMovedFrom
  */
 
 #include <iostream>
@@ -24,6 +26,7 @@ int main() {
 	int mF = 0, mT = 0;
 	Board board;
 	displayBoard(board);
+
 	while (!exit) {
 		userInput(board, mF, mT);
 		board.setMove(mF, mT);
