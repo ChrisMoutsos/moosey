@@ -23,7 +23,6 @@ bool Board::legalMove(int mF, int mT, bool s, bool v) {
 		return false;
 	}
 	else {
-		std::cout << "You're good\n";
 		return true;
 	}
 }

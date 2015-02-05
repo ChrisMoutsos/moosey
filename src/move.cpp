@@ -13,7 +13,7 @@ void Board::movePiece() {
 	if (side) 
 		c = (moveFrom == _E1 && (moveTo == _G1 || moveTo == _B1)); 
 	else 
-		c = (moveFrom == _E8 && (moveTo == _G8 || moveTo == _B8)) 
+		c = (moveFrom == _E8 && (moveTo == _G8 || moveTo == _B8)); 
 	movePiece(moveFrom, moveTo, c);
 }
 
@@ -21,14 +21,16 @@ void Board::movePiece(int mF, int mT, bool castling) {
 	int rExtra, kExtra, eExtra, killSquare = mT;
 	bool s = piece[board120[mF]].color, passanting = false;
 
-	if (!castling) {
-		if (piece[board120[mF]].value == P_VAL && mT == epSq)
+	if (!castling) {	
+		if (piece[board120[mF]].value == P_VAL && mT == epSq) {
 			passanting = true;
+			killSquare = s ? mT-10 : mT+10;
+		}
 
 		//Set potential en passant square
 		if (piece[board120[mF]].value == P_VAL && abs(mF-mT) == 20)
 			epSq = s ? mF+10 : mF-10;
-		else epSq = null;
+		else epSq = 0;
 
 
 		prevOnMoveTo = board120[mT];
@@ -45,13 +47,11 @@ void Board::movePiece(int mF, int mT, bool castling) {
 		}
 		else {
 			if (s) {
-				std::cout << "EP KILLING " << board120[mT-10] << "\n";
 				piece[board120[mT-10]].alive = false;
 				piece[board120[mT-10]].pos = null;
 				board120[mT-10] = empty;
 			}
 			else {
-				std::cout << "EP KILLING " << board120[mT+10] << "\n";
 				piece[board120[mT+10]].alive = false;
 				piece[board120[mT+10]].pos = null;
 				board120[mT+10] = empty;
@@ -110,8 +110,10 @@ void Board::unmovePiece(int mF, int mT, bool castling) {
 
 	if (!castling) {
 		if (piece[pieceMoved].value == P_VAL && prevOnMoveTo == empty) {
-			if (diffMTMF == 11 || diffMTMF == 9)
+			if (diffMTMF == 11 || diffMTMF == 9) {
 				unpassanting = true;
+				epSq = mT;
+			}
 		}
 		board120[mF] = pieceMoved;
 		piece[board120[mF]].pos = mF;
@@ -128,13 +130,11 @@ void Board::unmovePiece(int mF, int mT, bool castling) {
 		else {
 			if (s) {
 				board120[mT-10] = pieceKilled;
-				std::cout << "EP KILLING " << board120[mT-10] << "\n";
 				piece[board120[mT-10]].pos = mT-10;
 				piece[board120[mT-10]].alive = true;
 			}
 			else {
 				board120[mT+10] = pieceKilled;
-				std::cout << "EP KILLING " << board120[mT-10] << "\n";
 				piece[board120[mT+10]].pos = mT+10;
 				piece[board120[mT+10]].alive = true;
 			}
