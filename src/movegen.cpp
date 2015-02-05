@@ -148,6 +148,14 @@ void Board::generateKingMoves(int p, int& counter) {
                         counter++;
                 }
         }
+	if (canCastle(KINGSIDE, s)) { 
+		piece[p].moveList[counter] = s ? _G1 : _G8;
+		counter++;
+	}
+	if (canCastle(QUEENSIDE, s)) { 
+		piece[p].moveList[counter] = s ? _B1 : _B8;
+		counter++;
+	}
 
 }
 
