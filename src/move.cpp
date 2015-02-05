@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include "board.h"
+#include <array>
 
 void Board::movePiece() {
 	bool c = false;
@@ -18,7 +19,9 @@ void Board::movePiece() {
 }
 
 void Board::movePiece(int mF, int mT, bool castling) {
-	int rExtra, kExtra, eExtra, killSquare = mT, epExtra = 0;
+	std::array<int, 3> cExtras; //For castling, it holds how far away
+			            //mF is from final pos of K, R, and corner
+	int killSquare = mT, epExtra = 0;
 	bool s = piece[board120[mF]].color, passanting = false;
 
 	if (!castling) {	
@@ -54,31 +57,24 @@ void Board::movePiece(int mF, int mT, bool castling) {
 		piece[board120[mT]].moved++;
 	}
 	else {
-		if (mT == _G1 || mT == _G8) {
-			eExtra = 3;
-			kExtra = 2;
-			rExtra = 1;
-		}
-		else {
-			eExtra = -4;
-			kExtra = -2;
-			rExtra = -1;
-		}
+		cExtras = {-2, -1, -4};		//Queenside
+		if (mT == _G1 || mT == _G8) 
+			cExtras = {2, 1, 3};	//Kingside
 	
 		prevOnMoveTo = empty;
 		movedFrom = mF;
 		pieceMoved = board120[mF];
 		
-		board120[mF+kExtra] = board120[mF];
+		board120[mF+cExtras[0]] = board120[mF];
 		board120[mF] = empty;
-		board120[mF+rExtra] = board120[mF+eExtra];
-		board120[mF+eExtra] = empty;
+		board120[mF+cExtras[1]] = board120[mF+cExtras[2]];
+		board120[mF+cExtras[2]] = empty;
 
-		piece[board120[mF+kExtra]].pos = mF+kExtra;
-		piece[board120[mF+rExtra]].pos = mF+rExtra;
+		piece[board120[mF+cExtras[0]]].pos = mF+cExtras[0];
+		piece[board120[mF+cExtras[1]]].pos = mF+cExtras[1];
 	
-		piece[board120[mF+kExtra]].moved++;
-		piece[board120[mF+rExtra]].moved++;
+		piece[board120[mF+cExtras[0]]].moved++;
+		piece[board120[mF+cExtras[1]]].moved++;
 	}
 	ply++;
 }
@@ -93,8 +89,9 @@ void Board::unmovePiece() {
 }
 
 void Board::unmovePiece(int mF, int mT, bool castling) {
-	int rExtra, kExtra, eExtra, epExtra = 0;
-	int diffMTMF = abs(mT-mF);
+	std::array<int, 3> cExtras; //For castling, it holds how far away
+			            //mF is from final pos of K, R, and corner
+	int diffMTMF = abs(mT-mF), epExtra = 0;
 	bool s = piece[board120[mT]].color, unpassanting = false;
 
 	if (!castling) {
@@ -119,27 +116,21 @@ void Board::unmovePiece(int mF, int mT, bool castling) {
 		}
 	}
 	else {
-		if (mT == _G1 || mT == _G8) {
-			eExtra = 3;
-			kExtra = 2;
-			rExtra = 1;
-		}
-		else {
-			eExtra = -4;
-			kExtra = -2;
-			rExtra = -1;
-		}
-		board120[mF] = board120[mF+kExtra];
+		cExtras = {-2, -1, -4};		//Queenside
+		if (mT == _G1 || mT == _G8) 	
+			cExtras = {2, 1, 3};	//Kingside
+
+		board120[mF] = board120[mF+cExtras[0]];
 		board120[mT] = empty;
-		board120[mF+eExtra] = board120[mF+rExtra];
-		board120[mF+kExtra] = empty;
-		board120[mF+rExtra] = empty;
+		board120[mF+cExtras[2]] = board120[mF+cExtras[1]];
+		board120[mF+cExtras[0]] = empty;
+		board120[mF+cExtras[1]] = empty;
 
 		piece[board120[mF]].pos = mF;
-		piece[board120[mF+eExtra]].pos = mF + eExtra;
+		piece[board120[mF+cExtras[2]]].pos = mF+cExtras[2];
 		
 		piece[board120[mF]].moved--;
-		piece[board120[mF+eExtra]].moved--;	
+		piece[board120[mF+cExtras[2]]].moved--;	
 
 	}
 	ply--;
@@ -159,9 +150,9 @@ void Board::moveInfo() const {
 		cout << " moved " << piece[pieceMoved].name;
 		cout << " from " << intToSquare(moveFrom);
 		cout  << " to " << intToSquare(moveTo);
-		if (prevOnMoveTo != empty) {
+		if (pieceKilled != empty) {
 			cout << " and captured a ";
-			cout << piece[prevOnMoveTo].name;
+			cout << piece[pieceKilled].name;
 		}
 	}
 	else {
