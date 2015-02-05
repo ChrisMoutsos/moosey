@@ -9,11 +9,10 @@
 #include "cmath"
 #include "board.h"
 
-bool Board::legalMove(int mF, int mT, bool s, bool verbose) { 
+bool Board::legalMove(int mF, int mT, bool s, bool v) { 
 	bool isInCheck;
-
 	if (!validateMove(mF, mT, s)) {
-		if (verbose) std::cout << "Illegal move.\n";
+		if (v) std::cout << "Illegal move..\n";
 		return false;
 	}
 	movePiece(mF, mT);
@@ -30,13 +29,13 @@ bool Board::checkStalemate() const {
 	return false;
 }
 
-bool Board::checkCheck(bool side, bool v) {
-	if (inCheck(side)) {
-		cleanMoveList(side);
-		if (inCheckmate(side)) { 
-			side ? std::cout << "White" : std::cout << "Black";
+bool Board::checkCheck(bool s, bool v) {
+	if (inCheck(s)) {
+		cleanMoveList(s);
+		if (inCheckmate(s)) { 
+			s ? std::cout << "White" : std::cout << "Black";
 			std::cout << " is in checkmate. ";
-			side ? std::cout << "Black wins!\n" : std::cout << "White wins!\n";
+			s ? std::cout << "Black wins!\n" : std::cout << "White wins!\n";
 			return true;
 		}
 		else {
@@ -50,10 +49,10 @@ bool Board::checkCheck(bool side, bool v) {
 	return false;
 }
 
-bool Board::inCheckmate(bool side) const { 
-	if (side && (int)whiteMoveList.size() == 0) 
+bool Board::inCheckmate(bool s) const { 
+	if (s && (int)whiteMoveList.size() == 0) 
 		return true;
-	else if (!side && (int)blackMoveList.size() == 0) 
+	else if (!s && (int)blackMoveList.size() == 0) 
 		return true;
 	return false;
 }
@@ -62,13 +61,14 @@ bool Board::inCheck(bool s) {
 	int kPos, pIndex, i, v, d;
 	kPos = s ? piece[wK].pos : piece[bK].pos;
 
+	/* Search ranks/files/diagonals for appropriate piece. */
 	for (int c = 1; c <= 8; c++) {
 		d = c==1 ? L : c==2 ? R : c==3 ? U : c==4 ? D : c==5 ? UL : c==6 ? UR : c==7 ? DL : DR;
 		i = 1;
 		pIndex = kPos+d*i;
-		while (board120[pIndex] != invalid) {
-			if (board120[pIndex] != empty) {
-				if (piece[board120[pIndex]].color != s) {
+		while (board120[pIndex] != invalid) { 
+			if (board120[pIndex] != empty) { 
+				if (piece[board120[pIndex]].color != s) { 
 					v = piece[board120[pIndex]].value;
 					if (v == Q_VAL) return true;
 					if (c >= 1 && c <= 4) {
@@ -86,26 +86,34 @@ bool Board::inCheck(bool s) {
 			pIndex = kPos+d*i;
 		}
 	}
+	
+	/* Search the knight squares around the king for a knight. */
 	for (int c = 1; c <= 8; c++) {
-		d = c==1 ? K1 : c==2 ? K2 : i==3 ? K3 : i==4 ? K4 : i==5 ? K5 : 1==6 ? K6 : i==7 ? K7 : K8;
+		d = c==1 ? K1 : c==2 ? K2 : c==3 ? K3 : c==4 ? K4 : c==5 ? K5 : c==6 ? K6 : c==7 ? K7 : K8;
 		pIndex = kPos + d;
-		if (board120[pIndex] != empty) {
-			if (piece[board120[pIndex]].color == !s) {
-				if (piece[board120[pIndex]].value == N_VAL) return true;
-			}
-		}
+		if (board120[pIndex] != empty && board120[pIndex] != invalid)
+			if (piece[board120[pIndex]].color == !s)
+				if (piece[board120[pIndex]].value == N_VAL) 
+					return true;
+		
 	}
 
 	return false;
 }
 
-bool Board::validateMove(int mF, int mT, bool s) const {
-	int value = piece[board120[mF]].value, onMF = board120[mF], onMT = board120[mT];
+bool Board::validateMove(int mF, int mT, bool s) {
+	int onMF = board120[mF], onMT = board120[mT], value = piece[onMF].value;
+	bool castle = false;
+	if (s && onMF == wK && (mT == _G1 || mT == _B1))
+		castle = true;
+	else if (!s && onMF == bK && (mT == _G8 || mT == _B8))
+		castle = true;
 
 	if (onMF == -1 || mT == 0 || board120[mT] == invalid) 
 		return false;
-	if (onMT != empty && piece[onMF].color == piece[onMT].color) 
+	if (onMT != empty && piece[onMF].color == piece[onMT].color && !castle) {
 		return false;
+	}
 	if (piece[onMF].color != s) 
 		return false;
 
@@ -118,7 +126,7 @@ bool Board::validateMove(int mF, int mT, bool s) const {
 	else if (value == Q_VAL) 
 		return (validateHozMove(mF, mT) | (validateDiagMove(mF, mT)));
 	else if (value == K_VAL)
-		return validateKingMove(mF, mT);
+		return validateKingMove(mF, mT, s);
 	else if (value == P_VAL)
 		return validatePawnMove(mF, mT, s);
 
@@ -131,16 +139,17 @@ bool Board::validatePawnMove(int mF, int mT, bool s) const {
 	int onMF = board120[mF], onMT = board120[mT];
 	int diff = abs(mF - mT);
 
-	if ((s && mF > mT) || (!s && mF < mT)) //Ensures correct direction
+	if ((s && mF > mT) || (!s && mF < mT))  //Ensures correct direction
 		return false;
 
-	if (diff == 10 && onMT == empty) 
+	if (diff == 10 && onMT == empty)	//Moving forward one square
 		return true;
-	if (diff == 20 && onMT == empty) {
-		if (board120[mF+extra] == empty && piece[onMF].moved == 0) return true;
+	if (diff == 20 && onMT == empty) {	//Moving forward two squares
+		if (board120[mF+extra] == empty && piece[onMF].moved == 0) 
+			return true;
 		else return false;
 	}
-	if (diff == 9 || diff == 11) {
+	if (diff == 9 || diff == 11) {		//Attacking
 		if (onMT == empty) return false;
 		if (s != piece[onMT].color) return true;
 		else return false;
@@ -182,14 +191,43 @@ bool Board::validateKnightMove(int mF, int mT) const {
 	if (diff == 8 || diff == 12 || diff == 19 || diff == 21) {
 		if (onMT == empty) 
 			return true;
-		if (!piece[onMF].color != !piece[onMT].color)
+		if (piece[onMF].color != piece[onMT].color)
 			return true;
 	}
 	return false;
 }
 
-bool Board::validateKingMove(int mF, int mT) const {
+bool Board::validateKingMove(int mF, int mT, bool s) {
 	int diff = abs(mF - mT);
-	return (diff == 1 || diff == 10 || diff == 9 || diff == 11) ? true : false;
+	
+	if (diff == 1 || diff == 10 || diff == 9 || diff == 11)
+		return true;
+	else if (mF - mT == -2 || mF - mT == 3) //Castling 
+		return true;
+	return false;
 }
 
+bool Board::canCastle(bool dir, bool s) {
+	int k = s ? wK : bK;
+	int r = s ? dir ? wkR : wqR : dir ? bkR : bqR;
+	int kSq, c = dir ? 1 : -1;
+
+	if (piece[k].moved || piece[r].moved) return false;
+	for (int i = 1; i <= 3; i++) {	//Verify it's empty between K and R
+		if (dir && i == 3) break;
+		if (board120[piece[k].pos+i*c] != empty) return false;
+	}
+	if (inCheck(s)) return false;	//Verify not in check
+	
+	for (int j = 1; j <= 3; j++) {	//Verify not going through/to check
+		if (dir && j==3) break;
+		kSq = piece[k].pos;
+		movePiece(kSq, kSq+j*c);
+		if (inCheck(s)) {
+			unmovePiece(kSq, kSq+j*c);
+			return false;
+		}
+		unmovePiece(kSq, kSq+j*c);
+	}
+	return true;
+}

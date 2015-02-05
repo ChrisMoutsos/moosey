@@ -10,11 +10,35 @@
 #include "board.h"
 #include "input.h"
 
-bool getInput(int& moveFrom, int& moveTo) {
+bool getInput(Board& b, int& mF, int& mT) {
 	using namespace std;
 	
 	string input;
 	getline(cin, input);
+
+
+	if (input == "o-o" || input == "O-O" || input == "0-0") {
+		if (b.canCastle(KINGSIDE, b.getSide())) {
+			mF = b.getSide() ? b.getPos(wK) : b.getPos(bK);
+			mT = b.getSide() ? _G1 : _G8;
+			return true;
+		}
+		else {
+			cout << "Illegal move!\n";
+			return false;
+		}
+	}
+	if (input == "o-o-o" || input == "O-O-O" || input == "0-0-0") {
+		if (b.canCastle(QUEENSIDE, b.getSide())) {
+			mF = b.getSide() ? b.getPos(wK) : b.getPos(bK);
+			mT = b.getSide() ? _B1 : _B8;
+			return true;
+		}
+		else {
+			cout << "Illegal move!\n";
+			return false;
+		}
+	}
 
 	if ((int)input.size() != 5 || input[2] != ' ') {
 		cout << "Invalid input.\n";
@@ -27,18 +51,18 @@ bool getInput(int& moveFrom, int& moveTo) {
 			return false;
 		}
 
-	moveFrom = int(input[0])-96 + ((int(input[1])-47))*10;
-	moveTo = int(input[3])-96 +  ((int(input[4])-47))*10;
+	mF = int(input[0])-96 + ((int(input[1])-47))*10;
+	mT = int(input[3])-96 +  ((int(input[4])-47))*10;
 	
 	return true;
 }
 
-void userInput(Board& board, int& mF, int& mT) {	
+void userInput(Board& b, int& mF, int& mT) {	
 	using namespace std;
 	
 	do {
-		board.checkCheck(board.getSide(), 1);
-		board.getSide() ? cout << "White" : cout << "Black";
+		b.checkCheck(b.getSide(), 1);
+		b.getSide() ? cout << "White" : cout << "Black";
 		cout << " to move:\n\t";
-	} while (!getInput(mF, mT) || !board.legalMove(mF, mT, board.getSide(), 1));
+	} while (!getInput(b, mF, mT) || !b.legalMove(mF, mT, b.getSide(), 1));
 }
