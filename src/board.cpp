@@ -44,9 +44,9 @@ void Board::emptyBoard() {
 	}
 }
 
-void Board::placePiece(int pieceNumber, int square) {
-	piece[pieceNumber].pos = square;
-	board120[square] = pieceNumber;
+void Board::placePiece(int p, int sq) {
+	piece[p].pos = sq;
+	board120[sq] = p;
 }
 
 void Board::placePiecesDefault() {
@@ -90,106 +90,13 @@ void Board::initializePieces() {
         }
 }
 
-void Board::setMove(int mF, int mT) {
-	moveFrom = mF;
-	moveTo = mT;
-}
 
-void Board::setPly(int newPly) {
-	if (ply >= 0)  {
-		ply = newPly;
-		return;
-	}
-	std::cout << "Invalid setPly\n";
-}
-
-void Board::setSide(bool newSide) {
-	side = newSide;
-}
-
-void Board::setPieceMoved(int newPM) {
-	if (newPM >= empty && newPM <= bPh) {
-		pieceMoved = newPM;
-		return;
-	}
-	std::cout << "Invalid setPieceMoved\n";
-}
-
-void Board::setPieceMovedFrom(int newPMF) {
-	if (newPMF >= 1 && newPMF <= 64) {
-		pieceMovedFrom = newPMF;
-		return;
-	}
-	std::cout << "Invalid setPieceMovedFrom\n";
-}
-
-void Board::setPrevOnMoveTo(int newPOMT) {
-	if (newPOMT >= empty && newPOMT <= bPh) {
-		prevOnMoveTo = newPOMT;
-		return;
-	}
-	std::cout << "Invalid setPrevOnMoveTo\n";
-}
-
-void Board::setBoard120(int i, int v) {
-	if (i >= 0 && i < 120) 
-		if (v >= invalid && v <= bPh) {
-			board120[i] = v;
-			return;
-		}
-	std::cout << "Invalid setBoard120\n"; 
-}
-
-void Board::addToMovelist(bool side, int v) {
-	if (side) whiteMoveList.push_back(v);
+void Board::addToMovelist(bool s, int v) {
+	if (s) whiteMoveList.push_back(v);
 	else blackMoveList.push_back(v);
 }
 
-void Board::clearMoveList(bool side) {
-	if (side) whiteMoveList.clear();
+void Board::clearMoveList(bool s) {
+	if (s) whiteMoveList.clear();
 	else blackMoveList.clear();
-}
-
-void Board::killPiece(int i) {
-	if (i >= wqR && i <= bPh) {
-		piece[i].alive = false;
-		return;
-	}
-	std::cout << "Invalid killPiece\n";
-}
-
-void Board::unkillPiece(int i) {
-	if (i >= wqR && i <= bPh) {
-		piece[i].alive = true;
-		return;
-	}
-	std::cout << "Invalid unkillPiece\n";
-}
-
-void Board::setPiecePos(int p, int position) {
-	if (!(p >= wqR && p <= bPh)) {
-		std::cout << "Bad piece in setPiecePos\n";
-		return;
-	}
-	if (!(position >= 0 && position <= 64)) {
-		std::cout << "Bad pos in setPiecePos\n";
-		return;
-	}
-	piece[p].pos = position;
-}
-
-void Board::incrMoved(int p) {
-	if (!(p >= wqR && p <= bPh)) {
-		std::cout << "Bad piece in incrMoved\n";
-		return;
-	}
-	piece[p].moved++;
-}
-
-void Board::decrMoved(int p) {
-	if (!(p >= wqR && p <= bPh)) {
-		std::cout << "Bad piece in decrMoved\n";
-		return;
-	}
-	piece[p].moved--;
 }
