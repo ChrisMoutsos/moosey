@@ -18,13 +18,14 @@ void Board::movePiece() {
 }
 
 void Board::movePiece(int mF, int mT, bool castling) {
-	int rExtra, kExtra, eExtra, killSquare = mT;
+	int rExtra, kExtra, eExtra, killSquare = mT, epExtra = 0;
 	bool s = piece[board120[mF]].color, passanting = false;
 
 	if (!castling) {	
 		if (piece[board120[mF]].value == P_VAL && mT == epSq) {
 			passanting = true;
 			killSquare = s ? mT-10 : mT+10;
+			epExtra = s ? -10 : 10;
 		}
 
 		//Set potential en passant square
@@ -39,23 +40,11 @@ void Board::movePiece(int mF, int mT, bool castling) {
 		pieceMoved = board120[mF];
 		
 		pieceKilled = board120[killSquare];
-		if (!passanting) {
-			if (board120[mT] != empty) {
-				piece[board120[mT]].alive = false;
-				piece[board120[mT]].pos = null;
-			}
-		}
-		else {
-			if (s) {
-				piece[board120[mT-10]].alive = false;
-				piece[board120[mT-10]].pos = null;
-				board120[mT-10] = empty;
-			}
-			else {
-				piece[board120[mT+10]].alive = false;
-				piece[board120[mT+10]].pos = null;
-				board120[mT+10] = empty;
-			}
+		if (board120[mT+epExtra] != empty) {
+			piece[board120[mT+epExtra]].alive = false;
+			piece[board120[mT+epExtra]].pos = null;
+			if (passanting)
+				board120[mT+epExtra] = empty;
 		}
 	
 		board120[mT] = board120[mF];
