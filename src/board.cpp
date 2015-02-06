@@ -24,18 +24,9 @@ Board::Board(std::string FEN) {
 }
 
 void Board::initializeVars() {
-	wInCheck = false;
-	bInCheck = false;
-	moveFrom = 0;
-	moveTo = 0;
-	ply = 0;
+	moveFrom = movedFrom = moveTo = movedTo = ply = epSq = pmSq = null;
 	side = WHITE;
-	pieceMoved = empty;
-	movedFrom = null;
-	movedTo = null;
-	prevOnMoveTo = empty;
-	epSq = null;
-	pmSq = null;
+	pieceMoved = prevOnMoveTo = empty;
 }
 
 void Board::emptyBoard() {
