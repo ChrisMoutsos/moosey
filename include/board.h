@@ -21,8 +21,6 @@ public:
 	int getPly() const { return ply; };
 	bool getSide() const { return side; };
 	int getPieceMoved() const { return pieceMoved; };
-	int getMovedFrom() const { return movedFrom; };
-	int getMovedTo() const { return movedTo; };
 	int getPrevOnMoveTo() const { return prevOnMoveTo; };	
 	int getBoard120(int sq) const { return board120[sq]; };
 	int getPieceAbbr(int p) const { return piece[p].abbr; };
@@ -38,8 +36,6 @@ public:
 	void setPly(int newPly) { ply = newPly; };
 	void setSide(bool newSide) { side = newSide; };
 	void setPieceMoved(int p) { pieceMoved = p; };
-	void setMovedFrom(int sq) { movedFrom = sq; };
-	void setMovedTo(int sq) { movedTo = sq; };
 	void setPrevOnMoveTo(int p) { prevOnMoveTo = p; };
 	void setBoard120(int i, int v) { board120[i] = v; };
 	void addToMovelist(bool s, int v);
@@ -102,7 +98,7 @@ public:
 	
 private:
 	int moveFrom, moveTo, ply;
-	int pieceMoved, movedFrom, movedTo, prevOnMoveTo;
+	int pieceMoved, prevOnMoveTo;
 	int pieceKilled, epSq, pmSq;
 	bool side;
 };

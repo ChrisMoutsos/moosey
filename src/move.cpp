@@ -47,8 +47,6 @@ void Board::movePiece(int mF, int mT, bool castling) {
 
 
 		prevOnMoveTo = board120[mT];
-		movedFrom = mF;
-		movedTo = mT;
 		pieceMoved = board120[mF];
 		
 		pieceKilled = board120[killSquare];
@@ -71,7 +69,6 @@ void Board::movePiece(int mF, int mT, bool castling) {
 			cExtras = {2, 1, 3};	//Kingside
 	
 		prevOnMoveTo = empty;
-		movedFrom = mF;
 		pieceMoved = board120[mF];
 		
 		board120[mF+cExtras[0]] = board120[mF];
