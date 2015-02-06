@@ -9,8 +9,6 @@
 #include "cmath"
 #include "board.h"
 
-void showMoveLists(Board &b);
-
 bool Board::legalMove(int mF, int mT, bool s, bool v) { 
 	bool isInCheck;
 	int realEpSq = epSq;
@@ -42,7 +40,6 @@ bool Board::checkStalemate() const {
 bool Board::checkCheck(bool s, bool v) {
 	if (inCheck(s)) {
 		cleanMoveList(s);
-		showMoveLists(*this);
 		if (inCheckmate(s)) { 
 			s ? std::cout << "White" : std::cout << "Black";
 			std::cout << " is in checkmate. ";
