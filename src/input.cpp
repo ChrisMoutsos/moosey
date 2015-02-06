@@ -60,7 +60,6 @@ void userInput(Board& b, int& mF, int& mT) {
 	using namespace std;
 	
 	do {
-		b.checkCheck(b.getSide(), 1);
 		b.getSide() ? cout << "White" : cout << "Black";
 		cout << " to move:\n\t";
 	} while (!getInput(b, mF, mT) || !b.legalMove(mF, mT, b.getSide(), 1));

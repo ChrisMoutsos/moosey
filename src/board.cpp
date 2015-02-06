@@ -9,7 +9,7 @@
 #include <string>
 #include "board.h"
 
-Board::Board() {
+Board::Board() { 
 	initializeVars();
 	emptyBoard();
 	initializePieces();
@@ -24,6 +24,8 @@ Board::Board(std::string FEN) {
 }
 
 void Board::initializeVars() {
+	wInCheck = false;
+	bInCheck = false;
 	moveFrom = 0;
 	moveTo = 0;
 	ply = 0;
@@ -33,6 +35,7 @@ void Board::initializeVars() {
 	movedTo = null;
 	prevOnMoveTo = empty;
 	epSq = null;
+	pmSq = null;
 }
 
 void Board::emptyBoard() {
@@ -87,7 +90,7 @@ void Board::initializePieces() {
 
 	for (int i = wqR; i <= bPh; i++) {
                 v = piece[i].value;
-                piece[i].moveListSize = v==K_VAL ? 8 : v==R_VAL ? 14 : v==N_VAL ? 8 : v==P_VAL ? 4 : v==B_VAL ? 13:27;
+		piece[i].moveListSize = v==K_VAL ? 8 : v==R_VAL ? 14 : v==N_VAL ? 8 : v==B_VAL ? 13 : 27;
                 piece[i].moveList = new int[piece[i].moveListSize];
         }
 }

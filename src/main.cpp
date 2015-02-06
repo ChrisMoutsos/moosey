@@ -5,20 +5,13 @@
 	      main.cpp
  ---------------------------------
 */
-/*
- *	Verify that en passants are on moveList
- * 	Promotions
- *	SDL
- *	FEN parsing
- *	Vectors for various member data of Board,
- *	in anticipation of the bot making multiple moves.
- *	Similarly, add vector of all moves made
- */
 
 #include <iostream>
 #include "board.h"
 #include "display.h"
 #include "input.h"
+
+void showMoveLists(Board& board);
 
 using namespace std;
 
@@ -37,7 +30,7 @@ int main() {
 		board.moveInfo();
 		board.generateMoveLists();
 
-		if (board.checkCheck(board.getSide())) 
+		if (board.checkCheck(board.getSide(), 1)) 
 			exit = true;
 	}
 

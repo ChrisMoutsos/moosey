@@ -32,6 +32,7 @@ public:
 	int getValue(int p) const{ return piece[p].value; };
 	int getPos(int p) const { return piece[p].pos; };
 	int getEpSq() const { return epSq; };
+	int getPmSq() const { return pmSq; };
 	//MUTATORSS
 	void setMove(int mF, int mT) { moveFrom = mF; moveTo = mT; };
 	void setPly(int newPly) { ply = newPly; };
@@ -90,7 +91,7 @@ public:
         	int pos;        	//Board64 position
         	int moved;      	//>=0
         	bool alive;    
-        	int promoted;   	//0:none, 1:B, 2:R, 3:K, 4:Q
+        	bool promoted;   	//Only queen promotions
 		bool color;
         	int* moveList;  	
 		int moveListSize;
@@ -102,7 +103,7 @@ public:
 private:
 	int moveFrom, moveTo, ply;
 	int pieceMoved, movedFrom, movedTo, prevOnMoveTo;
-	int epSq, pieceKilled;
+	int pieceKilled, epSq, pmSq;
 	bool side;
 };
 

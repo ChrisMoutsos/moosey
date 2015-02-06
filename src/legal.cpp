@@ -26,9 +26,7 @@ bool Board::legalMove(int mF, int mT, bool s, bool v) {
 		if (v) std::cout << "Illegal move.\n";
 		return false;
 	}
-	else {
-		return true;
-	}
+	else return true;
 }
 
 bool Board::checkStalemate() const {

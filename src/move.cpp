@@ -21,7 +21,7 @@ void Board::movePiece() {
 void Board::movePiece(int mF, int mT, bool castling) {
 	std::array<int, 3> cExtras; //For castling, it holds how far away
 			            //mF is from final pos of K, R, and corner
-	int killSquare = mT, epExtra = 0;
+	int killSquare = mT, epExtra = 0, mFVal = piece[board120[mF]].value;
 	bool s = piece[board120[mF]].color, passanting = false;
 
 	if (!castling) {	
@@ -35,6 +35,15 @@ void Board::movePiece(int mF, int mT, bool castling) {
 		if (piece[board120[mF]].value == P_VAL && abs(mF-mT) == 20)
 			epSq = s ? mF+10 : mF-10;
 		else epSq = null;
+
+		if (mFVal == P_VAL && ((s && mT/10 == 9) || (!s && mT/10 == 2))) {
+			pmSq = mT;
+			piece[board120[mF]].value = Q_VAL;
+			piece[board120[mF]].name = "Queen";
+			piece[board120[mF]].abbr = s ? 'Q' : 'q';
+			piece[board120[mF]].promoted = true;
+		}
+		else pmSq = null;
 
 
 		prevOnMoveTo = board120[mT];
@@ -102,6 +111,12 @@ void Board::unmovePiece(int mF, int mT, bool castling) {
 				epExtra = s ? -10 : 10;
 			}
 		}
+		if (mT == pmSq) {
+			piece[board120[mT]].value = P_VAL;
+			piece[board120[mT]].name = "Pawn";
+			piece[board120[mF]].abbr = s ? 'P' : 'p';
+			piece[board120[mT]].promoted = false;
+		}	
 		board120[mF] = pieceMoved;
 		piece[board120[mF]].pos = mF;
 		piece[board120[mF]].moved--;
@@ -147,13 +162,19 @@ void Board::moveInfo() const {
 	else if (moveFrom==_E8 && (moveTo == _B8 || moveTo == _G8))
 		castling = true;
 	if (!castling) {
-		cout << " moved " << piece[pieceMoved].name;
+		cout << " moved ";
+		if (moveTo != pmSq)
+			cout << piece[pieceMoved].name;
+		else 
+			cout << "Pawn";
 		cout << " from " << intToSquare(moveFrom);
 		cout  << " to " << intToSquare(moveTo);
 		if (pieceKilled != empty) {
 			cout << " and captured a ";
 			cout << piece[pieceKilled].name;
 		}
+		if (moveTo == pmSq) 
+			cout << " and promoted to a Queen!";
 	}
 	else {
 		cout << " castled ";
