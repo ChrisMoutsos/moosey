@@ -46,12 +46,13 @@ public:
 	void incrMoved(int p) { piece[p].moved++; };
 	void decrMoved(int p) { piece[p].moved--; };
 	void setEpSq(int sq) { epSq = sq; };
+	void setCastling(bool c) { castling = c; };
 
 	//MOVE.CPP 
 	void movePiece();
-	void movePiece(int mF, int mT, bool castling = false);
+	void movePiece(int mF, int mT);
 	void unmovePiece();
-	void unmovePiece(int mF, int mT, bool castling = false);
+	void unmovePiece(int mF, int mT);
 	void changeTurn();
 	void moveInfo() const;
 
@@ -100,7 +101,7 @@ private:
 	int moveFrom, moveTo, ply;
 	int pieceMoved, prevOnMoveTo;
 	int pieceKilled, epSq, pmSq;
-	bool side;
+	bool side, castling;
 };
 
 //INLINE CONVERSION FUNCTIONS

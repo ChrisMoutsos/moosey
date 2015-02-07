@@ -10,19 +10,21 @@
 #include <array>
 
 void Board::movePiece() {
-	bool c = false;
-	if (side) 
-		c = (moveFrom == _E1 && (moveTo == _G1 || moveTo == _B1)); 
-	else 
-		c = (moveFrom == _E8 && (moveTo == _G8 || moveTo == _B8)); 
-	movePiece(moveFrom, moveTo, c);
+	movePiece(moveFrom, moveTo);
 }
 
-void Board::movePiece(int mF, int mT, bool castling) {
+void Board::movePiece(int mF, int mT) {
 	std::array<int, 3> cExtras; //For castling, it holds how far away
 			            //mF is from final pos of K, R, and corner
 	int killSquare = mT, epExtra = 0, mFVal = piece[board120[mF]].value;
-	bool s = piece[board120[mF]].color, passanting = false;
+	bool s = piece[board120[mF]].color, passanting = castling = false;
+	
+	if (piece[board120[mF]].value == K_VAL) {
+		if (s && mF == _E1 && (mT == _G1 || mT == _B1))
+			castling = true;
+		else if (!s && mF == _E8 && (mT || _G8 || mT == _B8))
+			castling = true;
+	}
 
 	if (!castling) {	
 		if (piece[board120[mF]].value == P_VAL && mT == epSq) {
@@ -83,22 +85,25 @@ void Board::movePiece(int mF, int mT, bool castling) {
 		piece[board120[mF+cExtras[1]]].moved++;
 	}
 	ply++;
+	castling = false;
 }
 
 void Board::unmovePiece() {
-	bool c = false;
-	if (side)
-		c = (moveFrom == _E1 && (moveTo == _G1 || moveTo == _B1));
-	else
-		c = (moveFrom == _E8 && (moveTo == _G8 || moveTo == _B8)); 
-	unmovePiece(moveFrom, moveTo, c);
+	unmovePiece(moveFrom, moveTo);
 }
 
-void Board::unmovePiece(int mF, int mT, bool castling) {
+void Board::unmovePiece(int mF, int mT) {
 	std::array<int, 3> cExtras; //For castling, it holds how far away
 			            //mF is from final pos of K, R, and corner
 	int diffMTMF = abs(mT-mF), epExtra = 0;
-	bool s = piece[board120[mT]].color, unpassanting = false;
+	bool s = piece[board120[mT]].color, unpassanting = castling = false;
+
+	if (piece[board120[mT]].value == K_VAL) {
+		if (s && mF == _E1 && (mT == _G1 || mT == _B1))
+			castling = true;
+		else if (!s && mF == _E8 && (mT || _G8 || mT == _B8))
+			castling = true;
+	}
 
 	if (!castling) {
 		if (piece[pieceMoved].value == P_VAL && prevOnMoveTo == empty) {
@@ -137,6 +142,7 @@ void Board::unmovePiece(int mF, int mT, bool castling) {
 		board120[mF+cExtras[2]] = board120[mF+cExtras[1]];
 		board120[mF+cExtras[0]] = empty;
 		board120[mF+cExtras[1]] = empty;
+		std::cout << "Checking mF: " << intToSquare(mF) << " to " << intToSquare(mT) << std::endl;
 
 		piece[board120[mF]].pos = mF;
 		piece[board120[mF+cExtras[2]]].pos = mF+cExtras[2];
@@ -146,6 +152,7 @@ void Board::unmovePiece(int mF, int mT, bool castling) {
 
 	}
 	ply--;
+	castling = false;
 }
 
 void Board::moveInfo() const {
@@ -154,10 +161,6 @@ void Board::moveInfo() const {
 
 	!side ? cout << "White" : cout << "Black";
 
-	if (moveFrom==_E1 && (moveTo == _B1 || moveTo == _G1))
-		castling = true;
-	else if (moveFrom==_E8 && (moveTo == _B8 || moveTo == _G8))
-		castling = true;
 	if (!castling) {
 		cout << " moved ";
 		if (moveTo != pmSq)

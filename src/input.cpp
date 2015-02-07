@@ -9,6 +9,7 @@
 #include <string>
 #include "board.h"
 #include "input.h"
+#include "display.h"
 
 bool getInput(Board& b, int& mF, int& mT) {
 	using namespace std;
@@ -16,10 +17,18 @@ bool getInput(Board& b, int& mF, int& mT) {
 	string input;
 	getline(cin, input);
 
+	if (input == "undo" && b.getPly() != 0) {
+		b.unmovePiece();
+		b.changeTurn();
+		displayBoard(b);
+		return false;
+	}
+
 	if (input == "o-o" || input == "O-O" || input == "0-0") {
 		if (b.canCastle(KINGSIDE, b.getSide())) {
 			mF = b.getSide() ? b.getPos(wK) : b.getPos(bK);
 			mT = b.getSide() ? _G1 : _G8;
+			b.setCastling(true);
 			return true;
 		}
 		else {
@@ -31,6 +40,7 @@ bool getInput(Board& b, int& mF, int& mT) {
 		if (b.canCastle(QUEENSIDE, b.getSide())) {
 			mF = b.getSide() ? b.getPos(wK) : b.getPos(bK);
 			mT = b.getSide() ? _B1 : _B8;
+			b.setCastling(true);
 			return true;
 		}
 		else {

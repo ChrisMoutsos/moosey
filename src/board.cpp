@@ -27,6 +27,7 @@ void Board::initializeVars() {
 	moveFrom = moveTo = ply = epSq = pmSq = null;
 	side = WHITE;
 	pieceMoved = prevOnMoveTo = empty;
+	castling = false;
 }
 
 void Board::emptyBoard() {

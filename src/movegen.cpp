@@ -47,6 +47,9 @@ void Board::cleanMoveList(bool s) {
 	int realPieceMoved = pieceMoved;
 	int realPrevOnMoveTo = prevOnMoveTo;
 	int realEpSq = epSq;
+	int realMoveFrom = moveFrom;
+	int realMoveTo = moveTo;
+
 	size = s ? (int)whiteMoveList.size() : (int)blackMoveList.size();
 	for (int i = 0; i < size; i++) {
 		mT = s ? whiteMoveList[i]%100 : blackMoveList[i]%100;
@@ -64,6 +67,8 @@ void Board::cleanMoveList(bool s) {
 	pieceMoved = realPieceMoved;
 	prevOnMoveTo = realPrevOnMoveTo;
 	epSq = realEpSq;
+	moveFrom = realMoveFrom;
+	moveTo = realMoveTo;
 }
 
 void Board::generateMoveListFor(int p) {
