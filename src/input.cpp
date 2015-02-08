@@ -11,12 +11,16 @@
 #include "input.h"
 #include "display.h"
 
-bool getInput(Board& b, int& mF, int& mT) {
+bool getInput(Board& b, int& mF, int& mT, bool& quit) {
 	using namespace std;
 	
 	string input;
-	getline(cin, input);
+	getline(std::cin, input);
 
+	if (input == "exit" || input == "quit") {
+		quit = true;
+		return true;
+	}
 	if (input == "undo" && b.getPly() != 0) {
 		b.unmovePiece();
 		b.changeTurn();
@@ -66,11 +70,11 @@ bool getInput(Board& b, int& mF, int& mT) {
 	return true;
 }
 
-void userInput(Board& b, int& mF, int& mT) {	
+void userInput(Board& b, int& mF, int& mT, bool& quit) {	
 	using namespace std;
-	
+
 	do {
 		b.getSide() ? cout << "White" : cout << "Black";
 		cout << " to move:\n\t";
-	} while (!getInput(b, mF, mT) || !b.legalMove(mF, mT, b.getSide(), 1));
+	} while (!getInput(b, mF, mT, quit) || !b.legalMove(mF, mT, b.getSide(), 1));
 }

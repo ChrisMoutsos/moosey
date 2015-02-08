@@ -2,9 +2,20 @@
 #define DISPLAY_H
 
 class Board;
+class Square;
 
-void displayBoard(const Board&);
-void printRow(const Board&, bool&, int);
-void emptyRow(bool&, int&);
+const int B_SIZE = 600;
+const int SQ_SIZE = 75;
+const int BXSTART = 50;
+const int BYSTART = 50;
+
+void displayBoard(Board& b);
+void setPiecesOnSquares(Board& b);
+void setSquarePositions();
+void setSpriteClips();
+void drawSquares(Board& b);
+void drawBorder();
+
+extern Square squares[64];
 
 #endif
