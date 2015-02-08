@@ -54,8 +54,7 @@ bool init_SDL() {
 bool loadMedia() {
 	bool success = true;
 	
-	if (spriteSheetTexture.loadFromFile("../res/spritesheet.png")) {
-		std::cout << "Failed to load media.\n";
+	if (!spriteSheetTexture.loadFromFile("../res/spritesheet.png")) {
 		success = false;
 	}
 	else {

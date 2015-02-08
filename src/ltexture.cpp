@@ -20,7 +20,7 @@ bool LTexture::loadFromFile(std::string path) {
 	SDL_Texture* newTexture = NULL;
 	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
 	if (loadedSurface == NULL) {
-		std::cout << "UNable to load image!\n";
+		std::cout << "Unable to load image!\n";
 	}
 	else {
 		SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0, 0xFF, 0xFF));
@@ -35,7 +35,7 @@ bool LTexture::loadFromFile(std::string path) {
 		SDL_FreeSurface(loadedSurface);
 	}
 	texture = newTexture;
-	return texture != NULL;
+	return (texture != NULL);
 }
 
 #ifdef _SDL_TTF_H
