@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <iostream>
 #include "sdl.h"
 #include "display.h"
 #include "square.h"
@@ -26,14 +27,14 @@ void displayBoard(Board& b) {
 
 void setPiecesOnSquares(Board& b) {
 	for (int i = 0; i < 64; i++) {
-		squares[i].setPiece(b.getBoard120(from64(i)));
+		squares[i].setPiece(b.getBoard120(from64(i+1)));
 	}
 }
 
 void setSquarePositions() {
 	for (int i = 0; i < 64; i++) {
-		squares[i].setPos(BXSTART+(SQ_SIZE*i%8),
-				  BYSTART+(SQ_SIZE*i/8));
+		squares[i].setPos(BXSTART+(SQ_SIZE*(i%8)),
+				  BYSTART+B_SIZE-(SQ_SIZE*(i/8+1)));
 	}
 }
 
@@ -61,7 +62,7 @@ void drawSquares(Board& b) {
 				 squares[i].getY(), //Y start
 				 SQ_SIZE, SQ_SIZE};	 //Width, height of square
 			SDL_RenderFillRect(renderer, &sqPos);
-			
+		
 			//Set clipSq based on square[from64(RF2SQ64(r, f)].piece
 			p = squares[i].getPiece();
 			if (p == wqR || p == wkR)
@@ -99,7 +100,7 @@ void drawSquares(Board& b) {
 
 			if (p != empty) 
 				spriteSheetTexture.render(sqPos.x, sqPos.y, &clipSq);
-			}
+		}
 	}
 }
 
