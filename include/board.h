@@ -1,3 +1,9 @@
+/*
+----------------------------------
+	~Moosey Chess Engine~
+	     	board.h
+----------------------------------
+*/
 #ifndef BOARD_H
 #define BOARD_h
 
