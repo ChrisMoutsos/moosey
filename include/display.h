@@ -1,3 +1,10 @@
+/*
+----------------------------------
+	~Moosey Chess Engine~
+	      display.h
+----------------------------------
+*/
+
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
