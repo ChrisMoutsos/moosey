@@ -26,20 +26,18 @@ void displayBoard(Board& b) {
 }
 
 void setPiecesOnSquares(Board& b) {
-	for (int i = 0; i < 64; i++) {
+	for (int i = 0; i < 64; i++)
 		squares[i].setPiece(b.getBoard120(from64(i+1)));
-	}
 }
 
 void setSquarePositions() {
-	for (int i = 0; i < 64; i++) {
+	for (int i = 0; i < 64; i++)
 		squares[i].setPos(BXSTART+(SQ_SIZE*(i%8)),
 				  BYSTART+B_SIZE-(SQ_SIZE*(i/8+1)));
-	}
 }
 
 void setSpriteClips() {
-	for (int i = 0; i <12; i++) {
+	for (int i = 0; i < 12; i++) {
 		spriteClips[i].x = i%6*SQ_SIZE;
 		spriteClips[i].y = i/6*SQ_SIZE;
 		spriteClips[i].w = SQ_SIZE;
@@ -48,23 +46,22 @@ void setSpriteClips() {
 }
 
 void drawSquares(Board& b) {
-	int p, i;
+	int p, sq;
 	SDL_Rect sqPos;
 	SDL_Rect clipSq;
 	for (int r = 1; r <= 8; r++) {
 		for (int f = 1; f <= 8; f++) {
-			i = FR2SQ64(f, r);
+			sq = FR2SQ64(f, r)-1;
 			if ((r+f)%2 == 0) //Light squares
 				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 			else
 				SDL_SetRenderDrawColor(renderer, 0, 128, 128, 255);
-			sqPos = {squares[i].getX(), //X start
-				 squares[i].getY(), //Y start
+			sqPos = {squares[sq].getX(), //X start
+				 squares[sq].getY(), //Y start
 				 SQ_SIZE, SQ_SIZE};	 //Width, height of square
 			SDL_RenderFillRect(renderer, &sqPos);
 		
-			//Set clipSq based on square[from64(RF2SQ64(r, f)].piece
-			p = squares[i].getPiece();
+			p = squares[sq].getPiece();
 			if (p == wqR || p == wkR)
 				clipSq = spriteClips[wRook];		
 		    	else if (p == wqN || p == wkN)
@@ -76,7 +73,7 @@ void drawSquares(Board& b) {
 		    	else if (p == wK)
 				clipSq = spriteClips[wKing];		
 		    	else if (p >= wPa && p <= wPh) {
-				if (b.getValue(b.getBoard120(from64(i))) == P_VAL)
+				if (b.getValue(b.getBoard120(from64(sq+1))) == P_VAL)
 					clipSq = spriteClips[wPawn];
 				else
 					clipSq = spriteClips[wQueen];
@@ -92,7 +89,7 @@ void drawSquares(Board& b) {
 		    	else if (p == bK)
 				clipSq = spriteClips[bKing];		
 		    	else if (p >= bPa && p <= bPh) {
-				if (b.getValue(b.getBoard120(from64(i))) == P_VAL)
+				if (b.getValue(b.getBoard120(from64(sq+1))) == P_VAL)
 					clipSq = spriteClips[bPawn];
 				else
 					clipSq = spriteClips[bQueen];
