@@ -1,3 +1,10 @@
+/*
+----------------------------------
+	~Moosey Chess Engine~
+	      ltexture.cpp
+----------------------------------
+*/
+
 #include <string>
 #include <stdint.h>
 #include <SDL2/SDL.h>
@@ -23,7 +30,7 @@ bool LTexture::loadFromFile(std::string path) {
 		std::cout << "Unable to load image!\n";
 	}
 	else {
-		SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xFF, 0xFF, 0xFF));
+		SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 237, 28, 36));
 		newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
 		if (newTexture == NULL) {
 			std::cout << "Unable to create texture.\n";

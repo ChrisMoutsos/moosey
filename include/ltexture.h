@@ -1,3 +1,10 @@
+/*
+----------------------------------
+	~Moosey Chess Engine~
+	      ltexture.h
+----------------------------------
+*/
+
 #ifndef LTEXTURE_H
 #define LTEXTURE_H
 

@@ -112,7 +112,7 @@ inline int to64(int x) {
 }
 
 inline int FR2SQ64(int f, int r) {
-	return (f-1)+((r-1)*8);
+	return (f)+((r-1)*8);
 }
 
 inline int from64(int x) {

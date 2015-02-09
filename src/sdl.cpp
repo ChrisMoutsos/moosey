@@ -1,3 +1,10 @@
+/*
+----------------------------------
+	~Moosey Chess Engine~
+	      sdl.cpp
+----------------------------------
+*/
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <iostream>
@@ -54,7 +61,7 @@ bool init_SDL() {
 bool loadMedia() {
 	bool success = true;
 	
-	if (!spriteSheetTexture.loadFromFile("../res/spritesheet.png")) {
+	if (!spriteSheetTexture.loadFromFile("../res/spritesheet2.png")) {
 		success = false;
 	}
 	else {

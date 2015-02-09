@@ -1,3 +1,10 @@
+/*
+----------------------------------
+	~Moosey Chess Engine~
+	      square.h
+----------------------------------
+*/
+
 #ifndef SQUARE_H
 #define SQUARE_H
 
