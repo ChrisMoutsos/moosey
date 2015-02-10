@@ -20,13 +20,15 @@ class Square {
 	public:
 		Square();
 		void setPos(int x, int y);
-		void handleEvent(SDL_Event* e);
+		void handleEvent(SDL_Event* e, int& mF, int& mT);
 		void render();
 		int getPiece() const { return piece; };
 		void setPiece(int p) { piece = p; };
 		int getX() const { return pos.x; };
 		int getY() const { return pos.y; };
+		void setSq(int i) { square = i; };
 	private:
+		int square;
 		int piece;
 		SDL_Point pos;
 		PieceSprite currentSprite;

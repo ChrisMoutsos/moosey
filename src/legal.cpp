@@ -13,22 +13,25 @@ bool Board::legalMove(int mF, int mT, bool s, bool v) {
 	bool isInCheck;
 	int realEpSq = epSq;
 	int realPieceMoved = pieceMoved;
-
 	if (!validateMove(mF, mT, s)) {
 		if (v) std::cout << "Illegal move..\n";
 		return false;
 	}
+	if (castling) return true;
+
 	movePiece(mF, mT);
 	isInCheck = inCheck(s);
 	unmovePiece(mF, mT);
-	
+
+	setCastling(0);	
 	pieceMoved = realPieceMoved;
 	epSq = realEpSq;
 	if (isInCheck) {
 		if (v) std::cout << "Illegal move.\n";
 		return false;
 	}
-	else return true;
+	else
+		return true;
 }
 
 bool Board::checkStalemate() const {
@@ -214,8 +217,10 @@ bool Board::validateKingMove(int mF, int mT, bool s) {
 	
 	if (diff == 1 || diff == 10 || diff == 9 || diff == 11)
 		return true;
-	else if (castling && (mF - mT == -2 || mF - mT == 3)) //Castling 
-		return true;
+	else if (mF - mT == -2)
+		return canCastle(KINGSIDE, s);
+	else if (mF - mT == 3)
+		return canCastle(QUEENSIDE, s);
 	return false;
 }
 
@@ -241,5 +246,6 @@ bool Board::canCastle(bool dir, bool s) {
 		}
 		unmovePiece(kSq, kSq+j*c);
 	}
+	setCastling(1);
 	return true;
 }

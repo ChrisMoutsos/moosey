@@ -61,7 +61,7 @@ bool init_SDL() {
 bool loadMedia() {
 	bool success = true;
 	
-	if (!spriteSheetTexture.loadFromFile("../res/spritesheet2.png")) {
+	if (!spriteSheetTexture.loadFromFile("../res/spritesheet3.bmp")) {
 		success = false;
 	}
 	else {

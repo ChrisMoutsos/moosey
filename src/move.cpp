@@ -17,15 +17,8 @@ void Board::movePiece(int mF, int mT) {
 	std::array<int, 3> cExtras; //For castling, it holds how far away
 			            //mF is from final pos of K, R, and corner
 	int killSquare = mT, epExtra = 0, mFVal = piece[board120[mF]].value;
-	bool s = piece[board120[mF]].color, passanting = castling = false;
+	bool s = piece[board120[mF]].color, passanting;
 	
-	if (piece[board120[mF]].value == K_VAL) {
-		if (s && mF == _E1 && (mT == _G1 || mT == _B1))
-			castling = true;
-		else if (!s && mF == _E8 && (mT || _G8 || mT == _B8))
-			castling = true;
-	}
-
 	if (!castling) {	
 		if (piece[board120[mF]].value == P_VAL && mT == epSq) {
 			passanting = true;
@@ -85,7 +78,6 @@ void Board::movePiece(int mF, int mT) {
 		piece[board120[mF+cExtras[1]]].moved++;
 	}
 	ply++;
-	castling = false;
 }
 
 void Board::unmovePiece() {
@@ -96,14 +88,7 @@ void Board::unmovePiece(int mF, int mT) {
 	std::array<int, 3> cExtras; //For castling, it holds how far away
 			            //mF is from final pos of K, R, and corner
 	int diffMTMF = abs(mT-mF), epExtra = 0;
-	bool s = piece[board120[mT]].color, unpassanting = castling = false;
-
-	if (piece[board120[mT]].value == K_VAL) {
-		if (s && mF == _E1 && (mT == _G1 || mT == _B1))
-			castling = true;
-		else if (!s && mF == _E8 && (mT || _G8 || mT == _B8))
-			castling = true;
-	}
+	bool s = piece[board120[mT]].color, unpassanting;
 
 	if (!castling) {
 		if (piece[pieceMoved].value == P_VAL && prevOnMoveTo == empty) {
@@ -116,7 +101,7 @@ void Board::unmovePiece(int mF, int mT) {
 		if (mT == pmSq) {
 			piece[board120[mT]].value = P_VAL;
 			piece[board120[mT]].name = "Pawn";
-			piece[board120[mF]].abbr = s ? 'P' : 'p';
+			piece[board120[mT]].abbr = s ? 'P' : 'p';
 			piece[board120[mT]].promoted = false;
 		}	
 		board120[mF] = pieceMoved;
@@ -152,7 +137,6 @@ void Board::unmovePiece(int mF, int mT) {
 
 	}
 	ply--;
-	castling = false;
 }
 
 void Board::moveInfo() const {
@@ -188,4 +172,5 @@ void Board::moveInfo() const {
 
 void Board::changeTurn() {
 	side = side ? 0 : 1;
+	setCastling(0);
 }

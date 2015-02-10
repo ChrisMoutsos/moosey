@@ -11,14 +11,14 @@ Square squares[64];
 SDL_Rect spriteClips[12];
 LTexture spriteSheetTexture;
 
-void displayBoard(Board& b) {
+void displayBoard(Board& b, const int& mF, const int& mT) {
 	//Clear screen
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderClear(renderer);
 		
 	//Need to make spriteClips once, somewhere
 	setPiecesOnSquares(b);
-	drawSquares(b);
+	drawSquares(b, mF, mT);
 	drawBorder();
 
 	//Update screen
@@ -31,9 +31,11 @@ void setPiecesOnSquares(Board& b) {
 }
 
 void setSquarePositions() {
-	for (int i = 0; i < 64; i++)
+	for (int i = 0; i < 64; i++) {
 		squares[i].setPos(BXSTART+(SQ_SIZE*(i%8)),
 				  BYSTART+B_SIZE-(SQ_SIZE*(i/8+1)));
+		squares[i].setSq(i+1);
+	}
 }
 
 void setSpriteClips() {
@@ -45,17 +47,29 @@ void setSpriteClips() {
 	}
 }
 
-void drawSquares(Board& b) {
+void drawSquares(Board& b, const int& mF, const int& mT) {
 	int p, sq;
 	SDL_Rect sqPos;
 	SDL_Rect clipSq;
 	for (int r = 1; r <= 8; r++) {
 		for (int f = 1; f <= 8; f++) {
 			sq = FR2SQ64(f, r)-1;
-			if ((r+f)%2 == 0) //Light squares
-				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-			else
-				SDL_SetRenderDrawColor(renderer, 0, 128, 128, 255);
+			if ((r+f)%2 == 0) {	//Light squares
+				if (mF != sq+1 && mT != sq+1 && to64(b.getMoveFrom()) != sq+1 && to64(b.getMoveTo()) != sq+1) {
+					SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+				}
+				else {
+					SDL_SetRenderDrawColor(renderer, 255, 255, 75, 255);
+				}
+			}
+			else { 			//Dark squares
+				if (mF != sq+1 && mT != sq+1 && to64(b.getMoveFrom()) != sq+1 && to64(b.getMoveTo()) != sq+1) {
+					SDL_SetRenderDrawColor(renderer, 0, 128, 128, 255);
+				}
+				else {
+					SDL_SetRenderDrawColor(renderer, 255, 255, 55, 255);
+				}
+			}
 			sqPos = {squares[sq].getX(), //X start
 				 squares[sq].getY(), //Y start
 				 SQ_SIZE, SQ_SIZE};	 //Width, height of square

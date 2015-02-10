@@ -61,6 +61,7 @@ void Board::cleanMoveList(bool s) {
 				blackMoveList.erase(blackMoveList.begin()+i);
 			size--;
 			i--;
+			setCastling(0);
 		}
 	}
 	side = realSide;	
@@ -164,10 +165,12 @@ void Board::generateKingMoves(int p, int& counter) {
 	if (canCastle(KINGSIDE, s)) { 
 		piece[p].moveList[counter] = s ? _G1 : _G8;
 		counter++;
+		setCastling(0);
 	}
 	if (canCastle(QUEENSIDE, s)) { 
 		piece[p].moveList[counter] = s ? _B1 : _B8;
 		counter++;
+		setCastling(0);
 	}
 
 }

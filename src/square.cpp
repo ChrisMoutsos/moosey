@@ -24,7 +24,7 @@ void Square::setPos(int x, int y) {
 	pos.y = y;
 }
 
-void Square::handleEvent(SDL_Event* e) {
+void Square::handleEvent(SDL_Event* e, int& mF, int& mT) {
 	if (e->type == SDL_MOUSEBUTTONDOWN) {
 		int x, y;
 		SDL_GetMouseState(&x, &y);
@@ -43,7 +43,13 @@ void Square::handleEvent(SDL_Event* e) {
 			switch (e->type) {
 				case SDL_MOUSEBUTTONDOWN:
 					//set moveTo or moveFrom
-					std::cout << "CLICKING\n";
+					std::cout << "CLICKING " << intToSquare(from64(square)) << '\n';
+					if (mF == -1) {
+						mF = square; 
+					}
+					else if (mT == -1) {
+						mT = square;
+					}
 				break;
 			}
 		}

@@ -53,6 +53,7 @@ public:
 	void decrMoved(int p) { piece[p].moved--; };
 	void setEpSq(int sq) { epSq = sq; };
 	void setCastling(bool c) { castling = c; };
+	bool getCastling() const { return castling; };
 
 	//MOVE.CPP 
 	void movePiece();
@@ -125,7 +126,7 @@ inline int from64(int x) {
 	return x+20+(((x-1)/8))*2;
 }
 
-inline std::string intToSquare(int square) {
+inline std::string intToSquare(int square) { //Board120 to A1, etc
 	std::string squareName;
 	if (square==0) return "";
 	squareName = char(int('a') + ((square)%10)-1);

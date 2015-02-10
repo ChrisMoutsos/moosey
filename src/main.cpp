@@ -36,7 +36,7 @@ int main(int argc, char* args[]) {
 		return -1;
 	}
 	bool quit = false;
-	int mF = 0, mT = 0;
+	int mF = -1, mT = -1;
 	SDL_Event e; //Event handler
 
 	Board board;
@@ -48,24 +48,25 @@ int main(int argc, char* args[]) {
 			if (e.type == SDL_QUIT) 
 				quit = true;
 		for (int i = 0; i < 64; i++) {
-			squares[i].handleEvent(&e);
+			squares[i].handleEvent(&e, mF, mT);
 		}	
 
 		}
-		displayBoard(board);
-
-
-	//	userInput(board, mF, mT, quit);
-	//	if (quit) break; 
-	//	board.setMove(mF, mT);
-	//	board.movePiece();
-	//	board.changeTurn();
-	//	board.moveInfo();
-	//	board.generateMoveLists();
-
-//		if (board.checkCheck(board.getSide(), 1)) 
-//			quit = true;
-
+		displayBoard(board, mF, mT);
+		if (mF != -1 && mT != -1) {
+			mF = from64(mF);
+			mT = from64(mT);
+			if (board.legalMove(mF, mT, board.getSide(), 1)) {
+				board.setMove(mF, mT);
+				board.movePiece();
+				board.changeTurn();
+				board.generateMoveLists();
+				if (board.checkCheck(board.getSide(), 1))
+					quit = true;
+			}
+			mF = -1;
+			mT = -1;
+		}
 //		showMoveLists(board);
 	}
 
