@@ -14,9 +14,12 @@
 #include "ltexture.h"
 
 Square::Square() {
+	square = 0;
+	piece = 0;
 	pos.x = 0;
 	pos.y = 0;
-	currentSprite = e;
+	dragging = false;
+	currentSprite = noPiece;
 }
 
 void Square::setPos(int x, int y) {
@@ -24,8 +27,7 @@ void Square::setPos(int x, int y) {
 	pos.y = y;
 }
 
-void Square::handleEvent(SDL_Event* e, int& mF, int& mT) {
-	if (e->type == SDL_MOUSEBUTTONDOWN) {
+void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 		int x, y;
 		SDL_GetMouseState(&x, &y);
 		bool inside = true;
@@ -37,23 +39,30 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT) {
 			inside = false;
 		else if (y > pos.y + SQ_SIZE)
 			inside = false;
-		if (!inside) {
-		}
-		else {
-			switch (e->type) {
-				case SDL_MOUSEBUTTONDOWN:
-					//set moveTo or moveFrom
-					std::cout << "CLICKING " << intToSquare(from64(square)) << '\n';
-					if (mF == -1) {
-						mF = square; 
+		switch (e->type) {
+			case SDL_MOUSEBUTTONDOWN:
+				if (inside && !dragging) {
+					if (mF == -1 && piece != noPiece) {
+						if ((s && piece <= wPh) || (!s && piece >= bqR)) {
+							mF = square; 
+							dragging = true;
+						}
 					}
-					else if (mT == -1) {
-						mT = square; 
+					else if (mF != -1) {	
+						mT = (square != mF) ? square : -1;
 					}
-				break;
-			}
+				}
+			break;
+			case SDL_MOUSEBUTTONUP:
+				if (dragging) dragging = false;
+				if (inside) {
+					if (mF != -1 && mT == -1) {
+						mT = (square != mF) ? square : -1;
+					}
+				}
+
+			break;
 		}
-	}
 }
 
 void Square::render() {

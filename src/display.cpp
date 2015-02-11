@@ -11,20 +11,21 @@ Square squares[64];
 SDL_Rect spriteClips[12];
 LTexture spriteSheetTexture;
 
-void displayBoard(Board& b, const int& mF, const int& mT) {
+void displayBoard(const Board& b, const int& mF, const int& mT) {
 	//Clear screen
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderClear(renderer);
 
 	setPiecesOnSquares(b);
 	drawSquares(b, mF, mT);
+	drawPieces(b, mF, mT);
 	drawBorder();
 
 	//Update screen
 	SDL_RenderPresent(renderer);
 }
 
-void setPiecesOnSquares(Board& b) {
+void setPiecesOnSquares(const Board& b) {
 	for (int i = 0; i < 64; i++)
 		squares[i].setPiece(b.getBoard120(from64(i+1)));
 }
@@ -46,10 +47,9 @@ void setSpriteClips() {
 	}
 }
 
-void drawSquares(Board& b, const int& mF, const int& mT) {
-	int p, sq;
+void drawSquares(const Board& b, const int& mF, const int& mT) {
+	int sq;
 	SDL_Rect sqPos;
-	SDL_Rect clipSq;
 	for (int r = 1; r <= 8; r++) {
 		for (int f = 1; f <= 8; f++) {
 			sq = FR2SQ64(f, r)-1;
@@ -69,10 +69,24 @@ void drawSquares(Board& b, const int& mF, const int& mT) {
 					SDL_SetRenderDrawColor(renderer, 255, 255, 55, 255);
 				}
 			}
-			sqPos = {squares[sq].getX(), //X start
-				 squares[sq].getY(), //Y start
+			sqPos = {squares[sq].getX(),	//X start
+				 squares[sq].getY(),	//Y start
 				 SQ_SIZE, SQ_SIZE};	 //Width, height of square
 			SDL_RenderFillRect(renderer, &sqPos);
+		}
+	}
+}
+
+void drawPieces(const Board& b, const int& mF, const int& mT) {
+	int p, sq, x, y;
+	SDL_Rect sqPos;
+	SDL_Rect clipSq;
+	for (int r = 1; r <= 8; r++) {
+		for (int f = 1; f <= 8; f++) {
+			sq = FR2SQ64(f, r)-1;
+			sqPos = {squares[sq].getX(), 	//X start
+				 squares[sq].getY(), 	//Y start
+				 SQ_SIZE, SQ_SIZE};	//Width, height of square
 		
 			p = squares[sq].getPiece();
 			if (p == wqR || p == wkR)
@@ -108,8 +122,15 @@ void drawSquares(Board& b, const int& mF, const int& mT) {
 					clipSq = spriteClips[bQueen];
 			}		
 
-			if (p != empty) 
-				spriteSheetTexture.render(sqPos.x, sqPos.y, &clipSq);
+			if (p != empty) { 
+				if (squares[sq].getDragging()) {
+					SDL_GetMouseState(&x, &y);
+					spriteSheetTexture.render(x-SQ_SIZE/2, y-SQ_SIZE/2, &clipSq);	
+				}
+				else {
+					spriteSheetTexture.render(sqPos.x, sqPos.y, &clipSq);
+				}
+			}
 		}
 	}
 }

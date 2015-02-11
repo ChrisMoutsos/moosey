@@ -49,7 +49,7 @@ int main(int argc, char* args[]) {
 			if (e.type == SDL_QUIT) 
 				quit = true;
 			for (int i = 0; i < 64; i++)
-				squares[i].handleEvent(&e, mF, mT);
+				squares[i].handleEvent(&e, mF, mT, board.getSide());
 
 		}
 		displayBoard(board, mF, mT);
