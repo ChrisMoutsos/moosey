@@ -8,11 +8,11 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <iostream>
-#include "ltexture.h"
-#include <sdl.h>
 #include <stdio.h>
 #include <string>
 #include <cmath>
+#include "ltexture.h"
+#include "sdl.h"
 
 SDL_Window* window; //The window we'll be rendering to
 SDL_Renderer* renderer; //The window renderer

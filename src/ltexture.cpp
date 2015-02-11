@@ -1,15 +1,14 @@
 /*
 ----------------------------------
 	~Moosey Chess Engine~
-	      ltexture.cpp
+	    ltexture.cpp
 ----------------------------------
 */
 
-#include <string>
-#include <stdint.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <iostream>
+#include <string>
 #include "ltexture.h"
 
 LTexture::LTexture() {

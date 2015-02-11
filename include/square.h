@@ -8,6 +8,9 @@
 #ifndef SQUARE_H
 #define SQUARE_H
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+
 class LTexture;
 
 enum PieceSprite {

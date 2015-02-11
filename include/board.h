@@ -5,110 +5,111 @@
 ----------------------------------
 */
 #ifndef BOARD_H
-#define BOARD_h
+#define BOARD_H
 
 #include <string>
 #include <vector>
 
 class Board {
 
-public:
-	//BOARD.CPP
-	Board();
-	Board(std::string FEN);
-	void initializeVars();
-	void emptyBoard();
-	void placePiece(int p, int sq);
-	void placePiecesDefault();	
-	void initializePieces();
-	//ACCESSORS
-	int getMoveFrom() const { return moveFrom; };
-	int getMoveTo() const { return moveTo; };
-	int getPly() const { return ply; };
-	bool getSide() const { return side; };
-	int getPieceMoved() const { return pieceMoved; };
-	int getPrevOnMoveTo() const { return prevOnMoveTo; };	
-	int getBoard120(int sq) const { return board120[sq]; };
-	int getPieceAbbr(int p) const { return piece[p].abbr; };
-	int getFromMovelist(bool s, int i) const;
-	int getTimesMoved(int p) const { return piece[p].moved; };
-	std::string getName(int p) const { return piece[p].name; };
-	int getValue(int p) const{ return piece[p].value; };
-	int getPos(int p) const { return piece[p].pos; };
-	int getEpSq() const { return epSq; };
-	int getPmSq() const { return pmSq; };
-	//MUTATORSS
-	void setMove(int mF, int mT) { moveFrom = mF; moveTo = mT; };
-	void setPly(int newPly) { ply = newPly; };
-	void setSide(bool newSide) { side = newSide; };
-	void setPieceMoved(int p) { pieceMoved = p; };
-	void setPrevOnMoveTo(int p) { prevOnMoveTo = p; };
-	void setBoard120(int i, int v) { board120[i] = v; };
-	void addToMovelist(bool s, int v);
-	void clearMoveList(bool s);
-	void killPiece(int p) { piece[p].alive = false; };
-	void unkillPiece(int p) { piece[p].alive = true; };
-	void setPiecePos(int p, int newPos) { piece[p].pos = newPos; };
-	void incrMoved(int p) { piece[p].moved++; };
-	void decrMoved(int p) { piece[p].moved--; };
-	void setEpSq(int sq) { epSq = sq; };
-	void setCastling(bool c) { castling = c; };
-	bool getCastling() const { return castling; };
+	friend void showMoveLists(Board& board);
 
-	//MOVE.CPP 
-	void movePiece();
-	void movePiece(int mF, int mT);
-	void unmovePiece();
-	void unmovePiece(int mF, int mT);
-	void changeTurn();
-	void moveInfo() const;
-
-	//LEGAL.CPP
-	bool legalMove(int mF, int mT, bool s, bool v = false);
-	bool validateMove(int mF, int mT, bool s);
-	bool validatePawnMove(int mF, int mT, bool s) const;
-	bool validateHozMove(int mF, int mT) const;
-	bool validateDiagMove(int mF, int mT) const;
-	bool validateKnightMove(int mF, int mT) const;
-	bool validateKingMove(int mF, int mT, bool s);
-	bool canCastle(bool dir, bool s);
-	bool checkStalemate() const;
-	bool checkCheck(bool s, bool v = false);
-	bool inCheckmate(bool s) const;
-	bool inCheck(bool s);
-
-	//MOVEGEN.CPP
-	void generateMoveLists();
-	void cleanMoveList(bool s);
-	void generateMoveListFor(int p);
-	void generateHozMoves(int p, int& counter);
-	void generateDiagMoves(int p, int& counter);
-	void generateKnightMoves(int p, int& counter);
-	void generateKingMoves(int p, int& counter);
-	void generatePawnMoves(int p, int& counter);
-
-	//DATA	
-	struct pieceEntry {
-        	std::string name;	//"Pawn", "Rook", etc.
-        	char abbr;		//'P' (white), 'p' (black)
-        	int value;      
-        	int pos;        	//Board64 position
-        	int moved;      	//>=0
-        	bool alive;    
-        	bool promoted;   	//Only queen promotions
-		bool color;
-        	int* moveList;  	
-		int moveListSize;
-	} piece[32];
-
-	int board120[120];
-	std::vector<int> whiteMoveList, blackMoveList;
+	public:
+		//BOARD.CPP
+		Board();
+		Board(std::string FEN);
+		void initializeVars();
+		void emptyBoard();
+		void placePiece(int p, int sq);
+		void placePiecesDefault();	
+		void initializePieces();
+		void handleInput(int& mF, int& mT);
+		//ACCESSORS
+		int getMoveFrom() const { return moveFrom; };
+		int getMoveTo() const { return moveTo; };
+		int getPly() const { return ply; };
+		bool getSide() const { return side; };
+		int getPieceMoved() const { return pieceMoved; };
+		int getPrevOnMoveTo() const { return prevOnMoveTo; };	
+		int getBoard120(int sq) const { return board120[sq]; };
+		int getPieceAbbr(int p) const { return piece[p].abbr; };
+		int getFromMoveList(bool s, int i) const;
+		int getMoveListSize(bool s) const;
+		int getTimesMoved(int p) const { return piece[p].moved; };
+		std::string getName(int p) const { return piece[p].name; };
+		int getValue(int p) const{ return piece[p].value; };
+		int getPos(int p) const { return piece[p].pos; };
+		int getEpSq() const { return epSq; };
+		int getPmSq() const { return pmSq; };
+		bool getCastling() const { return castling; };
+		//MUTATORSS
+		void setMove(int mF, int mT) { moveFrom = mF; moveTo = mT; };
+		void setPly(int newPly) { ply = newPly; };
+		void setSide(bool newSide) { side = newSide; };
+		void setPieceMoved(int p) { pieceMoved = p; };
+		void setPrevOnMoveTo(int p) { prevOnMoveTo = p; };
+		void setBoard120(int i, int v) { board120[i] = v; };
+		void addToMovelist(bool s, int v);
+		void clearMoveList(bool s);
+		void killPiece(int p) { piece[p].alive = false; };
+		void unkillPiece(int p) { piece[p].alive = true; };
+		void setPiecePos(int p, int newPos) { piece[p].pos = newPos; };
+		void incrMoved(int p) { piece[p].moved++; };
+		void decrMoved(int p) { piece[p].moved--; };
+		void setEpSq(int sq) { epSq = sq; };
+		void setCastling(bool c) { castling = c; };
 	
-private:
-	int moveFrom, moveTo, ply;
-	int pieceMoved, prevOnMoveTo;
-	int pieceKilled, epSq, pmSq;
-	bool side, castling;
+		//MOVE.CPP 
+		void movePiece();
+		void movePiece(int mF, int mT);
+		void unmovePiece();
+		void unmovePiece(int mF, int mT);
+		void changeTurn();
+		void moveInfo() const;
+	
+		//LEGAL.CPP
+		bool legalMove(int mF, int mT, bool s, bool v = false);
+		bool validateMove(int mF, int mT, bool s);
+		bool validatePawnMove(int mF, int mT, bool s) const;
+		bool validateHozMove(int mF, int mT) const;
+		bool validateDiagMove(int mF, int mT) const;
+		bool validateKnightMove(int mF, int mT) const;
+		bool validateKingMove(int mF, int mT, bool s);
+		bool canCastle(bool dir, bool s);
+		bool checkStalemate() const;
+		bool checkCheck(bool s, bool v = false);
+		bool inCheckmate(bool s) const;
+		bool inCheck(bool s);
+	
+		//MOVEGEN.CPP
+		void generateMoveLists();
+		void cleanMoveList(bool s);
+		void generateMoveListFor(int p);
+		void generateHozMoves(int p, int& counter);
+		void generateDiagMoves(int p, int& counter);
+		void generateKnightMoves(int p, int& counter);
+		void generateKingMoves(int p, int& counter);
+		void generatePawnMoves(int p, int& counter);
+	
+	private:
+		int board120[120], moveFrom, moveTo, ply;
+		int pieceMoved, prevOnMoveTo;
+		int pieceKilled, epSq, pmSq;
+		bool side, castling;
+		std::vector<int> whiteMoveList, blackMoveList;
+
+		struct pieceEntry {
+       		 	std::string name;	//"Pawn", "Rook", etc.
+       		 	char abbr;		//'P' (white), 'p' (black)
+       		 	int value;      
+       		 	int pos;        	//Board64 position
+	       	 	int moved;      	//>=0
+	       	 	bool alive;    
+	       	 	bool promoted;   	//Only queen promotions
+			bool color;
+        		int* moveList;  	
+			int moveListSize;
+		} piece[32];
 };
 
 //INLINE CONVERSION FUNCTIONS

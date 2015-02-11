@@ -97,3 +97,31 @@ void Board::clearMoveList(bool s) {
 	if (s) whiteMoveList.clear();
 	else blackMoveList.clear();
 }
+
+int Board::getMoveListSize(bool s) const {
+	if (s) 
+		return (int)whiteMoveList.size();
+	else 
+		return (int)blackMoveList.size();
+}
+int Board::getFromMoveList(bool s, int i) const {
+	if (s) 
+		return whiteMoveList[i];
+	else 
+		return blackMoveList[i];
+}
+
+void Board::handleInput(int& mF, int& mT) {
+	if (mF != -1 && mT != -1) {
+		mF = from64(mF);
+		mT = from64(mT);
+		if (legalMove(mF, mT, getSide(), 1)) {
+			setMove(mF, mT);
+			movePiece();
+			changeTurn();
+			generateMoveLists();
+		}
+		mF = -1;
+		mT = -1;
+	}
+}

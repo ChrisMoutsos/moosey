@@ -35,8 +35,9 @@ int main(int argc, char* args[]) {
 		cout << "Failure to load media.\n";
 		return -1;
 	}
+	int mF = -1;
+	int mT = -1;
 	bool quit = false;
-	int mF = -1, mT = -1;
 	SDL_Event e; //Event handler
 
 	Board board;
@@ -47,28 +48,17 @@ int main(int argc, char* args[]) {
 		while (SDL_PollEvent(&e) != 0) {
 			if (e.type == SDL_QUIT) 
 				quit = true;
-		for (int i = 0; i < 64; i++) {
-			squares[i].handleEvent(&e, mF, mT);
-		}	
+			for (int i = 0; i < 64; i++)
+				squares[i].handleEvent(&e, mF, mT);
 
 		}
 		displayBoard(board, mF, mT);
-		if (mF != -1 && mT != -1) {
-			mF = from64(mF);
-			mT = from64(mT);
-			if (board.legalMove(mF, mT, board.getSide(), 1)) {
-				board.setMove(mF, mT);
-				board.movePiece();
-				board.changeTurn();
-				board.generateMoveLists();
-				if (board.checkCheck(board.getSide(), 1))
-					quit = true;
-			}
-			mF = -1;
-			mT = -1;
-		}
+		board.handleInput(mF, mT);
+		if (board.checkCheck(board.getSide(), 1))
+			quit = true;
 //		showMoveLists(board);
 	}
+
 
 	return 0;
 }
@@ -76,15 +66,15 @@ int main(int argc, char* args[]) {
 void showMoveLists(Board &board) {
 	int mF, mT;
 	cout << "White movelist: " << endl;
-	for (int i = 0; i < (int)board.whiteMoveList.size(); i++) {
-		mF = board.whiteMoveList[i]/100;
-		mT = board.whiteMoveList[i]%100;
+	for (int i = 0; i < board.getMoveListSize(WHITE); i++) {
+		mF = board.getFromMoveList(WHITE, i)/(100);
+		mT = board.getFromMoveList(WHITE, i)%(100);
 		cout << intToSquare(mF) << " to " << intToSquare(mT) << ", ";
 	}
 	cout << endl << endl;
 	for (int i = 0; i <= wPh; i++) {
 		cout << board.getName(i) << ": ";
-		for (int j = 0; j < (int)board.piece[i].moveListSize; j++) {
+		for (int j = 0; j < board.getMoveListSize(WHITE); j++) {
 			if (board.piece[i].moveList[j] != null) {
 				mF = board.getPos(i);
 				mT = board.piece[i].moveList[j]%100;

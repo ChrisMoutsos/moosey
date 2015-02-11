@@ -5,11 +5,11 @@
 ----------------------------------
 */
 
-#include "iostream"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "board.h"
+#include <iostream>
 #include "display.h"
+#include "board.h"
 #include "square.h"
 #include "ltexture.h"
 
@@ -48,7 +48,7 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT) {
 						mF = square; 
 					}
 					else if (mT == -1) {
-						mT = square;
+						mT = square; 
 					}
 				break;
 			}

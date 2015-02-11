@@ -15,8 +15,7 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 	//Clear screen
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderClear(renderer);
-		
-	//Need to make spriteClips once, somewhere
+
 	setPiecesOnSquares(b);
 	drawSquares(b, mF, mT);
 	drawBorder();
