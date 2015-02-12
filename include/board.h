@@ -13,7 +13,7 @@
 class Board {
 
 	friend void showMoveLists(Board& board);
-
+	
 	public:
 		//BOARD.CPP
 		Board();
@@ -41,7 +41,7 @@ class Board {
 		int getPos(int p) const { return piece[p].pos; };
 		int getEpSq() const { return epSq; };
 		int getPmSq() const { return pmSq; };
-		bool getCastling() const { return castling; };
+		int getCastling() const { return castling; };
 		//MUTATORSS
 		void setMove(int mF, int mT) { moveFrom = mF; moveTo = mT; };
 		void setPly(int newPly) { ply = newPly; };
@@ -57,7 +57,7 @@ class Board {
 		void incrMoved(int p) { piece[p].moved++; };
 		void decrMoved(int p) { piece[p].moved--; };
 		void setEpSq(int sq) { epSq = sq; };
-		void setCastling(bool c) { castling = c; };
+		void setCastling(int c) { castling = c; };
 	
 		//MOVE.CPP 
 		void movePiece();
@@ -75,7 +75,7 @@ class Board {
 		bool validateDiagMove(int mF, int mT) const;
 		bool validateKnightMove(int mF, int mT) const;
 		bool validateKingMove(int mF, int mT, bool s);
-		bool canCastle(bool dir, bool s);
+		bool canCastle(int dir, bool s);
 		bool checkStalemate() const;
 		bool checkCheck(bool s, bool v = false);
 		bool inCheckmate(bool s) const;
@@ -94,8 +94,8 @@ class Board {
 	private:
 		int board120[120], moveFrom, moveTo, ply;
 		int pieceMoved, prevOnMoveTo;
-		int pieceKilled, epSq, pmSq;
-		bool side, castling;
+		int pieceKilled, epSq, pmSq, castling;
+		bool side;
 		std::vector<int> whiteMoveList, blackMoveList;
 
 		struct pieceEntry {
@@ -176,7 +176,7 @@ enum pieceValues_t { P_VAL = 100, N_VAL = 300, B_VAL = 310,
                      R_VAL = 500, Q_VAL = 1000, K_VAL = 9999 
 };
 
-enum sides_t { QUEENSIDE = 0, KINGSIDE = 1
+enum sides_t { QUEENSIDE = 2, KINGSIDE = 1
 };
 
 #endif

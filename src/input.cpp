@@ -29,28 +29,16 @@ bool getInput(Board& b, int& mF, int& mT, bool& quit) {
 	}
 
 	if (input == "o-o" || input == "O-O" || input == "0-0") {
-		if (b.canCastle(KINGSIDE, b.getSide())) {
-			mF = b.getSide() ? b.getPos(wK) : b.getPos(bK);
-			mT = b.getSide() ? _G1 : _G8;
-			b.setCastling(true);
-			return true;
-		}
-		else {
-			cout << "Illegal move!\n";
-			return false;
-		}
+		mF = b.getSide() ? b.getPos(wK) : b.getPos(bK);
+		mT = b.getSide() ? _G1 : _G8;
+		b.setCastling(1);
+		return true;
 	}
 	if (input == "o-o-o" || input == "O-O-O" || input == "0-0-0") {
-		if (b.canCastle(QUEENSIDE, b.getSide())) {
-			mF = b.getSide() ? b.getPos(wK) : b.getPos(bK);
-			mT = b.getSide() ? _B1 : _B8;
-			b.setCastling(true);
-			return true;
-		}
-		else {
-			cout << "Illegal move!\n";
-			return false;
-		}
+		mF = b.getSide() ? b.getPos(wK) : b.getPos(bK);
+		mT = b.getSide() ? _B1 : _B8;
+		b.setCastling(2);
+		return true;
 	}
 
 	if ((int)input.size() != 5 || input[2] != ' ') {

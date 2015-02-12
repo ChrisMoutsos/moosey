@@ -53,7 +53,7 @@ void drawSquares(const Board& b, const int& mF, const int& mT) {
 	for (int r = 1; r <= 8; r++) {
 		for (int f = 1; f <= 8; f++) {
 			sq = FR2SQ64(f, r)-1;
-			if ((r+f)%2 == 0) {	//Light squares
+			if ((r+f)%2 == 1) {	//Light squares
 				if (mF != sq+1 && mT != sq+1 && to64(b.getMoveFrom()) != sq+1 && to64(b.getMoveTo()) != sq+1) {
 					SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 				}

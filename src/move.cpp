@@ -127,7 +127,6 @@ void Board::unmovePiece(int mF, int mT) {
 		board120[mF+cExtras[2]] = board120[mF+cExtras[1]];
 		board120[mF+cExtras[0]] = empty;
 		board120[mF+cExtras[1]] = empty;
-		std::cout << "Checking mF: " << intToSquare(mF) << " to " << intToSquare(mT) << std::endl;
 
 		piece[board120[mF]].pos = mF;
 		piece[board120[mF+cExtras[2]]].pos = mF+cExtras[2];

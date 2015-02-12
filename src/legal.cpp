@@ -13,11 +13,13 @@ bool Board::legalMove(int mF, int mT, bool s, bool v) {
 	bool isInCheck;
 	int realEpSq = epSq;
 	int realPieceMoved = pieceMoved;
+	
 	if (!validateMove(mF, mT, s)) {
-		if (v) std::cout << "Illegal move..\n";
+		if (v) std::cout << "Invalid move..\n";
 		return false;
 	}
-	if (castling) return true;
+	if (castling)
+		return true;
 
 	movePiece(mF, mT);
 	isInCheck = inCheck(s);
@@ -30,8 +32,7 @@ bool Board::legalMove(int mF, int mT, bool s, bool v) {
 		if (v) std::cout << "Illegal move.\n";
 		return false;
 	}
-	else
-		return true;
+	return true;
 }
 
 bool Board::checkStalemate() const {
@@ -122,9 +123,8 @@ bool Board::validateMove(int mF, int mT, bool s) {
 
 	if (onMF == -1 || mT == 0 || board120[mT] == invalid) 
 		return false;
-	if (onMT != empty && piece[onMF].color == piece[onMT].color && !castling) {
+	if (onMT != empty && piece[onMF].color == piece[onMT].color && !castling) 
 		return false;
-	}
 	if (piece[onMF].color != s) 
 		return false;
 
@@ -143,7 +143,6 @@ bool Board::validateMove(int mF, int mT, bool s) {
 
 	return false;
 }
-
 
 bool Board::validatePawnMove(int mF, int mT, bool s) const {
 	int extra = s ? 10 : -10;
@@ -217,27 +216,28 @@ bool Board::validateKingMove(int mF, int mT, bool s) {
 	
 	if (diff == 1 || diff == 10 || diff == 9 || diff == 11)
 		return true;
-	else if (mF - mT == -2)
-		return canCastle(KINGSIDE, s);
-	else if (mF - mT == 3)
-		return canCastle(QUEENSIDE, s);
+	if ((mF - mT) == -2) {
+		setCastling(1);
+		return true;
+	}
+	if ((mF - mT) == 3) {
+		setCastling(2);
+		return true;
+	}
 	return false;
 }
 
-bool Board::canCastle(bool dir, bool s) {
+bool Board::canCastle(int dir, bool s) {
 	int k = s ? wK : bK;
-	int r = s ? dir ? wkR : wqR : dir ? bkR : bqR;
-	int kSq, c = dir ? 1 : -1;
+	int r = s ? dir==1 ? wkR : wqR : dir ? bkR : bqR;
+	int kSq, c = dir==1 ? 1 : -1;
 
 	if (piece[k].moved || piece[r].moved) return false;
-	for (int i = 1; i <= 3; i++) {	//Verify it's empty between K and R
-		if (dir && i == 3) break;
+	for (int i = 1; i <= 2; i++)	//Verify it's empty between K and R
 		if (board120[piece[k].pos+i*c] != empty) return false;
-	}
 	if (inCheck(s)) return false;	//Verify not in check
 	
-	for (int j = 1; j <= 3; j++) {	//Verify not going through/to check
-		if (dir && j==3) break;
+	for (int j = 1; j <= 2; j++) {	//Verify not going through/to check
 		kSq = piece[k].pos;
 		movePiece(kSq, kSq+j*c);
 		if (inCheck(s)) {
@@ -246,6 +246,6 @@ bool Board::canCastle(bool dir, bool s) {
 		}
 		unmovePiece(kSq, kSq+j*c);
 	}
-	setCastling(1);
+	setCastling(dir);
 	return true;
 }

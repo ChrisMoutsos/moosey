@@ -27,7 +27,7 @@ void Board::initializeVars() {
 	moveFrom = moveTo = ply = epSq = pmSq = null;
 	side = WHITE;
 	pieceMoved = prevOnMoveTo = empty;
-	castling = false;
+	castling = 0;
 }
 
 void Board::emptyBoard() {
@@ -125,3 +125,4 @@ void Board::handleInput(int& mF, int& mT) {
 		mT = -1;
 	}
 }
+
