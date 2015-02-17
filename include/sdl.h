@@ -10,7 +10,7 @@
 
 class LTexture;
 
-const int SCREEN_W = 700;
+const int SCREEN_W = 1200;
 const int SCREEN_H = 700;
 
 bool init_SDL();
@@ -20,5 +20,6 @@ void close_SDL();
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
 extern LTexture spriteSheetTexture;
+extern SDL_Color textColor;
 
 #endif

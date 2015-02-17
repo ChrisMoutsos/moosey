@@ -7,6 +7,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <iostream>
 #include <stdio.h>
 #include <string>
@@ -14,8 +15,9 @@
 #include "ltexture.h"
 #include "sdl.h"
 
-SDL_Window* window; //The window we'll be rendering to
-SDL_Renderer* renderer; //The window renderer
+SDL_Window* window = NULL; //The window we'll be rendering to
+SDL_Renderer* renderer = NULL; //The window renderer
+TTF_Font* font = NULL;
 
 bool init_SDL() {
 	bool success = true;
@@ -51,6 +53,12 @@ bool init_SDL() {
 					printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
 					success = false;
 				}
+
+				//Initialize SDL_ttf
+				if (!TTF_Init() == -1) {
+					printf("SDL_ttf could not be initialized.\n");
+					success = false;
+				}
 			}
 		}
 	}
@@ -60,12 +68,19 @@ bool init_SDL() {
 
 bool loadMedia() {
 	bool success = true;
-	
-	if (!spriteSheetTexture.loadFromFile("../res/spritesheet2.bmp")) {
+	font = TTF_OpenFont("../res/arial_narrow_7.ttf", 28);
+
+	if (font == NULL) {
 		success = false;
 	}
 	else {
+		textColor = {0, 0, 0};
 	}
+	
+	if (!spriteSheetTexture.loadFromFile("../res/spritesheet3.bmp")) {
+		success = false;
+	}
+	
 
 	return success;
 }
@@ -73,6 +88,9 @@ bool loadMedia() {
 void close_SDL() {
 	//Free loaded images
 	spriteSheetTexture.free();
+	//Free global font
+	TTF_CloseFont(font);
+	font = NULL;
 
 	//Destroy window	
 	SDL_DestroyRenderer(renderer);
@@ -81,6 +99,7 @@ void close_SDL() {
 	renderer = NULL;
 
 	//Quit SDL subsystems
+	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
 }

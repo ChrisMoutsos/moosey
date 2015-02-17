@@ -97,6 +97,7 @@ class Board {
 		int pieceKilled, epSq, pmSq, castling;
 		bool side;
 		std::vector<int> whiteMoveList, blackMoveList;
+		std::vector<int> movesMade;
 
 		struct pieceEntry {
        		 	std::string name;	//"Pawn", "Rook", etc.

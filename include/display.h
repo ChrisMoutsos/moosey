@@ -23,6 +23,7 @@ void setSpriteClips();
 void drawSquares(const Board& b, const int& mF = -1, const int& mT = -1);
 void drawPieces(const Board& b, const int& mF = -1, const int& mT = -1);
 void drawBorder();
+void drawMoveTable();
 
 extern Square squares[64];
 

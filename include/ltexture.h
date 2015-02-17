@@ -5,6 +5,8 @@
 ----------------------------------
 */
 
+#include <SDL2/SDL_ttf.h>
+
 #ifndef LTEXTURE_H
 #define LTEXTURE_H
 
@@ -13,7 +15,6 @@ class LTexture {
 		LTexture();
 		~LTexture();
 		bool loadFromFile(std::string path);
-
 		#ifdef _SDL_TTF_H
 		bool loadFromRenderedText(std::string textureText, SDL_Color textColor);
 		#endif
@@ -36,5 +37,6 @@ class LTexture {
 
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
+extern TTF_Font* font;
 
 #endif

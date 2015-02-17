@@ -7,6 +7,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <iostream>
 #include <string>
 #include "ltexture.h"
@@ -48,7 +49,7 @@ bool LTexture::loadFromFile(std::string path) {
 bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColor) {
 	free();	
 	
-	SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, textureText.c_str(), textColor);
+	SDL_Surface* textSurface = TTF_RenderText_Solid(font, textureText.c_str(), textColor);
 	if (textSurface == NULL) {
 		std::cout << "Unable to render text surface.\n";
 	}

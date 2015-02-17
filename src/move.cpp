@@ -18,6 +18,8 @@ void Board::movePiece(int mF, int mT) {
 			            //mF is from final pos of K, R, and corner
 	int killSquare = mT, epExtra = 0, mFVal = piece[board120[mF]].value;
 	bool s = piece[board120[mF]].color, passanting;
+
+//	movesMade.push_back(mF*100+mT);
 	
 	if (!castling) {	
 		if (piece[board120[mF]].value == P_VAL && mT == epSq) {
@@ -89,6 +91,8 @@ void Board::unmovePiece(int mF, int mT) {
 			            //mF is from final pos of K, R, and corner
 	int diffMTMF = abs(mT-mF), epExtra = 0;
 	bool s = piece[board120[mT]].color, unpassanting;
+
+	//movesMade.erase(movesMade.size()+movesMade.begin());
 
 	if (!castling) {
 		if (piece[pieceMoved].value == P_VAL && prevOnMoveTo == empty) {

@@ -10,16 +10,31 @@
 Square squares[64];
 SDL_Rect spriteClips[12];
 LTexture spriteSheetTexture;
+LTexture turnText;
+SDL_Color textColor;
 
 void displayBoard(const Board& b, const int& mF, const int& mT) {
+	static bool s = WHITE;
+
 	//Clear screen
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_SetRenderDrawColor(renderer, 200, 200, 255, 255);
 	SDL_RenderClear(renderer);
 
 	setPiecesOnSquares(b);
 	drawSquares(b, mF, mT);
 	drawPieces(b, mF, mT);
 	drawBorder();
+
+	drawMoveTable();
+
+	if (s != b.getSide()) {
+		s = b.getSide();
+		if (b.getSide()) 
+			turnText.loadFromRenderedText("White to move", textColor);
+		else
+			turnText.loadFromRenderedText("Black to move", textColor);
+	}
+	turnText.render(BXSTART+B_SIZE/2-100, BYSTART+B_SIZE+15);
 
 	//Update screen
 	SDL_RenderPresent(renderer);
@@ -140,5 +155,15 @@ void drawBorder() {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderDrawRect(renderer, &borderRect);
 	borderRect = {BXSTART-1, BYSTART-1, B_SIZE+2, B_SIZE+2};
+	SDL_RenderDrawRect(renderer, &borderRect);
+}
+
+void drawMoveTable() {
+	SDL_Rect borderRect = {BXSTART+B_SIZE+75, BYSTART, 400, 600};
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_RenderFillRect(renderer, &borderRect);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderDrawRect(renderer, &borderRect);
+	borderRect = {BXSTART+B_SIZE+74, BYSTART-1, 400, 600};
 	SDL_RenderDrawRect(renderer, &borderRect);
 }

@@ -47,16 +47,25 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 							mF = square; 
 							dragging = true;
 						}
+						else if ((s && piece >= bqR) || (!s && piece <= wPh)) {
+							
+						}
 					}
 					else if (mF != -1) {	
-						mT = (square != mF) ? square : -1;
+						if ((s && piece <= wPh) || (!s && piece >= bqR)) {
+							if (piece != noPiece) {
+								mF = square;
+								dragging = true;
+							}	
+						}
+						else
+							mT = (square != mF) ? square : -1;
 					}
 				}
 			break;
 			case SDL_MOUSEBUTTONUP:
 				if (inside) {
 					if (mF != -1 && mT == -1) {
-						std::cout << "Up. Inside, ";
 						if (square != mF) {
 							mT = square;
 						}
