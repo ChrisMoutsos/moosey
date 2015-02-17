@@ -8,11 +8,11 @@
 #include <iostream>
 #include "cmath"
 #include "board.h"
+#include "ltexture.h"
 
 bool Board::legalMove(int mF, int mT, bool s, bool v) { 
 	bool isInCheck;
 	int realEpSq = epSq;
-	int realPieceMoved = pieceMoved;
 	
 	if (!validateMove(mF, mT, s)) {
 		if (v) std::cout << "Invalid move..\n";
@@ -26,7 +26,6 @@ bool Board::legalMove(int mF, int mT, bool s, bool v) {
 	unmovePiece(mF, mT);
 
 	setCastling(0);	
-	pieceMoved = realPieceMoved;
 	epSq = realEpSq;
 	if (isInCheck) {
 		if (v) std::cout << "Illegal move.\n";
@@ -44,18 +43,22 @@ bool Board::checkStalemate() const {
 }
 
 bool Board::checkCheck(bool s, bool v) {
+	checkText.loadFromRenderedText(" ", textColor);
 	if (inCheck(s)) {
 		cleanMoveList(s);
 		if (inCheckmate(s)) { 
-			s ? std::cout << "White" : std::cout << "Black";
-			std::cout << " is in checkmate. ";
-			s ? std::cout << "Black wins!\n" : std::cout << "White wins!\n";
+			if (s)
+				checkText.loadFromRenderedText("Black wins!", textColor);
+			else
+				checkText.loadFromRenderedText("White wins!", textColor);
 			return true;
 		}
 		else {
 			if (v) {
-				side ? std::cout << "White" : std::cout << "Black";
-				std::cout << " is in check!\n\n";
+				if (s)
+					checkText.loadFromRenderedText("White is in check", textColor);
+				else
+					checkText.loadFromRenderedText("Black is in check", textColor);
 			}
 			return false;
 		}
@@ -71,7 +74,7 @@ bool Board::inCheckmate(bool s) const {
 	return false;
 }
 
-bool Board::inCheck(bool s) {
+bool Board::inCheck(bool s) const {
 	int kPos, pIndex, i, v, d;
 	kPos = s ? piece[wK].pos : piece[bK].pos;
 

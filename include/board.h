@@ -7,8 +7,13 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <string>
 #include <vector>
+
+class LTexture;
 
 class Board {
 
@@ -29,8 +34,6 @@ class Board {
 		int getMoveTo() const { return moveTo; };
 		int getPly() const { return ply; };
 		bool getSide() const { return side; };
-		int getPieceMoved() const { return pieceMoved; };
-		int getPrevOnMoveTo() const { return prevOnMoveTo; };	
 		int getBoard120(int sq) const { return board120[sq]; };
 		int getPieceAbbr(int p) const { return piece[p].abbr; };
 		int getFromMoveList(bool s, int i) const;
@@ -46,8 +49,6 @@ class Board {
 		void setMove(int mF, int mT) { moveFrom = mF; moveTo = mT; };
 		void setPly(int newPly) { ply = newPly; };
 		void setSide(bool newSide) { side = newSide; };
-		void setPieceMoved(int p) { pieceMoved = p; };
-		void setPrevOnMoveTo(int p) { prevOnMoveTo = p; };
 		void setBoard120(int i, int v) { board120[i] = v; };
 		void addToMovelist(bool s, int v);
 		void clearMoveList(bool s);
@@ -79,7 +80,7 @@ class Board {
 		bool checkStalemate() const;
 		bool checkCheck(bool s, bool v = false);
 		bool inCheckmate(bool s) const;
-		bool inCheck(bool s);
+		bool inCheck(bool s) const;
 	
 		//MOVEGEN.CPP
 		void generateMoveLists();
@@ -93,11 +94,11 @@ class Board {
 	
 	private:
 		int board120[120], moveFrom, moveTo, ply;
-		int pieceMoved, prevOnMoveTo;
-		int pieceKilled, epSq, pmSq, castling;
+		int epSq, pmSq, castling;
 		bool side;
 		std::vector<int> whiteMoveList, blackMoveList;
 		std::vector<int> movesMade;
+		std::vector<int> pieceMoved, prevOnMoveTo, pieceKilled;
 
 		struct pieceEntry {
        		 	std::string name;	//"Pawn", "Rook", etc.
@@ -179,5 +180,8 @@ enum pieceValues_t { P_VAL = 100, N_VAL = 300, B_VAL = 310,
 
 enum sides_t { QUEENSIDE = 2, KINGSIDE = 1
 };
+
+extern SDL_Color textColor;
+extern LTexture checkText;
 
 #endif

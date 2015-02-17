@@ -11,8 +11,6 @@
 void Board::generateMoveLists() {	
 	int mF, mT;
 	bool realSide = side;
-	int realPieceMoved = pieceMoved;
-	int realPrevOnMoveTo = prevOnMoveTo;
 	int realEpSq = epSq;
 
 	side = WHITE;
@@ -36,16 +34,12 @@ void Board::generateMoveLists() {
 			}
 
 	side = realSide;	
-	pieceMoved = realPieceMoved;
-	prevOnMoveTo = realPrevOnMoveTo;
 	epSq = realEpSq;
 }
 
 void Board::cleanMoveList(bool s) {
 	int mF, mT, size;
 	bool realSide = side;
-	int realPieceMoved = pieceMoved;
-	int realPrevOnMoveTo = prevOnMoveTo;
 	int realEpSq = epSq;
 	int realMoveFrom = moveFrom;
 	int realMoveTo = moveTo;
@@ -65,8 +59,6 @@ void Board::cleanMoveList(bool s) {
 		}
 	}
 	side = realSide;	
-	pieceMoved = realPieceMoved;
-	prevOnMoveTo = realPrevOnMoveTo;
 	epSq = realEpSq;
 	moveFrom = realMoveFrom;
 	moveTo = realMoveTo;

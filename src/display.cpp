@@ -11,10 +11,11 @@ Square squares[64];
 SDL_Rect spriteClips[12];
 LTexture spriteSheetTexture;
 LTexture turnText;
+LTexture checkText;
 SDL_Color textColor;
 
-void displayBoard(const Board& b, const int& mF, const int& mT) {
-	static bool s = !b.getSide();
+void displayBoard(Board& b, const int& mF, const int& mT) {
+	static bool sidey = !b.getSide();
 
 	//Clear screen
 	SDL_SetRenderDrawColor(renderer, 200, 200, 255, 255);
@@ -26,15 +27,19 @@ void displayBoard(const Board& b, const int& mF, const int& mT) {
 	drawBorder();
 
 	drawMoveTable();
-
-	if (s != b.getSide()) {
-		s = b.getSide();
+	
+	//Turn text
+	if (sidey != b.getSide()) {
+		sidey = b.getSide();
 		if (b.getSide()) 
 			turnText.loadFromRenderedText("White to move", textColor);
 		else
 			turnText.loadFromRenderedText("Black to move", textColor);
 	}
-	turnText.render(BXSTART+B_SIZE/2-100, BYSTART+B_SIZE+15);
+	turnText.render(BXSTART, BYSTART+B_SIZE+15);
+	//Check text
+	b.checkCheck(b.getSide(), 1);
+	checkText.render(BXSTART+B_SIZE-200, BYSTART+B_SIZE+15);
 
 	//Update screen
 	SDL_RenderPresent(renderer);

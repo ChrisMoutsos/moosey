@@ -26,7 +26,6 @@ Board::Board(std::string FEN) {
 void Board::initializeVars() {
 	moveFrom = moveTo = ply = epSq = pmSq = null;
 	side = WHITE;
-	pieceMoved = prevOnMoveTo = empty;
 	castling = 0;
 }
 
