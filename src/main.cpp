@@ -50,12 +50,9 @@ int main(int argc, char* args[]) {
 				quit = true;
 			for (int i = 0; i < 64; i++)
 				squares[i].handleEvent(&e, mF, mT, board.getSide());
-
 		}
 		displayBoard(board, mF, mT);
 		board.handleInput(mF, mT);
-		if (board.checkCheck(board.getSide(), 1))
-			quit = true;
 //		showMoveLists(board);
 	}
 
