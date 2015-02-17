@@ -14,7 +14,7 @@ LTexture turnText;
 SDL_Color textColor;
 
 void displayBoard(const Board& b, const int& mF, const int& mT) {
-	static bool s = WHITE;
+	static bool s = !b.getSide();
 
 	//Clear screen
 	SDL_SetRenderDrawColor(renderer, 200, 200, 255, 255);
