@@ -20,7 +20,6 @@
 #include "board.h"
 #include "display.h"
 #include "input.h"
-#include "square.h"
 
 void showMoveLists(Board& board);
 
@@ -41,18 +40,18 @@ int main(int argc, char* args[]) {
 	SDL_Event e; //Event handler
 
 	Board board;
-	setSquarePositions();
+	setSquarePositions(board);
 	setSpriteClips();	
 
 	while (!quit) {
 		while (SDL_PollEvent(&e) != 0) {
 			if (e.type == SDL_QUIT) 
 				quit = true;
-			for (int i = 0; i < 64; i++)
-				squares[i].handleEvent(&e, mF, mT, board.getSide());
+			board.handleSquares(&e, mF, mT);
+			board.handleInput(mF, mT);
+			displayBoard(board, mF, mT);
 		}
-		displayBoard(board, mF, mT);
-		board.handleInput(mF, mT);
+
 //		showMoveLists(board);
 	}
 
