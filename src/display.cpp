@@ -3,11 +3,9 @@
 #include <iostream>
 #include "sdl.h"
 #include "display.h"
-#include "square.h"
 #include "board.h"
 #include "ltexture.h"
 
-Square squares[64];
 SDL_Rect spriteClips[12];
 LTexture spriteSheetTexture;
 LTexture turnText;
@@ -45,16 +43,16 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 	SDL_RenderPresent(renderer);
 }
 
-void setPiecesOnSquares(const Board& b) {
+void setPiecesOnSquares(Board& b) {
 	for (int i = 0; i < 64; i++)
-		squares[i].setPiece(b.getBoard120(from64(i+1)));
+		b.squares[i].setPiece(b.getBoard120(from64(i+1)));
 }
 
-void setSquarePositions() {
+void setSquarePositions(Board& b) {
 	for (int i = 0; i < 64; i++) {
-		squares[i].setPos(BXSTART+(SQ_SIZE*(i%8)),
+		b.squares[i].setPos(BXSTART+(SQ_SIZE*(i%8)),
 				  BYSTART+B_SIZE-(SQ_SIZE*(i/8+1)));
-		squares[i].setSq(i+1);
+		b.squares[i].setSq(i+1);
 	}
 }
 
@@ -89,8 +87,8 @@ void drawSquares(const Board& b, const int& mF, const int& mT) {
 					SDL_SetRenderDrawColor(renderer, 255, 255, 55, 255);
 				}
 			}
-			sqPos = {squares[sq].getX(),	//X start
-				 squares[sq].getY(),	//Y start
+			sqPos = {b.squares[sq].getX(),	//X start
+				 b.squares[sq].getY(),	//Y start
 				 SQ_SIZE, SQ_SIZE};	 //Width, height of square
 			SDL_RenderFillRect(renderer, &sqPos);
 		}
@@ -104,11 +102,11 @@ void drawPieces(const Board& b, const int& mF, const int& mT) {
 	for (int r = 1; r <= 8; r++) {
 		for (int f = 1; f <= 8; f++) {
 			sq = FR2SQ64(f, r)-1;
-			sqPos = {squares[sq].getX(), 	//X start
-				 squares[sq].getY(), 	//Y start
+			sqPos = {b.squares[sq].getX(), 	//X start
+				 b.squares[sq].getY(), 	//Y start
 				 SQ_SIZE, SQ_SIZE};	//Width, height of square
 		
-			p = squares[sq].getPiece();
+			p = b.squares[sq].getPiece();
 			if (p == wqR || p == wkR)
 				clipSq = spriteClips[wRook];		
 		    	else if (p == wqN || p == wkN)
@@ -143,7 +141,7 @@ void drawPieces(const Board& b, const int& mF, const int& mT) {
 			}		
 
 			if (p != empty) { 
-				if (squares[sq].getDragging()) {
+				if (b.squares[sq].getDragging()) {
 					SDL_GetMouseState(&x, &y);
 					spriteSheetTexture.render(x-SQ_SIZE/2, y-SQ_SIZE/2, &clipSq);	
 				}

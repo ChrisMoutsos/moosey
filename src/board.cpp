@@ -86,6 +86,10 @@ void Board::initializePieces() {
         }
 }
 
+void Board::handleSquares(SDL_Event* e, int& mF, int& mT) {
+	for (int i = 0; i < 64; i++)
+		squares[i].handleEvent(e, mF, mT, side);
+}
 
 void Board::addToMovelist(bool s, int v) {
 	if (s) whiteMoveList.push_back(v);

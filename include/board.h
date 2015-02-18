@@ -12,12 +12,17 @@
 #include <SDL2/SDL_ttf.h>
 #include <string>
 #include <vector>
+#include "square.h"
 
 class LTexture;
 
 class Board {
 
-	friend void showMoveLists(Board& board);
+	friend void showMoveLists(Board&);
+	friend void drawPieces(const Board&, const int&, const int&);
+	friend void drawSquares(const Board&, const int&, const int&);
+	friend void setPiecesOnSquares(Board&);
+	friend void setSquarePositions(Board&);
 	
 	public:
 		//BOARD.CPP
@@ -29,6 +34,7 @@ class Board {
 		void placePiecesDefault();	
 		void initializePieces();
 		void handleInput(int& mF, int& mT);
+		void handleSquares(SDL_Event* e, int& mF, int& mT);
 		//ACCESSORS
 		int getMoveFrom() const { return moveFrom; };
 		int getMoveTo() const { return moveTo; };
@@ -112,6 +118,8 @@ class Board {
         		int* moveList;  	
 			int moveListSize;
 		} piece[32];
+	
+		Square squares[64]; //For the display
 };
 
 //INLINE CONVERSION FUNCTIONS
@@ -174,11 +182,11 @@ enum piece_t { wqR = 0, wqN, wqB, wQ, wK, wkB, wkN, wkR,
                bPa, bPb, bPc, bPd, bPe, bPf, bPg, bPh 
 };
 
-enum pieceValues_t { P_VAL = 100, N_VAL = 300, B_VAL = 310,
+enum pieceValue_t { P_VAL = 100, N_VAL = 300, B_VAL = 310,
                      R_VAL = 500, Q_VAL = 1000, K_VAL = 9999 
 };
 
-enum sides_t { QUEENSIDE = 2, KINGSIDE = 1
+enum castleside_t { QUEENSIDE = 2, KINGSIDE = 1
 };
 
 extern SDL_Color textColor;

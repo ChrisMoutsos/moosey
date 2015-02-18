@@ -30,7 +30,7 @@ class Square {
 		int getX() const { return pos.x; };
 		int getY() const { return pos.y; };
 		void setSq(int i) { square = i; };
-		bool getDragging() { return dragging; };
+		bool getDragging() const { return dragging; };
 		void setDragging(bool x) { dragging = x; };
 	private:
 		bool dragging;

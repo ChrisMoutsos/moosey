@@ -9,7 +9,6 @@
 #include <SDL2/SDL_image.h>
 #include <iostream>
 #include "display.h"
-#include "board.h"
 #include "square.h"
 #include "ltexture.h"
 
@@ -43,16 +42,16 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 			case SDL_MOUSEBUTTONDOWN:
 				if (inside) {
 					if (mF == -1 && piece != noPiece) {
-						if ((s && piece <= wPh) || (!s && piece >= bqR)) {
+						if ((s && piece <= 15) || (!s && piece >= 16)) {
 							mF = square; 
 							dragging = true;
 						}
-						else if ((s && piece >= bqR) || (!s && piece <= wPh)) {
+						else if ((s && piece >= 16) || (!s && piece <= 15)) {
 							
 						}
 					}
 					else if (mF != -1) {	
-						if ((s && piece <= wPh) || (!s && piece >= bqR)) {
+						if ((s && piece <= 15) || (!s && piece >= 16)) {
 							if (piece != noPiece) {
 								mF = square;
 								dragging = true;

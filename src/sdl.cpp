@@ -68,8 +68,8 @@ bool init_SDL() {
 
 bool loadMedia() {
 	bool success = true;
-	font = TTF_OpenFont("../res/arial_narrow_7.ttf", 28);
-	//font = TTF_OpenFont("../res/CiceroSerif.ttf", 28);
+	//font = TTF_OpenFont("../res/arial_narrow_7.ttf", 28);
+	font = TTF_OpenFont("../res/CiceroSerif.ttf", 28);
 
 	if (font == NULL) {
 		success = false;
