@@ -78,7 +78,7 @@ bool loadMedia() {
 		textColor = {0, 0, 0};
 	}
 	
-	if (!spriteSheetTexture.loadFromFile("../res/spritesheet3.bmp")) {
+	if (!spriteSheetTexture.loadFromFile("../res/spritesheet2.bmp")) {
 		success = false;
 	}
 	

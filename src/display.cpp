@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <iostream>
+#include <string>
 #include "sdl.h"
 #include "display.h"
 #include "board.h"
@@ -14,7 +15,11 @@ LTexture moveText;
 SDL_Color textColor;
 
 void displayBoard(Board& b, const int& mF, const int& mT) {
+	using std::string;
+
 	static bool sidey = !b.getSide();
+	static string moveStr = "";
+	string temp = "";
 
 	//Clear screen
 	SDL_SetRenderDrawColor(renderer, 200, 200, 255, 255);
@@ -34,6 +39,15 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 		else
 			turnText.loadFromRenderedText("Black to move", textColor);
 		b.checkCheck(b.getSide(), 1);
+
+		for (int i = 0; i < b.getPly(); i++) {
+			if ((i+1)%2 == 1) {
+				temp = std::to_string(i+1);
+				moveStr += temp + ". ";
+			}
+			
+		}
+		moveText.loadFromRenderedText(moveStr, textColor);
 		
 	}
 	turnText.render(BXSTART, BYSTART+B_SIZE+15);
