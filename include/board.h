@@ -33,8 +33,7 @@ class Board {
 		void placePiece(int p, int sq);
 		void placePiecesDefault();	
 		void initializePieces();
-		void handleInput(int& mF, int& mT);
-		void handleSquares(SDL_Event* e, int& mF, int& mT);
+		void handleInput(int& mF, int& mT, SDL_Event* e);
 		//ACCESSORS
 		int getMoveFrom() const { return moveFrom; };
 		int getMoveTo() const { return moveTo; };

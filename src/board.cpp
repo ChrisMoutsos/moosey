@@ -8,18 +8,23 @@
 #include <iostream>
 #include <string>
 #include "board.h"
+#include "display.h"
 
 Board::Board() { 
 	initializeVars();
 	emptyBoard();
 	initializePieces();
 	placePiecesDefault();	
+	setSquarePositions(*this);
+	setSpriteClips();	
 }
 
 Board::Board(std::string FEN) {
 	initializeVars();
 	emptyBoard();
 	initializePieces();
+	setSquarePositions(*this);
+	setSpriteClips();	
 	//FEN stuff
 }
 
@@ -86,11 +91,6 @@ void Board::initializePieces() {
         }
 }
 
-void Board::handleSquares(SDL_Event* e, int& mF, int& mT) {
-	for (int i = 0; i < 64; i++)
-		squares[i].handleEvent(e, mF, mT, side);
-}
-
 void Board::addToMovelist(bool s, int v) {
 	if (s) whiteMoveList.push_back(v);
 	else blackMoveList.push_back(v);
@@ -114,7 +114,9 @@ int Board::getFromMoveList(bool s, int i) const {
 		return blackMoveList[i];
 }
 
-void Board::handleInput(int& mF, int& mT) {
+void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
+	for (int i = 0; i < 64; i++)
+		squares[i].handleEvent(e, mF, mT, side);
 	if (mF != -1 && mT != -1) {
 		mF = from64(mF);
 		mT = from64(mT);

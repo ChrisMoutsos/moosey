@@ -8,9 +8,6 @@
 /*
  *	SDL
  *	FEN parsing
- *	Vectors for various member data of Board,
- *	in anticipation of the bot making multiple moves.
- *	Similarly, add vector of all moves made
  */
 
 #include <iostream>
@@ -19,7 +16,6 @@
 #include "sdl.h"
 #include "board.h"
 #include "display.h"
-#include "input.h"
 
 void showMoveLists(Board& board);
 
@@ -40,15 +36,13 @@ int main(int argc, char* args[]) {
 	SDL_Event e; //Event handler
 
 	Board board;
-	setSquarePositions(board);
-	setSpriteClips();	
 
 	while (!quit) {
+
 		while (SDL_PollEvent(&e) != 0) {
 			if (e.type == SDL_QUIT) 
 				quit = true;
-			board.handleSquares(&e, mF, mT);
-			board.handleInput(mF, mT);
+			board.handleInput(mF, mT, &e);
 			displayBoard(board, mF, mT);
 		}
 
