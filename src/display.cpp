@@ -21,7 +21,7 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 	string temp = "";
 
 	//Clear screen
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_SetRenderDrawColor(renderer, 209, 224, 255, 255);
 	SDL_RenderClear(renderer);
 
 	setPiecesOnSquares(b);
@@ -45,25 +45,25 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 			moveStr += intToSquare(mT2) + " ";
 		}
 		
-		moveText.loadFromRenderedText(moveStr, textColor, font3);
+		moveText.loadFromRenderedText(moveStr, textColor, Cicero22);
 		moveText.render(BXSTART+(m/21*250)+B_SIZE+40, BYSTART+10+(m%21)*30); 
 	}
 	
 	if (sidey != b.getSide()) {
 		sidey = b.getSide();
 		if (b.getSide()) 
-			turnText.loadFromRenderedText("White to move", textColor, font);
+			turnText.loadFromRenderedText("White to move", textColor, Garamond26);
 		else
-			turnText.loadFromRenderedText("Black to move", textColor, font);
+			turnText.loadFromRenderedText("Black to move", textColor, Garamond26);
 		b.checkCheck(b.getSide(), 1);
-		fileText.loadFromRenderedText("a         b        c         d         e         f         g         h", textColor, font2);
+		fileText.loadFromRenderedText("a         b        c         d         e         f         g         h", textColor, Cicero26);
 	}
 	turnText.render(BXSTART, BYSTART+B_SIZE+40);
 	checkText.render(BXSTART+B_SIZE-200, BYSTART+B_SIZE+40);
 	fileText.render(BXSTART+33, BYSTART+B_SIZE+10);
 	for (int i = int('8'); i >= int('1'); i--) {
 		rankStr = char(i);
-		rankText.loadFromRenderedText(rankStr, textColor, font2);
+		rankText.loadFromRenderedText(rankStr, textColor, Cicero26);
 		rankText.render(BXSTART-35, BYSTART+30+75*(int('8')-i));
 	}
 
@@ -104,7 +104,10 @@ void drawSquares(const Board& b, const int& mF, const int& mT) {
 					SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 				}
 				else {
-					SDL_SetRenderDrawColor(renderer, 255, 255, 75, 255);
+					if (mF == sq+1 || to64(b.getMoveFrom()) == sq+1)
+						SDL_SetRenderDrawColor(renderer, 248, 195, 248, 255);
+					else if (mT == sq+1 || to64(b.getMoveTo()) == sq+1)
+						SDL_SetRenderDrawColor(renderer, 238, 157, 242, 255);
 				}
 			}
 			else { 			//Dark squares
@@ -112,7 +115,11 @@ void drawSquares(const Board& b, const int& mF, const int& mT) {
 					SDL_SetRenderDrawColor(renderer, 0, 153, 153, 255);
 				}
 				else {
-					SDL_SetRenderDrawColor(renderer, 255, 255, 55, 255);
+					if (mF == sq+1 || to64(b.getMoveFrom()) == sq+1)
+						SDL_SetRenderDrawColor(renderer, 248, 195, 248, 255);
+					else if (mT == sq+1 || to64(b.getMoveTo()) == sq+1)
+						SDL_SetRenderDrawColor(renderer, 238, 157, 242, 255);
+					//SDL_SetRenderDrawColor(renderer, 150, 153, 253, 255);
 				}
 			}
 			sqPos = {b.squares[sq].getX(),	//X start
@@ -213,7 +220,7 @@ void drawBorder() {
 
 void drawMoveTable() {
 	SDL_Rect borderRect = {BXSTART+B_SIZE+25, BYSTART, 500, 650};
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_SetRenderDrawColor(renderer, 236, 247, 235, 255);
 	SDL_RenderFillRect(renderer, &borderRect);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderDrawRect(renderer, &borderRect);

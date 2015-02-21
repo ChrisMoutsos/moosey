@@ -37,6 +37,6 @@ class LTexture {
 
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
-extern TTF_Font* font, * font2, * font3;
+extern TTF_Font* Garamond26, *Garamond28, *Cicero22, *Cicero26;
 
 #endif

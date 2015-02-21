@@ -43,22 +43,22 @@ bool Board::checkStalemate() const {
 }
 
 bool Board::checkCheck(bool s, bool v) {
-	checkText.loadFromRenderedText(" ", textColor, font);
+	checkText.loadFromRenderedText(" ", textColor, Garamond26);
 	if (inCheck(s)) {
 		cleanMoveList(s);
 		if (inCheckmate(s)) { 
 			if (s)
-				checkText.loadFromRenderedText("Black wins!", textColor, font);
+				checkText.loadFromRenderedText("Black wins!", textColor, Garamond26);
 			else
-				checkText.loadFromRenderedText("White wins!", textColor, font);
+				checkText.loadFromRenderedText("White wins!", textColor, Garamond26);
 			return true;
 		}
 		else {
 			if (v) {
 				if (s)
-					checkText.loadFromRenderedText("White is in check", textColor, font);
+					checkText.loadFromRenderedText("White is in check", textColor, Garamond26);
 				else
-					checkText.loadFromRenderedText("Black is in check", textColor, font);
+					checkText.loadFromRenderedText("Black is in check", textColor, Garamond26);
 			}
 			return false;
 		}
@@ -246,15 +246,12 @@ bool Board::canCastle(int dir, bool s) {
 	
 	for (int j = 1; j <= 2; j++) {	//Verify not going through/to check
 		kSq = piece[k].pos;
-		std::cout << "j: " << j << ".. moving from " << kSq << " to " << kSq+j*c << std::endl;
 		movePiece(kSq, kSq+j*c);
 		if (inCheck(s)) {
 			unmovePiece(kSq, kSq+j*c);
-			std::cout << "j: " << j << ".. WAS IN CHECK, unmoving from " << kSq << " to " << kSq+j*c << std::endl;
 			return false;
 		}
 		unmovePiece(kSq, kSq+j*c);
-		std::cout << "j: " << j << ".. WASNT IN CHECK, unmoving from " << kSq << " to " << kSq+j*c << std::endl;
 	}
 	setCastling(dir);
 	return true;

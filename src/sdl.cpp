@@ -17,7 +17,8 @@
 
 SDL_Window* window = NULL; //The window we'll be rendering to
 SDL_Renderer* renderer = NULL; //The window renderer
-TTF_Font* font = NULL, * font2 = NULL, * font3 = NULL;
+TTF_Font* Garamond26 = NULL, * Garamond28 = NULL, 
+	* Cicero22= NULL, * Cicero26 = NULL;
 
 bool init_SDL() {
 	bool success = true;
@@ -68,17 +69,17 @@ bool init_SDL() {
 
 bool loadMedia() {
 	bool success = true;
-	//font = TTF_OpenFont("../res/arial_narrow_7.ttf", 28);
-	font = TTF_OpenFont("../res/CiceroSerif.ttf", 28);
-	font2 = TTF_OpenFont("../res/CiceroSerif.ttf", 26);
-	font3 = TTF_OpenFont("../res/CiceroSerif.ttf", 22);
+	Garamond28 = TTF_OpenFont("../res/Garamond.ttf", 28);
+	Cicero22 = TTF_OpenFont("../res/Cicero.ttf", 22);
+	Cicero26 = TTF_OpenFont("../res/Cicero.ttf", 26);
+	Garamond26 = TTF_OpenFont("../res/Garamond.ttf", 26);
 
-	if (font == NULL) {
+	if (Garamond28 == NULL || Garamond26 == NULL)
 		success = false;
-	}
-	else {
+	else if (Cicero26 == NULL || Cicero22 == NULL)
+		success = false;
+	else 
 		textColor = {0, 0, 0};
-	}
 	
 	if (!spriteSheetTexture.loadFromFile("../res/spritesheet2.bmp")) {
 		success = false;
@@ -92,8 +93,14 @@ void close_SDL() {
 	//Free loaded images
 	spriteSheetTexture.free();
 	//Free global font
-	TTF_CloseFont(font);
-	font = NULL;
+	TTF_CloseFont(Garamond26);
+	TTF_CloseFont(Garamond28);
+	TTF_CloseFont(Cicero22);
+	TTF_CloseFont(Cicero26);
+	Garamond26 = NULL;
+	Garamond28 = NULL;
+	Cicero22 = NULL;
+	Cicero26 = NULL;
 
 	//Destroy window	
 	SDL_DestroyRenderer(renderer);
