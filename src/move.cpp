@@ -183,3 +183,8 @@ void Board::changeTurn() {
 	side = side ? 0 : 1;
 	setCastling(0);
 }
+
+void Board::undoMove() {
+	unmovePiece();
+	changeTurn();
+}

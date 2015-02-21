@@ -72,6 +72,7 @@ class Board {
 		void movePiece(int mF, int mT);
 		void unmovePiece();
 		void unmovePiece(int mF, int mT);
+		void undoMove();
 		void changeTurn();
 		void moveInfo() const;
 	

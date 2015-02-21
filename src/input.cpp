@@ -22,8 +22,7 @@ bool getInput(Board& b, int& mF, int& mT, bool& quit) {
 		return true;
 	}
 	if (input == "undo" && b.getPly() != 0) {
-		b.unmovePiece();
-		b.changeTurn();
+		b.undoMove();
 		displayBoard(b);
 		return false;
 	}
