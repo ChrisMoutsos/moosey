@@ -220,20 +220,24 @@ bool Board::validateKingMove(int mF, int mT, bool s) {
 	if (diff == 1 || diff == 10 || diff == 9 || diff == 11)
 		return true;
 	if ((mF - mT) == -2) {
-		setCastling(1);
-		return true;
+		if (canCastle(KINGSIDE, s)) {
+			setCastling(KINGSIDE);
+			return true;
+		}
 	}
 	if ((mF - mT) == 3) {
-		setCastling(2);
-		return true;
+		if (canCastle(QUEENSIDE, s)) {
+			setCastling(QUEENSIDE);
+			return true;
+		}
 	}
 	return false;
 }
 
 bool Board::canCastle(int dir, bool s) {
 	int k = s ? wK : bK;
-	int r = s ? dir==1 ? wkR : wqR : dir ? bkR : bqR;
-	int kSq, c = dir==1 ? 1 : -1;
+	int r = s ? dir == KINGSIDE ? wkR : wqR : dir == KINGSIDE ? bkR : bqR;
+	int kSq, c = dir == KINGSIDE ? 1 : -1;
 
 	if (piece[k].moved || piece[r].moved) return false;
 	for (int i = 1; i <= 2; i++)	//Verify it's empty between K and R
@@ -242,12 +246,15 @@ bool Board::canCastle(int dir, bool s) {
 	
 	for (int j = 1; j <= 2; j++) {	//Verify not going through/to check
 		kSq = piece[k].pos;
+		std::cout << "j: " << j << ".. moving from " << kSq << " to " << kSq+j*c << std::endl;
 		movePiece(kSq, kSq+j*c);
 		if (inCheck(s)) {
 			unmovePiece(kSq, kSq+j*c);
+			std::cout << "j: " << j << ".. WAS IN CHECK, unmoving from " << kSq << " to " << kSq+j*c << std::endl;
 			return false;
 		}
 		unmovePiece(kSq, kSq+j*c);
+		std::cout << "j: " << j << ".. WASNT IN CHECK, unmoving from " << kSq << " to " << kSq+j*c << std::endl;
 	}
 	setCastling(dir);
 	return true;
