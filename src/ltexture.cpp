@@ -46,10 +46,10 @@ bool LTexture::loadFromFile(std::string path) {
 }
 
 #ifdef _SDL_TTF_H
-bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColor) {
+bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColor, TTF_Font* font) {
 	free();	
 	
-	SDL_Surface* textSurface = TTF_RenderText_Solid(font, textureText.c_str(), textColor);
+	SDL_Surface* textSurface = TTF_RenderText_Blended(font, textureText.c_str(), textColor);
 	if (textSurface == NULL) {
 		std::cout << "Unable to render text surface.\n";
 	}

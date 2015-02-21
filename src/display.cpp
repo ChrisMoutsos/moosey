@@ -9,20 +9,19 @@
 
 SDL_Rect spriteClips[12];
 LTexture spriteSheetTexture;
-LTexture turnText;
-LTexture checkText;
-LTexture moveText;
+LTexture turnText, checkText, moveText, rankText, fileText;
 SDL_Color textColor;
 
 void displayBoard(Board& b, const int& mF, const int& mT) {
 	using std::string;
 
 	static bool sidey = !b.getSide();
-	static string moveStr = "";
+	static string moveStr = "", rankStr;
+	int mF2, mT2;
 	string temp = "";
 
 	//Clear screen
-	SDL_SetRenderDrawColor(renderer, 200, 200, 255, 255);
+	SDL_SetRenderDrawColor(renderer, 255, 229, 204, 255);
 	SDL_RenderClear(renderer);
 
 	setPiecesOnSquares(b);
@@ -31,27 +30,42 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 	drawBorder();
 
 	drawMoveTable();
+	for (int m = 0; m <= b.getPly()/2; m++) {
+		moveStr = std::to_string(m+1) + ". ";
+		if (b.getPly() > m*2) {
+			mF2 = b.getMoveMade(m*2)/100;
+			moveStr += intToSquare(mF2) + " to ";
+			mT2 = b.getMoveMade(m*2)%100;	
+			moveStr += intToSquare(mT2) + ", ";
+		}
+		if (b.getPly() > m*2+1) {
+			mF2 = b.getMoveMade(m*2+1)/100;
+			moveStr += intToSquare(mF2) + " to ";
+			mT2 = b.getMoveMade(m*2+1)%100;	
+			moveStr += intToSquare(mT2) + " ";
+		}
+		
+		moveText.loadFromRenderedText(moveStr, textColor, font3);
+		moveText.render(BXSTART+(m/21*250)+B_SIZE+40, BYSTART+10+(m%21)*30); 
+	}
 	
 	if (sidey != b.getSide()) {
 		sidey = b.getSide();
 		if (b.getSide()) 
-			turnText.loadFromRenderedText("White to move", textColor);
+			turnText.loadFromRenderedText("White to move", textColor, font);
 		else
-			turnText.loadFromRenderedText("Black to move", textColor);
+			turnText.loadFromRenderedText("Black to move", textColor, font);
 		b.checkCheck(b.getSide(), 1);
-
-		for (int i = 0; i < b.getPly(); i++) {
-			if ((i+1)%2 == 1) {
-				temp = std::to_string(i+1);
-				moveStr += temp + ". ";
-			}
-			
-		}
-		moveText.loadFromRenderedText(moveStr, textColor);
-		
+		fileText.loadFromRenderedText("a         b        c         d         e         f         g         h", textColor, font2);
 	}
-	turnText.render(BXSTART, BYSTART+B_SIZE+15);
-	checkText.render(BXSTART+B_SIZE-200, BYSTART+B_SIZE+15);
+	turnText.render(BXSTART, BYSTART+B_SIZE+40);
+	checkText.render(BXSTART+B_SIZE-200, BYSTART+B_SIZE+40);
+	fileText.render(BXSTART+33, BYSTART+B_SIZE+10);
+	for (int i = int('8'); i >= int('1'); i--) {
+		rankStr = char(i);
+		rankText.loadFromRenderedText(rankStr, textColor, font2);
+		rankText.render(BXSTART-35, BYSTART+30+75*(int('8')-i));
+	}
 
 	//Update screen
 	SDL_RenderPresent(renderer);
@@ -95,7 +109,7 @@ void drawSquares(const Board& b, const int& mF, const int& mT) {
 			}
 			else { 			//Dark squares
 				if (mF != sq+1 && mT != sq+1 && to64(b.getMoveFrom()) != sq+1 && to64(b.getMoveTo()) != sq+1) {
-					SDL_SetRenderDrawColor(renderer, 0, 128, 128, 255);
+					SDL_SetRenderDrawColor(renderer, 0, 153, 153, 255);
 				}
 				else {
 					SDL_SetRenderDrawColor(renderer, 255, 255, 55, 255);
@@ -105,14 +119,24 @@ void drawSquares(const Board& b, const int& mF, const int& mT) {
 				 b.squares[sq].getY(),	//Y start
 				 SQ_SIZE, SQ_SIZE};	 //Width, height of square
 			SDL_RenderFillRect(renderer, &sqPos);
+			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+			//SDL_RenderDrawRect(renderer, &sqPos);
+			/*
+			SDL_RenderDrawLine(renderer, 
+					sqPos.x, sqPos.y,
+					sqPos.x+SQ_SIZE, sqPos.y);
+			SDL_RenderDrawLine(renderer, 
+					sqPos.x, sqPos.y, 
+					sqPos.x, sqPos.y+SQ_SIZE);
+			*/
 		}
 	}
 }
 
 void drawPieces(const Board& b, const int& mF, const int& mT) {
-	int p, sq, x, y;
+	int p, sq, x, y, putOnTop = -1;
 	SDL_Rect sqPos;
-	SDL_Rect clipSq;
+	SDL_Rect clipSq, pOTClipSq;
 	for (int r = 1; r <= 8; r++) {
 		for (int f = 1; f <= 8; f++) {
 			sq = FR2SQ64(f, r)-1;
@@ -156,14 +180,26 @@ void drawPieces(const Board& b, const int& mF, const int& mT) {
 
 			if (p != empty) { 
 				if (b.squares[sq].getDragging()) {
-					SDL_GetMouseState(&x, &y);
-					spriteSheetTexture.render(x-SQ_SIZE/2, y-SQ_SIZE/2, &clipSq);	
+					putOnTop = sq;
+					pOTClipSq = clipSq;
 				}
 				else {
 					spriteSheetTexture.render(sqPos.x, sqPos.y, &clipSq);
 				}
 			}
 		}
+	}
+	if (putOnTop != -1) {
+		SDL_GetMouseState(&x, &y);
+		if (x < BXSTART + SQ_SIZE/2) 
+			x = BXSTART + SQ_SIZE/2;
+		if (x > BXSTART + B_SIZE - SQ_SIZE/2) 
+			x = BXSTART + B_SIZE - SQ_SIZE/2;
+		if (y < BYSTART + SQ_SIZE/2) 
+			y = BYSTART + SQ_SIZE/2;
+		if (y > BYSTART + B_SIZE - SQ_SIZE/2) 
+			y = BYSTART + B_SIZE - SQ_SIZE/2;
+		spriteSheetTexture.render(x-SQ_SIZE/2, y-SQ_SIZE/2, &pOTClipSq);
 	}
 }
 
@@ -176,11 +212,11 @@ void drawBorder() {
 }
 
 void drawMoveTable() {
-	SDL_Rect borderRect = {BXSTART+B_SIZE+75, BYSTART, 400, 600};
+	SDL_Rect borderRect = {BXSTART+B_SIZE+25, BYSTART, 500, 650};
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderFillRect(renderer, &borderRect);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderDrawRect(renderer, &borderRect);
-	borderRect = {BXSTART+B_SIZE+74, BYSTART-1, 400, 600};
+	borderRect = {BXSTART+B_SIZE+24, BYSTART-1, 500, 650};
 	SDL_RenderDrawRect(renderer, &borderRect);
 }

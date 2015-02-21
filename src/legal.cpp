@@ -43,22 +43,22 @@ bool Board::checkStalemate() const {
 }
 
 bool Board::checkCheck(bool s, bool v) {
-	checkText.loadFromRenderedText(" ", textColor);
+	checkText.loadFromRenderedText(" ", textColor, font);
 	if (inCheck(s)) {
 		cleanMoveList(s);
 		if (inCheckmate(s)) { 
 			if (s)
-				checkText.loadFromRenderedText("Black wins!", textColor);
+				checkText.loadFromRenderedText("Black wins!", textColor, font);
 			else
-				checkText.loadFromRenderedText("White wins!", textColor);
+				checkText.loadFromRenderedText("White wins!", textColor, font);
 			return true;
 		}
 		else {
 			if (v) {
 				if (s)
-					checkText.loadFromRenderedText("White is in check", textColor);
+					checkText.loadFromRenderedText("White is in check", textColor, font);
 				else
-					checkText.loadFromRenderedText("Black is in check", textColor);
+					checkText.loadFromRenderedText("Black is in check", textColor, font);
 			}
 			return false;
 		}

@@ -84,7 +84,9 @@ void Board::movePiece(int mF, int mT) {
 }
 
 void Board::unmovePiece() {
-	unmovePiece(moveFrom, moveTo);
+	int moveFrom2 = movesMade[movesMade.size()-1]/100;
+	int moveTo2 = movesMade[movesMade.size()-1]%100;
+	unmovePiece(moveFrom2, moveTo2);
 }
 
 void Board::unmovePiece(int mF, int mT) {

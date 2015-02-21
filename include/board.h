@@ -51,6 +51,7 @@ class Board {
 		int getEpSq() const { return epSq; };
 		int getPmSq() const { return pmSq; };
 		int getCastling() const { return castling; };
+		int getMoveMade(int i) const { return movesMade[i]; };
 		//MUTATORSS
 		void setMove(int mF, int mT) { moveFrom = mF; moveTo = mT; };
 		void setPly(int newPly) { ply = newPly; };

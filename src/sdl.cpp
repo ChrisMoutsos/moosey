@@ -17,7 +17,7 @@
 
 SDL_Window* window = NULL; //The window we'll be rendering to
 SDL_Renderer* renderer = NULL; //The window renderer
-TTF_Font* font = NULL;
+TTF_Font* font = NULL, * font2 = NULL, * font3 = NULL;
 
 bool init_SDL() {
 	bool success = true;
@@ -70,6 +70,8 @@ bool loadMedia() {
 	bool success = true;
 	//font = TTF_OpenFont("../res/arial_narrow_7.ttf", 28);
 	font = TTF_OpenFont("../res/CiceroSerif.ttf", 28);
+	font2 = TTF_OpenFont("../res/CiceroSerif.ttf", 26);
+	font3 = TTF_OpenFont("../res/CiceroSerif.ttf", 22);
 
 	if (font == NULL) {
 		success = false;

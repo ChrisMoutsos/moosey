@@ -16,7 +16,7 @@ class LTexture {
 		~LTexture();
 		bool loadFromFile(std::string path);
 		#ifdef _SDL_TTF_H
-		bool loadFromRenderedText(std::string textureText, SDL_Color textColor);
+		bool loadFromRenderedText(std::string textureText, SDL_Color textColor, TTF_Font* font);
 		#endif
 		void free();
 		void setColor(Uint8 red, Uint8 green, Uint8 blue);
@@ -37,6 +37,6 @@ class LTexture {
 
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
-extern TTF_Font* font;
+extern TTF_Font* font, * font2, * font3;
 
 #endif
