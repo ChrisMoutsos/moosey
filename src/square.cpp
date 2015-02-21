@@ -40,41 +40,39 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 			inside = false;
 		switch (e->type) {
 			case SDL_MOUSEBUTTONDOWN:
-				if (inside) {
-					if (mF == -1 && piece != noPiece) {
+				if (!inside) break;
+				if (mF == -1) {
+					if (piece != noPiece) {
 						if ((s && piece <= 15) || (!s && piece >= 16)) {
 							mF = square; 
 							dragging = true;
 						}
-						else if ((s && piece >= 16) || (!s && piece <= 15)) {
-							
-						}
 					}
-					else if (mF != -1) {	
-						if ((s && piece <= 15) || (!s && piece >= 16)) {
-							if (piece != noPiece) {
-								mF = square;
-								dragging = true;
-							}	
-						}
-						else
-							mT = (square != mF) ? square : -1;
+				}
+				else if (mF != -1) {	
+					if ((s && piece <= 15) || (!s && piece >= 16)) {
+						if (piece != noPiece) {
+							mF = square;
+							dragging = true;
+						}	
 					}
+					else
+						mT = (square != mF) ? square : -1;
 				}
 			break;
 			case SDL_MOUSEBUTTONUP:
-				if (inside) {
-					if (mF != -1 && mT == -1) {
-						if (square != mF) {
-							mT = square;
-						}
-						else if (!dragging) {
-							mF = -1;
-							mT = -1;
-						}
+			if (inside) {
+				if (mF != -1 && mT == -1) {
+					if (square != mF) {
+						mT = square;
+					}
+					else if (!dragging) {
+						mF = -1;
+						mT = -1;
 					}
 				}
-				if (dragging) dragging = false;
+			}
+			if (dragging) dragging = false;
 
 			break;
 		}
