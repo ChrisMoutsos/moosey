@@ -21,7 +21,7 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 	string temp = "";
 
 	//Clear screen
-	SDL_SetRenderDrawColor(renderer, 255, 229, 204, 255);
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderClear(renderer);
 
 	setPiecesOnSquares(b);
