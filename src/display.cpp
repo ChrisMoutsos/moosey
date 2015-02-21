@@ -16,39 +16,22 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 	using std::string;
 
 	static bool sidey = !b.getSide();
-	static string moveStr = "", rankStr;
-	int mF2, mT2;
+	static string rankStr;
+	string fileStr = "a         b        c         d         e         f         g         h";
 	string temp = "";
 
 	//Clear screen
 	SDL_SetRenderDrawColor(renderer, 209, 224, 255, 255);
 	SDL_RenderClear(renderer);
 
-	setPiecesOnSquares(b);
-	drawSquares(b, mF, mT);
-	drawPieces(b, mF, mT);
-	drawBorder();
+	setPiecesOnSquares(b);	//Update piece positions
+	drawSquares(b, mF, mT);	//Draw the squares
+	drawPieces(b, mF, mT);	//Draw pieces on squares
+	drawBorder();		//Draw border around board
 
-	drawMoveTable();
-	for (int m = 0; m <= b.getPly()/2; m++) {
-		moveStr = std::to_string(m+1) + ". ";
-		if (b.getPly() > m*2) {
-			mF2 = b.getMoveMade(m*2)/100;
-			moveStr += intToSquare(mF2) + " to ";
-			mT2 = b.getMoveMade(m*2)%100;	
-			moveStr += intToSquare(mT2) + ", ";
-		}
-		if (b.getPly() > m*2+1) {
-			mF2 = b.getMoveMade(m*2+1)/100;
-			moveStr += intToSquare(mF2) + " to ";
-			mT2 = b.getMoveMade(m*2+1)%100;	
-			moveStr += intToSquare(mT2) + " ";
-		}
-		
-		moveText.loadFromRenderedText(moveStr, textColor, Cicero22);
-		moveText.render(BXSTART+(m/21*250)+B_SIZE+40, BYSTART+10+(m%21)*30); 
-	}
+	drawMoveTable(b);	//Draw movetable
 	
+	//If someone made a move, update the important text
 	if (sidey != b.getSide()) {
 		sidey = b.getSide();
 		if (b.getSide()) 
@@ -56,16 +39,18 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 		else
 			turnText.loadFromRenderedText("Black to move", textColor, Garamond26);
 		b.checkCheck(b.getSide(), 1);
-		fileText.loadFromRenderedText("a         b        c         d         e         f         g         h", textColor, Cicero26);
+		fileText.loadFromRenderedText(fileStr, textColor, Cicero26);
 	}
-	turnText.render(BXSTART, BYSTART+B_SIZE+40);
-	checkText.render(BXSTART+B_SIZE-200, BYSTART+B_SIZE+40);
-	fileText.render(BXSTART+33, BYSTART+B_SIZE+10);
+	//Draw rank numbers
 	for (int i = int('8'); i >= int('1'); i--) {
 		rankStr = char(i);
 		rankText.loadFromRenderedText(rankStr, textColor, Cicero26);
 		rankText.render(BXSTART-35, BYSTART+30+75*(int('8')-i));
 	}
+	//Render all the rest of the text
+	turnText.render(BXSTART, BYSTART+B_SIZE+40);
+	checkText.render(BXSTART+B_SIZE-200, BYSTART+B_SIZE+40);
+	fileText.render(BXSTART+33, BYSTART+B_SIZE+10);
 
 	//Update screen
 	SDL_RenderPresent(renderer);
@@ -99,43 +84,19 @@ void drawSquares(const Board& b, const int& mF, const int& mT) {
 	for (int r = 1; r <= 8; r++) {
 		for (int f = 1; f <= 8; f++) {
 			sq = FR2SQ64(f, r)-1;
-			if ((r+f)%2 == 1) {	//Light squares
-				if (mF != sq+1 && mT != sq+1 && to64(b.getMoveFrom()) != sq+1 && to64(b.getMoveTo()) != sq+1) {
-					SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-				}
-				else {
-					if (mF == sq+1 || to64(b.getMoveFrom()) == sq+1)
-						SDL_SetRenderDrawColor(renderer, 248, 195, 248, 255);
-					else if (mT == sq+1 || to64(b.getMoveTo()) == sq+1)
-						SDL_SetRenderDrawColor(renderer, 238, 157, 242, 255);
-				}
-			}
-			else { 			//Dark squares
-				if (mF != sq+1 && mT != sq+1 && to64(b.getMoveFrom()) != sq+1 && to64(b.getMoveTo()) != sq+1) {
-					SDL_SetRenderDrawColor(renderer, 0, 153, 153, 255);
-				}
-				else {
-					if (mF == sq+1 || to64(b.getMoveFrom()) == sq+1)
-						SDL_SetRenderDrawColor(renderer, 248, 195, 248, 255);
-					else if (mT == sq+1 || to64(b.getMoveTo()) == sq+1)
-						SDL_SetRenderDrawColor(renderer, 238, 157, 242, 255);
-					//SDL_SetRenderDrawColor(renderer, 150, 153, 253, 255);
-				}
-			}
+			if (mF == sq+1 || to64(b.getMoveFrom()) == sq+1)	//moveFrom square
+				SDL_SetRenderDrawColor(renderer, 248, 195, 248, 255);
+			else if (mT == sq+1 || to64(b.getMoveTo()) == sq+1)	//moveTo square
+				SDL_SetRenderDrawColor(renderer, 238, 157, 242, 255);
+			else if ((r+f)%2 == 1)				//Light squares
+				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+			else 						//Dark squares
+				SDL_SetRenderDrawColor(renderer, 0, 153, 153, 255);
 			sqPos = {b.squares[sq].getX(),	//X start
 				 b.squares[sq].getY(),	//Y start
 				 SQ_SIZE, SQ_SIZE};	 //Width, height of square
 			SDL_RenderFillRect(renderer, &sqPos);
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-			//SDL_RenderDrawRect(renderer, &sqPos);
-			/*
-			SDL_RenderDrawLine(renderer, 
-					sqPos.x, sqPos.y,
-					sqPos.x+SQ_SIZE, sqPos.y);
-			SDL_RenderDrawLine(renderer, 
-					sqPos.x, sqPos.y, 
-					sqPos.x, sqPos.y+SQ_SIZE);
-			*/
 		}
 	}
 }
@@ -186,13 +147,13 @@ void drawPieces(const Board& b, const int& mF, const int& mT) {
 			}		
 
 			if (p != empty) { 
+				//Save piece being dragged, to rerender on top
 				if (b.squares[sq].getDragging()) {
 					putOnTop = sq;
 					pOTClipSq = clipSq;
 				}
-				else {
+				else	//Every other piece
 					spriteSheetTexture.render(sqPos.x, sqPos.y, &clipSq);
-				}
 			}
 		}
 	}
@@ -218,7 +179,11 @@ void drawBorder() {
 	SDL_RenderDrawRect(renderer, &borderRect);
 }
 
-void drawMoveTable() {
+void drawMoveTable(const Board& b) {
+	using std::string;
+	int mF2, mT2;
+	static string moveStr = "";
+
 	SDL_Rect borderRect = {BXSTART+B_SIZE+25, BYSTART, 500, 650};
 	SDL_SetRenderDrawColor(renderer, 236, 247, 235, 255);
 	SDL_RenderFillRect(renderer, &borderRect);
@@ -226,4 +191,23 @@ void drawMoveTable() {
 	SDL_RenderDrawRect(renderer, &borderRect);
 	borderRect = {BXSTART+B_SIZE+24, BYSTART-1, 500, 650};
 	SDL_RenderDrawRect(renderer, &borderRect);
+
+	for (int m = 0; m <= b.getPly()/2; m++) {
+		moveStr = std::to_string(m+1) + ". ";
+		if (b.getPly() > m*2) {
+			mF2 = b.getMoveMade(m*2)/100;
+			moveStr += intToSquare(mF2) + " to ";
+			mT2 = b.getMoveMade(m*2)%100;	
+			moveStr += intToSquare(mT2) + ", ";
+		}
+		if (b.getPly() > m*2+1) {
+			mF2 = b.getMoveMade(m*2+1)/100;
+			moveStr += intToSquare(mF2) + " to ";
+			mT2 = b.getMoveMade(m*2+1)%100;	
+			moveStr += intToSquare(mT2) + " ";
+		}
+		
+		moveText.loadFromRenderedText(moveStr, textColor, Cicero22);
+		moveText.render(BXSTART+(m/21*250)+B_SIZE+40, BYSTART+10+(m%21)*30); 
+	}
 }
