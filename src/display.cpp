@@ -2,6 +2,7 @@
 #include <SDL2/SDL_image.h>
 #include <iostream>
 #include <string>
+#include <vector>
 #include "sdl.h"
 #include "display.h"
 #include "board.h"
@@ -181,8 +182,10 @@ void drawBorder() {
 
 void drawMoveTable(const Board& b) {
 	using std::string;
-	int mF2, mT2;
-	static string moveStr = "";
+	using std::vector;
+	static vector<string> plyStrings;
+	int mF2, mT2, p;
+	static string plyStr = "";
 
 	SDL_Rect borderRect = {BXSTART+B_SIZE+25, BYSTART, 500, 650};
 	SDL_SetRenderDrawColor(renderer, 236, 247, 235, 255);
@@ -192,22 +195,45 @@ void drawMoveTable(const Board& b) {
 	borderRect = {BXSTART+B_SIZE+24, BYSTART-1, 500, 650};
 	SDL_RenderDrawRect(renderer, &borderRect);
 
-	for (int m = 0; m <= b.getPly()/2; m++) {
-		moveStr = std::to_string(m+1) + ". ";
-		if (b.getPly() > m*2) {
-			mF2 = b.getMoveMade(m*2)/100;
-			moveStr += intToSquare(mF2) + " to ";
-			mT2 = b.getMoveMade(m*2)%100;	
-			moveStr += intToSquare(mT2) + ", ";
+	if ((int)plyStrings.size() < b.getPly()) {
+		mF2 = b.getMoveMade(b.getPly()-1)/100;	
+		mT2 = b.getMoveMade(b.getPly()-1)%100;	
+		if ((b.getPly()-1)%2 == 0)
+			plyStr = std::to_string((b.getPly()-1)/2+1) + ". ";
+		else
+			plyStr = "";
+		p = b.getPieceMoved(b.getPly()-1);
+		if (b.getValue(p) == Q_VAL)
+			plyStr += "Q";
+		else if (b.getValue(p) == K_VAL)
+			plyStr += "K";
+		else if (b.getValue(p) == R_VAL) 
+			plyStr += "R";
+		else if (b.getValue(p) == B_VAL) 
+			plyStr += "B";
+		else if (b.getValue(p) == N_VAL) 
+			plyStr += "N";
+		if (b.getPrevOnMoveTo(b.getPly()-1) != empty) { //Capture
+			if (b.getValue(p) == P_VAL)
+				plyStr += char(mF2%10+int('a')-1);
+			plyStr += "x";
 		}
-		if (b.getPly() > m*2+1) {
-			mF2 = b.getMoveMade(m*2+1)/100;
-			moveStr += intToSquare(mF2) + " to ";
-			mT2 = b.getMoveMade(m*2+1)%100;	
-			moveStr += intToSquare(mT2) + " ";
+		else if (b.getValue(p) == P_VAL) {	//En passant
+			if (abs(mF2 - mT2) == 9 || abs(mF2 - mT2) == 11) {
+				plyStr += char(mF2%10+int('a')-1);
+				plyStr += "x";
+			}
 		}
 		
-		moveText.loadFromRenderedText(moveStr, textColor, Cicero22);
-		moveText.render(BXSTART+(m/21*250)+B_SIZE+40, BYSTART+10+(m%21)*30); 
+		plyStr += intToSquare(mT2) + " ";
+		plyStrings.push_back(plyStr);
+	}
+	for (int i = 0; i < (int)plyStrings.size(); i+=2) {
+		plyStr = plyStrings[i];
+		if (i+1 < (int)plyStrings.size())
+			plyStr += " " + plyStrings[i+1];
+		moveText.loadFromRenderedText(plyStr, textColor, Cicero22);
+		moveText.render(BXSTART+(i/42*150)+B_SIZE+40, 
+				BYSTART+10+((i/2)%21)*30); 
 	}
 }
