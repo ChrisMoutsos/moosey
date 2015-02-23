@@ -32,6 +32,8 @@ void Board::initializeVars() {
 	moveFrom = moveTo = ply = epSq = pmSq = null;
 	side = WHITE;
 	castling = 0;
+	sideInCheck = 0; 
+	sideInCheckmate = 0;
 }
 
 void Board::emptyBoard() {

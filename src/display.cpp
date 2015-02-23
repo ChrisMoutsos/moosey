@@ -30,8 +30,6 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 	drawPieces(b, mF, mT);	//Draw pieces on squares
 	drawBorder();		//Draw border around board
 
-	drawMoveTable(b);	//Draw movetable
-	
 	//If someone made a move, update the important text
 	if (sidey != b.getSide()) {
 		sidey = b.getSide();
@@ -42,6 +40,9 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 		b.checkCheck(b.getSide(), 1);
 		fileText.loadFromRenderedText(fileStr, textColor, Cicero26);
 	}
+
+	drawMoveTable(b);	//Draw movetable
+
 	//Draw rank numbers
 	for (int i = int('8'); i >= int('1'); i--) {
 		rankStr = char(i);
@@ -184,8 +185,9 @@ void drawMoveTable(const Board& b) {
 	using std::string;
 	using std::vector;
 	static vector<string> plyStrings;
-	int mF2, mT2, p;
 	static string plyStr = "";
+	int mF2, mT2, p;
+	bool castling = false;
 
 	SDL_Rect borderRect = {BXSTART+B_SIZE+25, BYSTART, 500, 650};
 	SDL_SetRenderDrawColor(renderer, 236, 247, 235, 255);
@@ -205,8 +207,24 @@ void drawMoveTable(const Board& b) {
 		p = b.getPieceMoved(b.getPly()-1);
 		if (b.getValue(p) == Q_VAL)
 			plyStr += "Q";
-		else if (b.getValue(p) == K_VAL)
-			plyStr += "K";
+		else if (b.getValue(p) == K_VAL) {
+			if (mF2 == _E1 && (mT2 == _B1 || mT2 == _G1)) {
+				castling = true;
+				if (mT2 == _G1)
+					plyStr += "0-0";
+				else
+					plyStr += "0-0-0";
+			}
+			else if (mF2 == _E8 && (mT2 == _B8 || mT2 == _G8)) {
+				castling = true;
+				if (mT2 == _G8)
+					plyStr += "0-0";
+				else
+					plyStr += "0-0-0";
+			}
+			else
+				plyStr += "K";
+		}
 		else if (b.getValue(p) == R_VAL) 
 			plyStr += "R";
 		else if (b.getValue(p) == B_VAL) 
@@ -224,8 +242,16 @@ void drawMoveTable(const Board& b) {
 				plyStr += "x";
 			}
 		}
-		
-		plyStr += intToSquare(mT2) + " ";
+
+		if (!castling) 
+			plyStr += intToSquare(mT2);
+		if (b.getSideInCheck()) {
+			if (b.getSideInCheckmate())
+				plyStr += '#';
+			else
+				plyStr += '+'; 
+		}
+
 		plyStrings.push_back(plyStr);
 	}
 	for (int i = 0; i < (int)plyStrings.size(); i+=2) {

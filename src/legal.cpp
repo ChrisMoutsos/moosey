@@ -43,10 +43,17 @@ bool Board::checkStalemate() const {
 }
 
 bool Board::checkCheck(bool s, bool v) {
+	int save;
+	sideInCheck = 0;
+	sideInCheckmate = 0;
 	checkText.loadFromRenderedText(" ", textColor, Garamond26);
 	if (inCheck(s)) {
+		sideInCheck = s ? 1 : 2;
+		save = sideInCheck;
 		cleanMoveList(s);
+		sideInCheck = save;
 		if (inCheckmate(s)) { 
+			sideInCheckmate = s ? 1 : 2;
 			if (s)
 				checkText.loadFromRenderedText("Black wins!", textColor, Garamond26);
 			else

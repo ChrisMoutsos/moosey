@@ -53,6 +53,8 @@ class Board {
 		int getMoveMade(int i) const { return movesMade[i]; };
 		int getPrevOnMoveTo(int i) const { return prevOnMoveTo[i]; };
 		int getPieceMoved(int i) const { return pieceMoved[i]; };
+		int getSideInCheck() const { return sideInCheck; };
+		int getSideInCheckmate() const { return sideInCheckmate; };
 		//MUTATORSS
 		void setMove(int mF, int mT) { moveFrom = mF; moveTo = mT; };
 		void setPly(int newPly) { ply = newPly; };
@@ -67,6 +69,8 @@ class Board {
 		void decrMoved(int p) { piece[p].moved--; };
 		void setEpSq(int sq) { epSq = sq; };
 		void setCastling(int c) { castling = c; };
+		void setSideInCheck(int i) { sideInCheck = i; };
+		void setSideInCheckmate(int i) { sideInCheckmate = i; };
 	
 		//MOVE.CPP 
 		void movePiece();
@@ -104,6 +108,7 @@ class Board {
 	private:
 		int board120[120], moveFrom, moveTo, ply;
 		int epSq, pmSq, castling;
+		int sideInCheck, sideInCheckmate;
 		bool side;
 		std::vector<int> whiteMoveList, blackMoveList;
 		std::vector<int> movesMade;
