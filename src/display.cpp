@@ -186,8 +186,8 @@ void drawMoveTable(const Board& b) {
 	using std::vector;
 	static vector<string> plyStrings;
 	static string plyStr = "";
-	int mF2, mT2, p;
-	bool castling = false;
+	int mF2, mT2, p, otherPiece;
+	bool castling = false, dupMove = false;
 
 	SDL_Rect borderRect = {BXSTART+B_SIZE+25, BYSTART, 500, 650};
 	SDL_SetRenderDrawColor(renderer, 236, 247, 235, 255);
@@ -225,12 +225,28 @@ void drawMoveTable(const Board& b) {
 			else
 				plyStr += "K";
 		}
-		else if (b.getValue(p) == R_VAL) 
+		else if (b.getValue(p) == R_VAL) {
 			plyStr += "R";
+			otherPiece = !b.getSide() ? (p == 0 ? 7 : 0) : (p == 16 ? 23 : 16);
+			if (b.getAlive(otherPiece))
+				if (b.validateHozMove(b.getPos(otherPiece), mT2))
+					dupMove = true;
+		}
 		else if (b.getValue(p) == B_VAL) 
 			plyStr += "B";
-		else if (b.getValue(p) == N_VAL) 
+		else if (b.getValue(p) == N_VAL) { 
 			plyStr += "N";
+			otherPiece = !b.getSide() ? (p == 1 ? 6 : 1) : (p == 17 ? 22 : 17);
+			if (b.getAlive(otherPiece))
+				if (b.validateKnightMove(b.getPos(otherPiece), mT2))
+					dupMove = true;
+		}
+		if (dupMove) {
+			if (mF2%10 != b.getPos(otherPiece)%10) //Not same file
+				plyStr += char(mF2%10+int('a')-1);
+			else //Not same rank
+				plyStr += char(mF2/10+int('1')-2);
+		}
 		if (b.getPrevOnMoveTo(b.getPly()-1) != empty) { //Capture
 			if (b.getValue(p) == P_VAL)
 				plyStr += char(mF2%10+int('a')-1);
