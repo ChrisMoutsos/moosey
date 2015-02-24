@@ -82,7 +82,6 @@ class Board {
 		void unmovePiece(int mF, int mT);
 		void undoMove();
 		void changeTurn();
-		void moveInfo() const;
 	
 		//LEGAL.CPP
 		bool legalMove(int mF, int mT, bool s, bool v = false);

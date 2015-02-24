@@ -148,37 +148,6 @@ void Board::unmovePiece(int mF, int mT) {
 	ply--;
 }
 
-void Board::moveInfo() const {
-	using namespace std;
-	bool castling = false;
-
-	!side ? cout << "White" : cout << "Black";
-
-	if (!castling) {
-		cout << " moved ";
-		if (moveTo != pmSq)
-			cout << piece[pieceMoved[ply-1]].name;
-		else 
-			cout << "Pawn";
-		cout << " from " << intToSquare(moveFrom);
-		cout  << " to " << intToSquare(moveTo);
-		if (pieceKilled[ply-1] != empty) {
-			cout << " and captured a ";
-			cout << piece[pieceKilled[ply-1]].name;
-		}
-		if (moveTo == pmSq) 
-			cout << " and promoted to a Queen!";
-	}
-	else {
-		cout << " castled ";
-		if (moveTo == _B1 || moveTo == _B8)
-			cout << "queenside";
-		else
-			cout << "kingside";
-	}
-	cout << "\n\n";
-}	
-
 void Board::changeTurn() {
 	side = side ? 0 : 1;
 	setCastling(0);
