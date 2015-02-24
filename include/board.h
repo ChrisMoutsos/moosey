@@ -45,7 +45,10 @@ class Board {
 		int getMoveListSize(bool s) const;
 		int getTimesMoved(int p) const { return piece[p].moved; };
 		std::string getName(int p) const { return piece[p].name; };
-		int getValue(int p) const{ return piece[p].value; };
+		bool getAlive(int p) const { return piece[p].alive; };
+		int getFromPieceMoveList(int p, int i) const { return piece[p].moveList[i]; };
+		int getPieceMoveListSize(int p) const { return piece[p].moveListSize; };
+		int getValue(int p) const { return piece[p].value; };
 		int getPos(int p) const { return piece[p].pos; };
 		int getEpSq() const { return epSq; };
 		int getPmSq() const { return pmSq; };
