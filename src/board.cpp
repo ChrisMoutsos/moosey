@@ -28,6 +28,11 @@ Board::Board(std::string FEN) {
 	//FEN stuff
 }
 
+Board::~Board() {
+	for (int i = wqR; i <= bPh; i++) 
+		delete [] piece[i].moveList;
+}
+
 void Board::initializeVars() {
 	moveFrom = moveTo = ply = epSq = pmSq = null;
 	side = WHITE;
@@ -88,7 +93,7 @@ void Board::initializePieces() {
 
 	for (int i = wqR; i <= bPh; i++) {
                 v = piece[i].value;
-		piece[i].moveListSize = v==K_VAL ? 8 : v==R_VAL ? 14 : v==N_VAL ? 8 : v==B_VAL ? 13 : 27;
+		piece[i].moveListSize = v==K_VAL?8:v==R_VAL?14:v==N_VAL?8:v==B_VAL?13:v==P_VAL ?4:27;
                 piece[i].moveList = new int[piece[i].moveListSize];
         }
 }
@@ -132,4 +137,3 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 		mT = -1;
 	}
 }
-

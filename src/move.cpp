@@ -18,11 +18,12 @@ void Board::movePiece(int mF, int mT) {
 			            //mF is from final pos of K, R, and corner
 	int killSquare = mT, epExtra = 0, mFVal = piece[board120[mF]].value;
 	bool s = piece[board120[mF]].color, passanting;
+	int * temp = NULL;
 
 	movesMade.push_back(mF*100+mT);
 	
 	if (!castling) {	
-		if (piece[board120[mF]].value == P_VAL && mT == epSq) {
+		if (piece[board120[mF]].value == P_VAL && mT == epSq) { //Enpassanting
 			passanting = true;
 			killSquare = s ? mT-10 : mT+10;
 			epExtra = s ? -10 : 10;
@@ -33,12 +34,19 @@ void Board::movePiece(int mF, int mT) {
 			epSq = s ? mF+10 : mF-10;
 		else epSq = null;
 
-		if (mFVal == P_VAL && ((s && mT/10 == 9) || (!s && mT/10 == 2))) {
+		if (mFVal == P_VAL && ((s && mT/10 == 9) || (!s && mT/10 == 2))) { //Promoting
 			pmSq = mT;
 			piece[board120[mF]].value = Q_VAL;
 			piece[board120[mF]].name = "Queen";
 			piece[board120[mF]].abbr = s ? 'Q' : 'q';
 			piece[board120[mF]].promoted = true;
+			temp = new int[27]; //Make bigger movelist
+			for (int i = 0; i < 4; i++) //Copy any old values over
+				temp[i] = piece[board120[mF]].moveList[i];
+			delete [] piece[board120[mF]].moveList;	//Free old moveList
+			piece[board120[mF]].moveList = temp;	//Point at new array
+			for (int i = 4; i < 27; i++ )	//Fill rest of array with zeroes
+				piece[board120[mF]].moveList[i] = 0;
 		}
 		else pmSq = null;
 
@@ -60,7 +68,7 @@ void Board::movePiece(int mF, int mT) {
 	
 		piece[board120[mT]].moved++;
 	}
-	else {
+	else { //Castling
 		cExtras = {-2, -1, -4};		//Queenside
 		if (mT == _G1 || mT == _G8) 
 			cExtras = {2, 1, 3};	//Kingside
@@ -92,12 +100,14 @@ void Board::unmovePiece() {
 void Board::unmovePiece(int mF, int mT) {
 	std::array<int, 3> cExtras; //For castling, it holds how far away
 			            //mF is from final pos of K, R, and corner
-	int diffMTMF = abs(mT-mF), epExtra = 0;
+	int diffMTMF = abs(mT-mF), epExtra = 0, fakeCounter;
+	int * temp;
 	bool s = piece[board120[mT]].color, unpassanting;
 
 	movesMade.erase(movesMade.size()-1+movesMade.begin());
 
 	if (!castling) {
+		//Unpassanting
 		if (piece[pieceMoved[ply-1]].value == P_VAL && prevOnMoveTo[ply-1] == empty) {
 			if (diffMTMF == 11 || diffMTMF == 9) {
 				unpassanting = true;
@@ -105,11 +115,15 @@ void Board::unmovePiece(int mF, int mT) {
 				epExtra = s ? -10 : 10;
 			}
 		}
-		if (mT == pmSq) {
+		if (mT == pmSq) { //Promoting
 			piece[board120[mT]].value = P_VAL;
 			piece[board120[mT]].name = "Pawn";
 			piece[board120[mT]].abbr = s ? 'P' : 'p';
 			piece[board120[mT]].promoted = false;
+			temp = new int[4]; //Create smaller movelist
+			delete [] piece[board120[mT]].moveList; //Free old moveList
+			piece[board120[mT]].moveList = temp;	//Point at new moveList
+			generatePawnMoves(board120[mT], fakeCounter); //Regen moves
 		}	
 		board120[mF] = pieceMoved[ply-1];
 		piece[board120[mF]].pos = mF;
@@ -124,7 +138,7 @@ void Board::unmovePiece(int mF, int mT) {
 			piece[board120[mT+epExtra]].alive = true;
 		}
 	}
-	else {
+	else { //Castling
 		cExtras = {-2, -1, -4};		//Queenside
 		if (mT == _G1 || mT == _G8) 	
 			cExtras = {2, 1, 3};	//Kingside

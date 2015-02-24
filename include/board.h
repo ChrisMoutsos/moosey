@@ -28,6 +28,7 @@ class Board {
 		//BOARD.CPP
 		Board();
 		Board(std::string FEN);
+		~Board();
 		void initializeVars();
 		void emptyBoard();
 		void placePiece(int p, int sq);
