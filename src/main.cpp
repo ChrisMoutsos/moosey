@@ -46,10 +46,9 @@ int main(int argc, char* args[]) {
 			displayBoard(board, mF, mT);
 		}
 
-//		showMoveLists(board);
 	}
 
-
+	close_SDL();
 	return 0;
 }
 
