@@ -1,3 +1,10 @@
+/*
+----------------------------------
+	~Moosey Chess Engine~
+	      display.cpp
+----------------------------------
+*/
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <iostream>
@@ -159,7 +166,7 @@ void drawPieces(const Board& b, const int& mF, const int& mT) {
 			}
 		}
 	}
-	if (putOnTop != -1) {
+	if (putOnTop != -1) { //Rerender piece being dragged
 		SDL_GetMouseState(&x, &y);
 		if (x < BXSTART + SQ_SIZE/2) 
 			x = BXSTART + SQ_SIZE/2;
@@ -185,10 +192,11 @@ void drawMoveTable(const Board& b) {
 	using std::string;
 	using std::vector;
 	static vector<string> plyStrings;
-	static string plyStr = "";
+	string plyStr = "";
 	int mF2, mT2, p, otherPiece;
 	bool castling = false, dupMove = false;
 
+	//Draw the border and background
 	SDL_Rect borderRect = {BXSTART+B_SIZE+25, BYSTART, 500, 650};
 	SDL_SetRenderDrawColor(renderer, 236, 247, 235, 255);
 	SDL_RenderFillRect(renderer, &borderRect);
@@ -197,36 +205,29 @@ void drawMoveTable(const Board& b) {
 	borderRect = {BXSTART+B_SIZE+24, BYSTART-1, 500, 650};
 	SDL_RenderDrawRect(renderer, &borderRect);
 
-	if ((int)plyStrings.size() < b.getPly()) {
-		mF2 = b.getMoveMade(b.getPly()-1)/100;	
+	if ((int)plyStrings.size() < b.getPly()) { //If a new move has been made
+		mF2 = b.getMoveMade(b.getPly()-1)/100;
 		mT2 = b.getMoveMade(b.getPly()-1)%100;	
-		if ((b.getPly()-1)%2 == 0)
+		if ((b.getPly()-1)%2 == 0)	//Add number in front for white's moves
 			plyStr = std::to_string((b.getPly()-1)/2+1) + ". ";
-		else
-			plyStr = "";
 		p = b.getPieceMoved(b.getPly()-1);
 		if (b.getValue(p) == Q_VAL)
 			plyStr += "Q";
 		else if (b.getValue(p) == K_VAL) {
-			if (mF2 == _E1 && (mT2 == _B1 || mT2 == _G1)) {
+			if (mF2 == _E1 && (mT2 == _B1 || mT2 == _G1)) { //White castled
 				castling = true;
-				if (mT2 == _G1)
-					plyStr += "0-0";
-				else
-					plyStr += "0-0-0";
+				plyStr += (mT2 == _G1) ? "0-0" : "0-0-0";
 			}
-			else if (mF2 == _E8 && (mT2 == _B8 || mT2 == _G8)) {
+			else if (mF2 == _E8 && (mT2 == _B8 || mT2 == _G8)) { //Black castled
 				castling = true;
-				if (mT2 == _G8)
-					plyStr += "0-0";
-				else
-					plyStr += "0-0-0";
+				plyStr += (mT2 == _G8) ? "0-0" : "0-0-0";
 			}
 			else
 				plyStr += "K";
 		}
 		else if (b.getValue(p) == R_VAL) {
 			plyStr += "R";
+			//Check same side and same piecetype, for ambiguous moves
 			otherPiece = !b.getSide() ? (p == 0 ? 7 : 0) : (p == 16 ? 23 : 16);
 			if (b.getAlive(otherPiece))
 				if (b.validateHozMove(b.getPos(otherPiece), mT2))
@@ -236,44 +237,38 @@ void drawMoveTable(const Board& b) {
 			plyStr += "B";
 		else if (b.getValue(p) == N_VAL) { 
 			plyStr += "N";
+			//Check same side and same piecetype, for ambiguous moves
 			otherPiece = !b.getSide() ? (p == 1 ? 6 : 1) : (p == 17 ? 22 : 17);
 			if (b.getAlive(otherPiece))
 				if (b.validateKnightMove(b.getPos(otherPiece), mT2))
 					dupMove = true;
 		}
-		if (dupMove) {
+		if (dupMove) { //If the move was ambiguous, de-ambiguate
 			if (mF2%10 != b.getPos(otherPiece)%10) //Not same file
-				plyStr += char(mF2%10+int('a')-1);
-			else //Not same rank
-				plyStr += char(mF2/10+int('1')-2);
+				plyStr += char(mF2%10+int('a')-1); //so, file is sufficient
+			else 					//Same file
+				plyStr += char(mF2/10+int('1')-2); //so, rank is sufficient
 		}
-		if (b.getPrevOnMoveTo(b.getPly()-1) != empty) { //Capture
-			if (b.getValue(p) == P_VAL)
+		if (b.getPrevOnMoveTo(b.getPly()-1) != empty) { //If move was a capture
+			if (b.getValue(p) == P_VAL)	//Special case for pawns, e.g. "axb4"
 				plyStr += char(mF2%10+int('a')-1);
 			plyStr += "x";
 		}
-		else if (b.getValue(p) == P_VAL) {	//En passant
-			if (abs(mF2 - mT2) == 9 || abs(mF2 - mT2) == 11) {
-				plyStr += char(mF2%10+int('a')-1);
-				plyStr += "x";
-			}
-		}
+		else if (b.getValue(p) == P_VAL)	//Check for en passant
+			if (abs(mF2 - mT2) == 9 || abs(mF2 - mT2) == 11)
+				plyStr += char(mF2%10+int('a')-1) + 'x';
 
 		if (!castling) 
 			plyStr += intToSquare(mT2);
-		if (b.getSideInCheck()) {
-			if (b.getSideInCheckmate())
-				plyStr += '#';
-			else
-				plyStr += '+'; 
-		}
+		if (b.getSideInCheck())
+			plyStr += b.getSideInCheckmate() ? '#' : '+';
 
-		plyStrings.push_back(plyStr);
+		plyStrings.push_back(plyStr); //Add it to the list of ply-moves
 	}
-	for (int i = 0; i < (int)plyStrings.size(); i+=2) {
-		plyStr = plyStrings[i];
-		if (i+1 < (int)plyStrings.size())
-			plyStr += " " + plyStrings[i+1];
+	for (int i = 0; i < (int)plyStrings.size(); i+=2) { //Loop through moves
+		plyStr = plyStrings[i];			//Load white move
+		if (i+1 < (int)plyStrings.size())	//If black has moved,
+			plyStr += " " + plyStrings[i+1];  //load their move, too
 		moveText.loadFromRenderedText(plyStr, textColor, Cicero22);
 		moveText.render(BXSTART+(i/42*150)+B_SIZE+40, 
 				BYSTART+10+((i/2)%21)*30); 
