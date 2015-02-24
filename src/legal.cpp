@@ -209,7 +209,6 @@ bool Board::validateDiagMove(int mF, int mT) const {
 }
 
 bool Board::validateKnightMove(int mF, int mT) const {
-	int onMT = board120[mT], onMF = board120[mF];
 	int diff = abs(mF - mT);
 	
 	if (diff == 8 || diff == 12 || diff == 19 || diff == 21)
