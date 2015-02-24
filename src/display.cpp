@@ -255,8 +255,10 @@ void drawMoveTable(const Board& b) {
 			plyStr += "x";
 		}
 		else if (b.getValue(p) == P_VAL)	//Check for en passant
-			if (abs(mF2 - mT2) == 9 || abs(mF2 - mT2) == 11)
-				plyStr += char(mF2%10+int('a')-1) + 'x';
+			if (abs(mF2 - mT2) == 9 || abs(mF2 - mT2) == 11) {
+				plyStr += char(mF2%10+int('a')-1);
+				plyStr += 'x';
+			}
 
 		if (!castling) 
 			plyStr += intToSquare(mT2);
