@@ -74,7 +74,7 @@ void Board::initializePieces() {
 		{"Rook", 'R', R_VAL, 0, 0, 1, 0, 1},{"Knight", 'N', N_VAL, 0, 0, 1, 0, 1}, 
 		{"Bishop", 'B', B_VAL, 0, 0, 1, 0, 1}, {"Queen", 'Q', Q_VAL, 0, 0, 1, 0, 1}, 
 		{"King", 'K', K_VAL, 0, 0, 1, 0, 1}, {"Bishop", 'B', B_VAL, 0, 0, 1, 0, 1},
-        	{"Knight", 'N', N_VAL, 0, 0, 1, 0, 1}, {"Rook", 'R', R_VAL, 0, 0, 1, 0, 1}, 
+		{"Knight", 'N', N_VAL, 0, 0, 1, 0, 1}, {"Rook", 'R', R_VAL, 0, 0, 1, 0, 1}, 
 		{"Pawn", 'P', P_VAL, 0, 0, 1, 0, 1}, {"Pawn", 'P', P_VAL, 0, 0, 1, 0, 1}, 
 		{"Pawn", 'P', P_VAL, 0, 0, 1, 0,1 }, {"Pawn", 'P', P_VAL, 0, 0, 1, 0, 1}, 
 		{"Pawn", 'P', P_VAL, 0, 0, 1, 0, 1}, {"Pawn", 'P', P_VAL, 0, 0, 1, 0, 1}, 
@@ -92,10 +92,46 @@ void Board::initializePieces() {
 		piece[i] = pieceTemp[i];
 
 	for (int i = wqR; i <= bPh; i++) {
-                v = piece[i].value;
-		piece[i].moveListSize = v==K_VAL?8:v==R_VAL?14:v==N_VAL?8:v==B_VAL?13:v==P_VAL ?4:27;
-                piece[i].moveList = new int[piece[i].moveListSize];
-        }
+		v = piece[i].value;
+		switch (v) {
+		case K_VAL:
+			piece[i].moveListSize = 8;
+			break;
+		case Q_VAL:
+			piece[i].moveListSize = 27;
+			break;
+		case R_VAL:
+			piece[i].moveListSize = 14;
+			break;
+		case B_VAL:
+			piece[i].moveListSize = 13;
+			break;
+		case N_VAL:
+			piece[i].moveListSize =8;
+			break;
+		case P_VAL:
+			piece[i].moveListSize = 4;
+			break;
+		}
+		piece[i].moveList = new int[piece[i].moveListSize];
+    }
+}
+
+void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
+	for (int i = 0; i < 64; i++)
+		squares[i].handleEvent(e, mF, mT, side);
+	if (mF != -1 && mT != -1) {
+		mF = from64(mF);
+		mT = from64(mT);
+		if (legalMove(mF, mT, getSide(), 1)) {
+			setMove(mF, mT);
+			movePiece();
+			changeTurn();
+			generateMoveLists();
+		}
+		mF = -1;
+		mT = -1;
+	}
 }
 
 void Board::addToMovelist(bool s, int v) {
@@ -119,21 +155,4 @@ int Board::getFromMoveList(bool s, int i) const {
 		return whiteMoveList[i];
 	else 
 		return blackMoveList[i];
-}
-
-void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
-	for (int i = 0; i < 64; i++)
-		squares[i].handleEvent(e, mF, mT, side);
-	if (mF != -1 && mT != -1) {
-		mF = from64(mF);
-		mT = from64(mT);
-		if (legalMove(mF, mT, getSide(), 1)) {
-			setMove(mF, mT);
-			movePiece();
-			changeTurn();
-			generateMoveLists();
-		}
-		mF = -1;
-		mT = -1;
-	}
 }
