@@ -14,16 +14,16 @@
 bool Board::legalMove(int mF, int mT, bool s, bool v) { 
 	int realEpSq = epSq;
 	
-	if (!validateMove(mF, mT, s)) { //Make sure the piece moves in that way
+	if (!validateMove(mF, mT, s)) { //Verify piece moves that way
 		if (v) std::cout << "Invalid move..\n";
 		return false;
 	}
-	if (castling)	      //Legalization of castling occurs in validateMove
+	if (castling)		//Legalization occurs in validateMove
 		return true;
 	
-	movePiece(mF, mT);    //Move the piece,
-	inCheck(s);		      //see if we put our king in check
-	unmovePiece(mF, mT);  //unmove the piece
+	movePiece(mF, mT);	//Move the piece,
+	inCheck(s);		//see if we put our king in check
+	unmovePiece(mF, mT);	//unmove the piece
 	
 	epSq = realEpSq;
 	if (sideInCheck) {    //If either side is in check
