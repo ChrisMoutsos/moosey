@@ -7,6 +7,9 @@
 */
 /*
  *	SDL
+ *	- Draw king
+ *	- Sounds
+ *	- Splash screen
  *	FEN parsing
  * 
  * Known issues:
