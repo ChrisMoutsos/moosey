@@ -94,7 +94,7 @@ class Board {
 		bool validateKingMove(int mF, int mT, bool s);
 		bool canCastle(int dir, bool s);
 		bool checkStalemate() const;
-		bool checkCheck(bool s, bool v = false);
+		bool checkCheck(bool s);
 		bool inCheckmate(bool s) const;
 		bool inCheck(bool s) const;
 	

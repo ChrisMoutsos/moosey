@@ -55,7 +55,6 @@ void Board::cleanMoveList(bool s) {
 				blackMoveList.erase(blackMoveList.begin()+i);
 			size--;
 			i--;
-			setCastling(0);
 		}
 	}
 	side = realSide;	

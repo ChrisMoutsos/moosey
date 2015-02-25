@@ -6,28 +6,27 @@
 */
 
 #include <iostream>
+#include <string>
 #include "cmath"
 #include "board.h"
 #include "ltexture.h"
 
 bool Board::legalMove(int mF, int mT, bool s, bool v) { 
-	bool isInCheck;
 	int realEpSq = epSq;
 	
-	if (!validateMove(mF, mT, s)) {
+	if (!validateMove(mF, mT, s)) { //Make sure the piece moves in that way
 		if (v) std::cout << "Invalid move..\n";
 		return false;
 	}
-	if (castling)
+	if (castling)	      //Legalization of castling occurs in validateMove
 		return true;
-
-	movePiece(mF, mT);
-	isInCheck = inCheck(s);
-	unmovePiece(mF, mT);
-
-	setCastling(0);	
+	
+	movePiece(mF, mT);    //Move the piece,
+	inCheck(s);		      //see if we put our king in check
+	unmovePiece(mF, mT);  //unmove the piece
+	
 	epSq = realEpSq;
-	if (isInCheck) {
+	if (sideInCheck) {    //If either side is in check
 		if (v) std::cout << "Illegal move.\n";
 		return false;
 	}
@@ -42,35 +41,29 @@ bool Board::checkStalemate() const {
 	return false;
 }
 
-bool Board::checkCheck(bool s, bool v) {
-	int save;
+bool Board::checkCheck(bool s) {
+	std::string checkStr = " ";
+
 	sideInCheck = 0;
 	sideInCheckmate = 0;
-	checkText.loadFromRenderedText(" ", textColor, Garamond26);
+	
 	if (inCheck(s)) {
 		sideInCheck = s ? 1 : 2;
-		save = sideInCheck;
 		cleanMoveList(s);
-		sideInCheck = save;
-		if (inCheckmate(s)) { 
+		if (inCheckmate(s)) { //Checkmate
 			sideInCheckmate = s ? 1 : 2;
-			if (s)
-				checkText.loadFromRenderedText("Black wins!", textColor, Garamond26);
-			else
-				checkText.loadFromRenderedText("White wins!", textColor, Garamond26);
+			checkStr = s ? "Black wins!" : "White wins!";
+			checkText.loadFromRenderedText(checkStr, textColor, Garamond26);
 			return true;
 		}
-		else {
-			if (v) {
-				if (s)
-					checkText.loadFromRenderedText("White is in check", textColor, Garamond26);
-				else
-					checkText.loadFromRenderedText("Black is in check", textColor, Garamond26);
-			}
+		else {				  //Check
+			checkStr = s ? "White is in check" : "Black is in check";
+			checkText.loadFromRenderedText(checkStr, textColor, Garamond26);
 			return false;
 		}
 	}
-	return false;
+	checkText.loadFromRenderedText(" ", textColor, Garamond26);
+	return false;	//Neither check nor checkmate
 }
 
 bool Board::inCheckmate(bool s) const { 
@@ -131,10 +124,13 @@ bool Board::inCheck(bool s) const {
 bool Board::validateMove(int mF, int mT, bool s) {
 	int onMF = board120[mF], onMT = board120[mT], value = piece[onMF].value;
 
+	//Moving empty square, to null square, or invalid square
 	if (onMF == -1 || mT == 0 || board120[mT] == invalid) 
 		return false;
+	//Trying to capture your own piece
 	if (onMT != empty && piece[onMF].color == piece[onMT].color && !castling) 
 		return false;
+	//Trying to move enemy piece
 	if (piece[onMF].color != s) 
 		return false;
 
@@ -202,7 +198,7 @@ bool Board::validateDiagMove(int mF, int mT) const {
 	int diff = big - small;
 
 	temp = diff%11 == 0 ? 11 : diff%9 == 0 ? 9 : 0;
-	if (!temp) return false;
+	if (!temp) return false; //Not moving diagonally
 	for (int j = small+temp; j < big; j+=temp)
 		if (board120[j] != empty) return false;
 	return true;
@@ -221,13 +217,13 @@ bool Board::validateKingMove(int mF, int mT, bool s) {
 	
 	if (diff == 1 || diff == 10 || diff == 9 || diff == 11)
 		return true;
-	if ((mF - mT) == -2) {
+	if ((mF - mT) == -2) {	//Castling kingside
 		if (canCastle(KINGSIDE, s)) {
 			setCastling(KINGSIDE);
 			return true;
 		}
 	}
-	if ((mF - mT) == 3) {
+	if ((mF - mT) == 3) {   //Castling queenside
 		if (canCastle(QUEENSIDE, s)) {
 			setCastling(QUEENSIDE);
 			return true;
@@ -255,6 +251,5 @@ bool Board::canCastle(int dir, bool s) {
 		}
 		unmovePiece(kSq, kSq+j*c);
 	}
-	setCastling(dir);
 	return true;
 }
