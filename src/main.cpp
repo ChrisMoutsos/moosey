@@ -40,15 +40,14 @@ int main(int argc, char* args[]) {
 		cout << "Failure to load media.\n";
 		return -1;
 	}
-	int mF = -1;
-	int mT = -1;
+
+	int mF = -1, mT = -1;
 	bool quit = false;
 	SDL_Event e; //Event handler
 
 	Board board;
 
 	while (!quit) {
-
 		while (SDL_PollEvent(&e) != 0) {
 			if (e.type == SDL_QUIT) 
 				quit = true;
