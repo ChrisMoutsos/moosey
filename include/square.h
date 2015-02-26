@@ -24,7 +24,6 @@ class Square {
 		Square();
 		void setPos(int x, int y);
 		void handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s);
-		void render();
 		int getPiece() const { return piece; };
 		void setPiece(int p) { piece = p; };
 		int getX() const { return pos.x; };
@@ -37,10 +36,9 @@ class Square {
 		int square;
 		int piece;
 		SDL_Point pos;
-		PieceSprite currentSprite;
 };
 
-extern LTexture spriteSheetTexture;
 extern SDL_Rect spriteClips[12];
+extern LTexture spriteSheetTexture;
 
 #endif
