@@ -15,7 +15,6 @@
  * Known issues:
  * Internals:
  * ^^Do multiple undos work?
- * Possibly rewrite code to use enumerated types instead of just ints
  * Algebraic notation:
  * Write dupMove code for Queens
  */
