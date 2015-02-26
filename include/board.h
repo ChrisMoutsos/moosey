@@ -14,16 +14,12 @@
 #include <vector>
 #include "square.h"
 
-class LTexture;
-
 class Board {
 
 	friend void showMoveLists(Board&);
 	friend void showPieceMoveLists(Board&);
 	friend void drawPieces(const Board&, const int&, const int&);
 	friend void drawSquares(const Board&, const int&, const int&);
-	friend void setPiecesOnSquares(Board&);
-	friend void setSquarePositions(Board&);
 	
 	public:
 		//BOARD.CPP
@@ -36,6 +32,8 @@ class Board {
 		void placePiecesDefault();	
 		void initializePieces();
 		void handleInput(int& mF, int& mT, SDL_Event* e);
+		void setSquarePositions();
+		void setPiecesOnSquares();
 		//ACCESSORS
 		int getMoveFrom() const { return moveFrom; };
 		int getMoveTo() const { return moveTo; };
@@ -200,8 +198,5 @@ enum pieceValue_t { P_VAL = 100, N_VAL = 300, B_VAL = 310,
 
 enum castleside_t { QUEENSIDE = 2, KINGSIDE = 1
 };
-
-extern SDL_Color textColor;
-extern LTexture checkText;
 
 #endif
