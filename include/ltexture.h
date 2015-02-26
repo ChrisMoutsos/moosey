@@ -15,9 +15,7 @@ class LTexture {
 		LTexture();
 		~LTexture();
 		bool loadFromFile(std::string path);
-		#ifdef _SDL_TTF_H
 		bool loadFromRenderedText(std::string textureText, SDL_Color textColor, TTF_Font* font);
-		#endif
 		void free();
 		void setColor(Uint8 red, Uint8 green, Uint8 blue);
 		void setBlendMode(SDL_BlendMode blending);
