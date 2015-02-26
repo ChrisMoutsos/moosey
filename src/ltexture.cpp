@@ -45,7 +45,6 @@ bool LTexture::loadFromFile(std::string path) {
 	return (texture != NULL);
 }
 
-#ifdef _SDL_TTF_H
 bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColor, TTF_Font* font) {
 	free();	
 	
@@ -67,7 +66,6 @@ bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColor
 	
 	return texture != NULL;
 }
-#endif
 
 void LTexture::free() {
 	if (texture != NULL) {
