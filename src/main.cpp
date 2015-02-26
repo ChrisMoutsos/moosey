@@ -13,8 +13,6 @@
  *	FEN parsing
  * 
  * Known issues:
- * Display:
- * A1 and H8 don't highlight when you move to or from them. 
  * Internals:
  * Need to update epSq to a vector?
  * Maybe pmSq needs to be a vector?
@@ -24,9 +22,7 @@
  * When you promote a pawn, it outputs the move as Q[a-h]8.
  * The solution might involve restructuring encoding of the moveList,
  * or a vector to hold whether or not a move was a promotion move.
- * It disambiguates unnecessarily sometimes. Solution: loop through
- * squares inbetween otherPiece and moveTo, to check if moveFrom is
- * in between (rooks).
+ * Write dupMove code for Queens
  */
 
 #include <iostream>
@@ -64,7 +60,6 @@ int main(int argc, char* args[]) {
 			board.handleInput(mF, mT, &e);
 			displayBoard(board, mF, mT);
 		}
-
 	}
 
 	close_SDL();
