@@ -13,6 +13,8 @@
 #include <string>
 #include <cmath>
 #include "ltexture.h"
+#include "square.h"
+#include "button.h"
 #include "sdl.h"
 
 SDL_Window* window = NULL; //The window we'll be rendering to
@@ -83,9 +85,7 @@ bool loadMedia() {
 	
 	if (!spriteSheetTexture.loadFromFile("../res/spritesheet2.bmp"))
 		success = false;
-	if (!undoTexture.loadFromFile("../res/undo.bmp"))
-		success = false;
-	if (!restartTexture.loadFromFile("../res/restart.bmp"))
+	if (!buttonTexture.loadFromFile("../res/buttons.bmp"))
 		success = false;
 	
 
