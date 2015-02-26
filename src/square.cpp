@@ -8,9 +8,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <iostream>
-#include "display.h"
 #include "square.h"
 #include "ltexture.h"
+#include "display.h"
 
 Square::Square() {
 	square = 0;
@@ -18,7 +18,6 @@ Square::Square() {
 	pos.x = 0;
 	pos.y = 0;
 	dragging = false;
-	currentSprite = noPiece;
 }
 
 void Square::setPos(int x, int y) {
@@ -74,8 +73,4 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 
 			break;
 		}
-}
-
-void Square::render() {
-	spriteSheetTexture.render(pos.x, pos.y, &spriteClips[currentSprite]);	
 }
