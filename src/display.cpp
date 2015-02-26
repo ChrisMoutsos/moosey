@@ -214,7 +214,7 @@ void drawMoveTable(const Board& b) {
 		if ((b.getPly()-1)%2 == 0)	//Add number in front for white's moves
 			plyStr = std::to_string((b.getPly()-1)/2+1) + ". ";
 		p = b.getPieceMoved(b.getPly()-1);
-		if (b.getValue(p) == Q_VAL)
+		if (b.getValue(p) == Q_VAL && b.getPmSq(b.getPly()-1) != mT2)
 			plyStr += "Q";
 		else if (b.getValue(p) == K_VAL) {
 			if (mF2 == _E1 && (mT2 == _B1 || mT2 == _G1)) { //White castled
@@ -270,18 +270,23 @@ void drawMoveTable(const Board& b) {
 				plyStr += char(mF2/10+int('1')-2); //so, rank is sufficient
 		}
 		if (b.getPrevOnMoveTo(b.getPly()-1) != empty) { //If move was a capture
-			if (b.getValue(p) == P_VAL)	//Special case for pawns, e.g. "axb4"
+			//Special case for pawns, display the file of departure
+			if (b.getValue(p) == P_VAL || b.getPmSq(b.getPly()-1) == mT2)
 				plyStr += char(mF2%10+int('a')-1);
 			plyStr += "x";
 		}
-		else if (b.getValue(p) == P_VAL)	//Check for en passant
-			if (abs(mF2 - mT2) == 9 || abs(mF2 - mT2) == 11) {
+		else if (b.getValue(p) == P_VAL)
+			if (abs(mF2 - mT2) == 9 || abs(mF2 - mT2) == 11) { //En passant
 				plyStr += char(mF2%10+int('a')-1);
 				plyStr += 'x';
 			}
 
-		if (!castling) 
+		if (!castling)	//Add moveTo 
 			plyStr += intToSquare(mT2);
+
+		if (b.getPmSq(b.getPly()-1) == mT2) //If it was a promotion
+			plyStr += "=Q";
+
 		if (b.getSideInCheck())
 			plyStr += b.getSideInCheckmate() ? '#' : '+';
 
