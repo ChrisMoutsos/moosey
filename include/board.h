@@ -137,17 +137,17 @@ class Board {
 };
 
 //INLINE CONVERSION FUNCTIONS
-inline int to64(int x) {
-	if (x < 98 && x > 21 && !(x%10 == 0 || x%10 == 9))
+inline int to64(int x) { //returns 1 to 64
+	if (x < 99 && x > 20 && !(x%10 == 0 || x%10 == 9))
 			return x-20-2*((x-x%10)/10-2);
 	return 0;
 }
 
-inline int FR2SQ64(int f, int r) {
+inline int FR2SQ64(int f, int r) { //returns 1 to 64
 	return (f)+((r-1)*8);
 }
 
-inline int from64(int x) {
+inline int from64(int x) { //returns 21 to 98
 	return x+20+(((x-1)/8))*2;
 }
 
