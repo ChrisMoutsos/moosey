@@ -5,8 +5,9 @@
 	      main.cpp
  ---------------------------------
 */
-/*
+/*   ##To-Do List##
  *	SDL
+ * 	- Add undo button
  *	- Draw king
  *	- Sounds
  *	- Splash screen
