@@ -14,14 +14,9 @@
  * 
  * Known issues:
  * Internals:
- * Need to update epSq to a vector?
- * Maybe pmSq needs to be a vector?
  * ^^Do multiple undos work?
  * Possibly rewrite code to use enumerated types instead of just ints
  * Algebraic notation:
- * When you promote a pawn, it outputs the move as Q[a-h]8.
- * The solution might involve restructuring encoding of the moveList,
- * or a vector to hold whether or not a move was a promotion move.
  * Write dupMove code for Queens
  */
 
