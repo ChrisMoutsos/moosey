@@ -9,13 +9,15 @@
 #include <string>
 #include "board.h"
 #include "display.h"
+#include "button.h"
 
 Board::Board() { 
 	initializeVars();
 	emptyBoard();
 	initializePieces();
 	placePiecesDefault();	
-	setSquarePositions(*this);
+	setSquarePositions();
+	setButtonPositions();
 	setSpriteClips();	
 	generateMoveLists();
 }
@@ -24,7 +26,8 @@ Board::Board(std::string FEN) {
 	initializeVars();
 	emptyBoard();
 	initializePieces();
-	setSquarePositions(*this);
+	setSquarePositions();
+	setButtonPositions();
 	setSpriteClips();	
 	generateMoveLists();
 	//FEN stuff
@@ -33,6 +36,19 @@ Board::Board(std::string FEN) {
 Board::~Board() {
 	for (int i = wqR; i <= bPh; i++) 
 		delete [] piece[i].moveList;
+}
+
+void Board::setSquarePositions() {
+	for (int i = 0; i < 64; i++) {
+		squares[i].setPos(BXSTART+(SQ_SIZE*(i%8)),
+				  BYSTART+B_SIZE-(SQ_SIZE*(i/8+1)));
+		squares[i].setSq(i+1);
+	}
+}
+
+void Board::setPiecesOnSquares() {
+	for (int i = 0; i < 64; i++)
+		squares[i].setPiece(board120[from64(i+1)]);
 }
 
 void Board::initializeVars() {
@@ -122,6 +138,17 @@ void Board::initializePieces() {
 void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 	for (int i = 0; i < 64; i++)
 		squares[i].handleEvent(e, mF, mT, side);
+	bool clearMFMT = false;
+	for (int i = 0; i < 2; i++) 
+		if (buttons[i].handleEvent(e, *this))
+			clearMFMT = true;
+	//std::cout << "clearMFMT: " << clearMFMT << '\n';
+	if (clearMFMT) {
+		mF = -1;
+		mT = -1;
+	}
+	//std::cout << "mF = " << mF << " mT = " << mT << '\n';
+	
 	if (mF != -1 && mT != -1) {
 		mF = from64(mF);
 		mT = from64(mT);
@@ -135,7 +162,38 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 		mF = -1;
 		mT = -1;
 	}
+	std::cout << "movesMade: ";
+	for (int i = 0; i < (int)movesMade.size(); i++) {
+		std::cout << movesMade[i] << ", ";
+	}
+	std::cout << '\n';
+	std::cout << "prevOnMoveTo: ";
+	for (int i = 0; i < (int)prevOnMoveTo.size(); i++) {
+		std::cout << prevOnMoveTo[i] << ", ";
+	}
+	std::cout << '\n';
+	std::cout << "pieceKilled: size: " << (int)pieceKilled.size() << " : ";
+	for (int i = 0; i < (int)pieceKilled.size(); i++) {
+		std::cout << pieceKilled[i] << ", ";
+	}
+	std::cout << '\n';
+	std::cout << "pieceMoved: ";
+	for (int i = 0; i < (int)pieceMoved.size(); i++) {
+		std::cout << pieceMoved[i] << ", ";
+	}
+	std::cout << '\n';
+	std::cout << "epSq: ";
+	for (int i = 0; i < (int)epSq.size(); i++) {
+		std::cout << epSq[i] << ", ";
+	}
+	std::cout << '\n';
+	std::cout << "pmSq: ";
+	for (int i = 0; i < (int)pmSq.size(); i++) {
+		std::cout << pmSq[i] << ", ";
+	}
+	std::cout << '\n';
 }
+
 
 void Board::addToMovelist(bool s, int v) {
 	if (s) whiteMoveList.push_back(v);
