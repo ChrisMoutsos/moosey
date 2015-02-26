@@ -96,7 +96,7 @@ void Board::generateHozMoves(int p, int& counter) {
 		while (board120[posIndex] != invalid) {	
 			if (board120[posIndex] != empty && piece[board120[posIndex]].color == s) break;
                        
-			if (validateMove(piece[p].pos, posIndex, s)) {
+			if (validateHozMove(piece[p].pos, posIndex)) {
 				piece[p].moveList[counter] = posIndex;
                         	counter++;
 			}
@@ -110,46 +110,57 @@ void Board::generateHozMoves(int p, int& counter) {
 
 void Board::generateDiagMoves(int p, int& counter) {
 	bool s = piece[p].color;
-	int d, i, posIndex;
+	int d, i, posIndex, pOMT;
 
 	for (int c = 1; c <= 4; c++) {
 		d = c==1 ? -11 : c==2 ? -9 : c==3 ? 11 : 9;
 		i = 1;
 		posIndex = piece[p].pos+d*i;
+		pOMT = board120[posIndex];
 		
-		while (board120[posIndex] != invalid) { 
-			if (board120[posIndex] != empty && piece[board120[posIndex]].color == s) break;
+		while (pOMT != invalid) { 
+			if (pOMT != empty && piece[pOMT].color == s) 
+					break;
                         
-			if (validateMove(piece[p].pos, posIndex, s)) {
+			if (validateDiagMove(piece[p].pos, posIndex)) {
 				piece[p].moveList[counter] = posIndex;
                         	counter++;
 			}
 			i++;
-			if (board120[posIndex] != empty && piece[board120[posIndex]].color != s) break;
+			if (pOMT != empty && piece[pOMT].color != s) break;
                         posIndex = piece[p].pos+d*i;
+			pOMT = board120[posIndex];
                 }
 	}
 }
 
 void Board::generateKnightMoves(int p, int& counter) {
 	bool s = piece[p].color;
-	int extra;
+	int extra, mT;
 	for (int i = 1; i <= 8; i++) {
 		extra = i==1 ? 8 : i==2 ? -8 : i==3 ? 12 : i==4 ? -12 : i==5 ? 19 : i==6 ? -19 : i==7 ? 21 : -21;
-		if (validateMove(piece[p].pos, piece[p].pos + extra, s)) {
-			piece[p].moveList[counter] = piece[p].pos + extra;
-			counter++;
+		mT = piece[p].pos + extra;
+		if (board120[mT] == invalid) continue;
+		if (board120[mT] != empty)
+			if (piece[board120[mT]].color == s) continue; 
+		if (validateKnightMove(piece[p].pos, mT)) {
+			piece[p].moveList[counter] = mT;
+			counter++;	
 		}
 	}
 }
 
 void Board::generateKingMoves(int p, int& counter) {
 	bool s = piece[p].color;
-	int extra;
+	int extra, mT;
         for (int i = 1; i <= 8; i++) {
                 extra = i==1 ? 1 : i==2 ? -1 : i==3 ? 10 : i==4 ? -10 : i==5 ? 11 : i==6 ? -11 : i==7 ? 9 : -9;
-                if (validateMove(piece[p].pos, piece[p].pos+extra, s)) {
-                        piece[p].moveList[counter] = piece[p].pos + extra;
+		mT = piece[p].pos + extra;
+		if (board120[mT] == invalid) continue;	
+		if (board120[mT] != empty)
+			if (piece[board120[mT]].color == s) continue; 
+                if (validateKingMove(piece[p].pos, mT, s)) {
+                        piece[p].moveList[counter] = mT;
                         counter++;
                 }
         }
@@ -168,13 +179,18 @@ void Board::generateKingMoves(int p, int& counter) {
 
 void Board::generatePawnMoves(int p, int& counter) {
 	bool s = piece[p].color;
-	int extra;
+	int extra, mT;
         for (int i = 1; i <= 4; i++) {
                 extra = i==1 ? 10 : i==2 ? 20 : i==3 ? 11 : 9;
 		extra = side ? extra : -extra;
-                if (validateMove(piece[p].pos, piece[p].pos+extra, s)) {
-                        piece[p].moveList[counter] = piece[p].pos + extra;
+		mT = piece[p].pos + extra;
+		if (board120[mT] == invalid) break;	
+		if (board120[mT] != empty)
+			if (piece[board120[mT]].color == s) break; 
+                if (validatePawnMove(piece[p].pos, mT, s)) {
+                        piece[p].moveList[counter] = mT;
                         counter++;
+
                 }
         }
 }
