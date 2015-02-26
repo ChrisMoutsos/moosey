@@ -52,8 +52,8 @@ class Board {
 		int getPieceMoveListSize(int p) const { return piece[p].moveListSize; };
 		int getValue(int p) const { return piece[p].value; };
 		int getPos(int p) const { return piece[p].pos; };
-		int getEpSq() const { return epSq; };
-		int getPmSq() const { return pmSq; };
+		int getEpSq(int i) const { return epSq[i]; };
+		int getPmSq(int i) const { return pmSq[i]; };
 		int getCastling() const { return castling; };
 		int getMoveMade(int i) const { return movesMade[i]; };
 		int getPrevOnMoveTo(int i) const { return prevOnMoveTo[i]; };
@@ -72,7 +72,6 @@ class Board {
 		void setPiecePos(int p, int newPos) { piece[p].pos = newPos; };
 		void incrMoved(int p) { piece[p].moved++; };
 		void decrMoved(int p) { piece[p].moved--; };
-		void setEpSq(int sq) { epSq = sq; };
 		void setCastling(int c) { castling = c; };
 		void setSideInCheck(int i) { sideInCheck = i; };
 		void setSideInCheckmate(int i) { sideInCheckmate = i; };
@@ -111,13 +110,12 @@ class Board {
 	
 	private:
 		int board120[120], moveFrom, moveTo, ply;
-		int epSq, pmSq;
 		//for the line below.. 0: none, 1: white, 2: black 
 		int sideInCheck, sideInCheckmate;
 		int castling;
 		bool side;
 		std::vector<int> whiteMoveList, blackMoveList;
-		std::vector<int> movesMade;
+		std::vector<int> movesMade, pmSq, epSq;
 		std::vector<int> pieceMoved, prevOnMoveTo, pieceKilled;
 
 		struct pieceEntry {

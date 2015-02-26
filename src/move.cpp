@@ -23,7 +23,7 @@ void Board::movePiece(int mF, int mT) {
 	movesMade.push_back(mF*100+mT);
 	
 	if (!castling) {	
-		if (piece[board120[mF]].value == P_VAL && mT == epSq) { //Enpassanting
+		if (piece[board120[mF]].value == P_VAL && ply > 0 && mT == epSq[ply-1]) { //Enpassanting
 			passanting = true;
 			killSquare = s ? mT-10 : mT+10;
 			epExtra = s ? -10 : 10;
@@ -31,11 +31,12 @@ void Board::movePiece(int mF, int mT) {
 
 		//Set potential en passant square
 		if (piece[board120[mF]].value == P_VAL && abs(mF-mT) == 20)
-			epSq = s ? mF+10 : mF-10;
-		else epSq = null;
+			if (s) epSq.push_back(mF+10);
+			else epSq.push_back(mF-10);
+		else epSq.push_back(null);
 
 		if (mFVal == P_VAL && ((s && mT/10 == 9) || (!s && mT/10 == 2))) { //Promoting
-			pmSq = mT;
+			pmSq.push_back(mT);
 			piece[board120[mF]].value = Q_VAL;
 			piece[board120[mF]].name = "Queen";
 			piece[board120[mF]].abbr = s ? 'Q' : 'q';
@@ -48,7 +49,7 @@ void Board::movePiece(int mF, int mT) {
 			for (int i = 4; i < 27; i++ )	//Fill rest of array with zeroes
 				piece[board120[mF]].moveList[i] = 0;
 		}
-		else pmSq = null;
+		else pmSq.push_back(null);
 
 
 		prevOnMoveTo.push_back(board120[mT]);
@@ -69,6 +70,9 @@ void Board::movePiece(int mF, int mT) {
 		piece[board120[mT]].moved++;
 	}
 	else { //Castling
+		epSq.push_back(null);
+		pmSq.push_back(null);		
+
 		cExtras = {-2, -1, -4};		//Queenside
 		if (mT == _G1 || mT == _G8) 
 			cExtras = {2, 1, 3};	//Kingside
@@ -111,11 +115,10 @@ void Board::unmovePiece(int mF, int mT) {
 		if (piece[pieceMoved[ply-1]].value == P_VAL && prevOnMoveTo[ply-1] == empty) {
 			if (diffMTMF == 11 || diffMTMF == 9) {
 				unpassanting = true;
-				epSq = mT;
 				epExtra = s ? -10 : 10;
 			}
 		}
-		if (mT == pmSq) { //Promoting
+		if (mT == pmSq[ply-1]) { //Promoting
 			piece[board120[mT]].value = P_VAL;
 			piece[board120[mT]].name = "Pawn";
 			piece[board120[mT]].abbr = s ? 'P' : 'p';
@@ -159,6 +162,8 @@ void Board::unmovePiece(int mF, int mT) {
 	pieceMoved.erase(pieceMoved.begin()+ply-1);
 	prevOnMoveTo.erase(prevOnMoveTo.begin()+ply-1);
 	pieceKilled.erase(pieceKilled.begin()+ply-1);
+	pmSq.erase(pmSq.begin()+ply-1);
+	epSq.erase(epSq.begin()+ply-1);
 	ply--;
 }
 

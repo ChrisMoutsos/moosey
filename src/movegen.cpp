@@ -11,7 +11,6 @@
 void Board::generateMoveLists() {	
 	int mF, mT;
 	bool realSide = side;
-	int realEpSq = epSq;
 
 	side = WHITE;
 	for (int i = wqR; i <= wPh; i++)
@@ -22,7 +21,7 @@ void Board::generateMoveLists() {
 
 	whiteMoveList.clear();
 	blackMoveList.clear();
-	for (int i = wqR; i <= bPh; i++) 
+	for (int i = wqR; i <= bPh; i++)
 		for (int j = 0; j < piece[i].moveListSize; j++) 
 			if (piece[i].moveList[j] != null) {
 				mF = piece[i].pos;
@@ -34,13 +33,11 @@ void Board::generateMoveLists() {
 			}
 
 	side = realSide;	
-	epSq = realEpSq;
 }
 
 void Board::cleanMoveList(bool s) {
 	int mF, mT, size;
 	bool realSide = side;
-	int realEpSq = epSq;
 	int realMoveFrom = moveFrom;
 	int realMoveTo = moveTo;
 
@@ -58,7 +55,6 @@ void Board::cleanMoveList(bool s) {
 		}
 	}
 	side = realSide;	
-	epSq = realEpSq;
 	moveFrom = realMoveFrom;
 	moveTo = realMoveTo;
 }
@@ -190,7 +186,6 @@ void Board::generatePawnMoves(int p, int& counter) {
                 if (validatePawnMove(piece[p].pos, mT, s)) {
                         piece[p].moveList[counter] = mT;
                         counter++;
-
                 }
         }
 }

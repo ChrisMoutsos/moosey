@@ -12,7 +12,6 @@
 #include "ltexture.h"
 
 bool Board::legalMove(int mF, int mT, bool s, bool v) { 
-	int realEpSq = epSq;
 	bool isInCheck;
 	
 	if (!validateMove(mF, mT, s)) { //Verify piece moves that way
@@ -26,7 +25,6 @@ bool Board::legalMove(int mF, int mT, bool s, bool v) {
 	isInCheck = inCheck(s);		//see if we put our king in check
 	unmovePiece(mF, mT);	//unmove the piece
 	
-	epSq = realEpSq;
 	if (isInCheck) { 
 		if (v) std::cout << "Illegal move.\n";
 		return false;
@@ -67,7 +65,7 @@ bool Board::checkCheck(bool s) {
 	return false;	//Neither check nor checkmate
 }
 
-bool Board::inCheckmate(bool s)  { 
+bool Board::inCheckmate(bool s) const { 
 	if (s && (int)whiteMoveList.size() == 0) 
 		return true;
 	else if (!s && (int)blackMoveList.size() == 0) 
@@ -75,7 +73,7 @@ bool Board::inCheckmate(bool s)  {
 	return false;
 }
 
-bool Board::inCheck(bool s) {
+bool Board::inCheck(bool s) const {
 	int kPos, pIndex, i, v, d;
 	kPos = s ? piece[wK].pos : piece[bK].pos;
 
@@ -176,8 +174,9 @@ bool Board::validatePawnMove(int mF, int mT, bool s) const {
 	}
 	if (diff == 9 || diff == 11) {		//Attacking
 		if (onMT == empty) { 	
-			if (mT == epSq) 	//En passanting
-				if ((s && epSq > _H5) || (!s && epSq < _A4))
+			if (ply > 0 && mT == epSq[ply-1]) 	//En passanting
+				if ((s && epSq[ply-1] > _H5) 
+				   || (!s && epSq[ply-1] < _A4))
 					return true;
 			return false;	
 		}

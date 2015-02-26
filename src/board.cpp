@@ -36,7 +36,7 @@ Board::~Board() {
 }
 
 void Board::initializeVars() {
-	moveFrom = moveTo = ply = epSq = pmSq = null;
+	moveFrom = moveTo = ply =  null;
 	side = WHITE;
 	castling = 0;
 	sideInCheck = 0; 
