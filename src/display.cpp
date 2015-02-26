@@ -11,12 +11,14 @@
 #include <string>
 #include <vector>
 #include "sdl.h"
-#include "display.h"
 #include "board.h"
 #include "ltexture.h"
+#include "button.h"
+#include "display.h"
 
-SDL_Rect spriteClips[12];
-LTexture spriteSheetTexture;
+SDL_Rect spriteClips[12], buttonClips[6];
+Button buttons[2];
+LTexture spriteSheetTexture, buttonTexture;
 LTexture turnText, checkText, moveText, rankText, fileText;
 SDL_Color textColor;
 void showMoveLists(Board& board);
@@ -26,27 +28,38 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 	using std::string;
 
 	static bool sidey = !b.getSide();
-	static string rankStr;
+	static string rankStr, turnStr;
 	string fileStr = "a         b        c         d         e         f         g         h";
-	string temp = "";
+	string checkStr = " ", temp = "";
 
 	//Clear screen
 	SDL_SetRenderDrawColor(renderer, 209, 224, 255, 255);
 	SDL_RenderClear(renderer);
 
-	setPiecesOnSquares(b);	//Update piece positions
+	b.setPiecesOnSquares();	//Update piece positions
 	drawSquares(b, mF, mT);	//Draw the squares
 	drawPieces(b, mF, mT);	//Draw pieces on squares
 	drawBorder();		//Draw border around board
 
+	drawButtons(b);
+
 	//If someone made a move, update the important text
 	if (sidey != b.getSide()) {
 		sidey = b.getSide();
-		if (b.getSide()) 
-			turnText.loadFromRenderedText("White to move", textColor, Garamond26);
-		else
-			turnText.loadFromRenderedText("Black to move", textColor, Garamond26);
-		fileText.loadFromRenderedText(fileStr, textColor, Cicero26);
+		turnStr = sidey ? "White to move" : "Black to move"; //Load turn text
+		turnText.loadFromRenderedText(turnStr, textColor, Garamond26);
+		fileText.loadFromRenderedText(fileStr, textColor, Cicero26); //Load file text
+		if (b.getSideInCheck()) { //Load check text
+			if (b.getSideInCheckmate() == 1)
+				checkStr = "Black wins!";
+			else if (b.getSideInCheckmate() == 2) 
+				checkStr = "White wins!";
+			else if (b.getSideInCheck() == 1)
+				checkStr = "White is in check";
+			else if (b.getSideInCheck() == 2)
+				checkStr = "Black is in check";
+		}
+		checkText.loadFromRenderedText(checkStr, textColor, Cicero26);
 		
 	//	showPieceMoveLists(b);
 	}
@@ -68,17 +81,12 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 	SDL_RenderPresent(renderer);
 }
 
-void setPiecesOnSquares(Board& b) {
-	for (int i = 0; i < 64; i++)
-		b.squares[i].setPiece(b.getBoard120(from64(i+1)));
-}
 
-void setSquarePositions(Board& b) {
-	for (int i = 0; i < 64; i++) {
-		b.squares[i].setPos(BXSTART+(SQ_SIZE*(i%8)),
-				  BYSTART+B_SIZE-(SQ_SIZE*(i/8+1)));
-		b.squares[i].setSq(i+1);
-	}
+void setButtonPositions() {
+	buttons[0].setPos(1185, 25);
+	buttons[0].setButt(0);
+	buttons[1].setPos(1185, 75);
+	buttons[1].setButt(1);
 }
 
 void setSpriteClips() {
@@ -88,6 +96,38 @@ void setSpriteClips() {
 		spriteClips[i].w = SQ_SIZE;
 		spriteClips[i].h = SQ_SIZE;
 	}
+	for (int i = 0; i < 6; i++) {
+		buttonClips[i].x = i%2*BUT_SIZEX;
+		buttonClips[i].y = i/2*BUT_SIZEY;
+		buttonClips[i].w = BUT_SIZEX;
+		buttonClips[i].h = BUT_SIZEY;
+	}
+}
+
+void drawButtons(const Board& b) {
+	SDL_Rect clipSq;
+	//Draw restart button
+	if (buttons[0].getInside()) {
+		if (buttons[0].getClicking())
+			clipSq = buttonClips[4];
+		else 
+			clipSq = buttonClips[2];
+	}
+	else
+		clipSq = buttonClips[0];
+
+	buttonTexture.render(buttons[0].getX(), buttons[0].getY(), &clipSq);
+	//Draw undo button
+	if (buttons[1].getInside()) {
+		if (buttons[1].getClicking())
+			clipSq = buttonClips[5];
+		else
+			clipSq = buttonClips[3];
+	}
+	else 
+		clipSq = buttonClips[1];
+	buttonTexture.render(buttons[1].getX(), buttons[1].getY(), &clipSq);
+
 }
 
 void drawSquares(const Board& b, const int& mF, const int& mT) {
