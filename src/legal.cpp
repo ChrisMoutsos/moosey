@@ -13,6 +13,7 @@
 
 bool Board::legalMove(int mF, int mT, bool s, bool v) { 
 	int realEpSq = epSq;
+	bool isInCheck;
 	
 	if (!validateMove(mF, mT, s)) { //Verify piece moves that way
 		if (v) std::cout << "Invalid move..\n";
@@ -22,11 +23,11 @@ bool Board::legalMove(int mF, int mT, bool s, bool v) {
 		return true;
 	
 	movePiece(mF, mT);	//Move the piece,
-	inCheck(s);		//see if we put our king in check
+	isInCheck = inCheck(s);		//see if we put our king in check
 	unmovePiece(mF, mT);	//unmove the piece
 	
 	epSq = realEpSq;
-	if (sideInCheck) {    //If either side is in check
+	if (isInCheck) { 
 		if (v) std::cout << "Illegal move.\n";
 		return false;
 	}
@@ -66,7 +67,7 @@ bool Board::checkCheck(bool s) {
 	return false;	//Neither check nor checkmate
 }
 
-bool Board::inCheckmate(bool s) const { 
+bool Board::inCheckmate(bool s)  { 
 	if (s && (int)whiteMoveList.size() == 0) 
 		return true;
 	else if (!s && (int)blackMoveList.size() == 0) 
@@ -74,7 +75,7 @@ bool Board::inCheckmate(bool s) const {
 	return false;
 }
 
-bool Board::inCheck(bool s) const {
+bool Board::inCheck(bool s) {
 	int kPos, pIndex, i, v, d;
 	kPos = s ? piece[wK].pos : piece[bK].pos;
 
@@ -87,18 +88,24 @@ bool Board::inCheck(bool s) const {
 			if (board120[pIndex] != empty) { 
 				if (piece[board120[pIndex]].color != s) { 
 					v = piece[board120[pIndex]].value;
-					if (v == Q_VAL)
+					if (v == Q_VAL)	//Queen on hoz or diag
 						return true;
 					if (c >= 1 && c <= 4) {
-						if (v == R_VAL)
+						if (v == R_VAL) //Rook on hoz
 							return true;
+
 					} 
 					else 
-						if (v == B_VAL)
+						if (v == B_VAL) //Bishop on diag
 							return true;
-					if (i == 1 && c >= 5 && v == P_VAL) 
-						if (!s != (d==UL || d==UR))
+					if (i == 1) { //First index
+						if (c >= 5 && v == P_VAL) { //Pawns
+							if (!s != (d==UL || d==UR))
+								return true;
+						}
+						else if (v == K_VAL) //Kings
 							return true;
+					}
 				}
 				break;
 			}
@@ -155,6 +162,8 @@ bool Board::validatePawnMove(int mF, int mT, bool s) const {
 	int onMF = board120[mF], onMT = board120[mT];
 	int diff = abs(mF - mT);
 
+	if (board120[mT] == invalid) return false;
+
 	if ((s && mF > mT) || (!s && mF < mT))  //Ensures correct direction
 		return false;
 
@@ -168,7 +177,8 @@ bool Board::validatePawnMove(int mF, int mT, bool s) const {
 	if (diff == 9 || diff == 11) {		//Attacking
 		if (onMT == empty) { 	
 			if (mT == epSq) 	//En passanting
-				return true;
+				if ((s && epSq > _H5) || (!s && epSq < _A4))
+					return true;
 			return false;	
 		}
 		if (s != piece[onMT].color) return true;
@@ -206,7 +216,7 @@ bool Board::validateDiagMove(int mF, int mT) const {
 
 bool Board::validateKnightMove(int mF, int mT) const {
 	int diff = abs(mF - mT);
-	
+
 	if (diff == 8 || diff == 12 || diff == 19 || diff == 21)
 		return true;
 	return false;
