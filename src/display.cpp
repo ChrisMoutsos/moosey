@@ -232,9 +232,26 @@ void drawMoveTable(const Board& b) {
 			plyStr += "R";
 			//Check same side and same piecetype, for ambiguous moves
 			otherPiece = !b.getSide() ? (p == 0 ? 7 : 0) : (p == 16 ? 23 : 16);
+			int oPos = b.getPos(otherPiece), e = 0, small, big;
+
 			if (b.getAlive(otherPiece))
-				if (b.validateHozMove(b.getPos(otherPiece), mT2))
+				if (b.validateHozMove(oPos, mT2)) {
 					dupMove = true;
+					//Make sure we're not needlessly disambiguating
+					if (oPos%10 == mT2%10)	//Same file
+						e = 10;
+					else if (oPos/10 == mT2/10) //Same rank
+						e = 1;
+					//Loop through the squares between otherPiece
+					//and moveTo, and if any of them are moveFrom,
+					//it's not really an ambiguous move
+					if (e) {
+						big = oPos > mT2 ? oPos : mT2;
+						small = oPos < mT2 ? oPos : mT2;
+						for (int i = small+e; i < big; i += e)
+							if (i == mF2) dupMove = false;
+					}
+				}
 		}
 		else if (b.getValue(p) == B_VAL) 
 			plyStr += "B";
