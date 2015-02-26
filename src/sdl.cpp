@@ -32,7 +32,7 @@ bool init_SDL() {
 			printf("Warning: Linear texture filtering not enabled!");
 
 		//Create window
-		window = SDL_CreateWindow("Moosey Chess Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_W, SCREEN_H, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED);
+		window = SDL_CreateWindow("Moosey Chess Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_W, SCREEN_H, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 		if (window == NULL) {
 			printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
 			success = false;
@@ -81,9 +81,12 @@ bool loadMedia() {
 	else 
 		textColor = {0, 0, 0};
 	
-	if (!spriteSheetTexture.loadFromFile("../res/spritesheet2.bmp")) {
+	if (!spriteSheetTexture.loadFromFile("../res/spritesheet2.bmp"))
 		success = false;
-	}
+	if (!undoTexture.loadFromFile("../res/undo.bmp"))
+		success = false;
+	if (!restartTexture.loadFromFile("../res/restart.bmp"))
+		success = false;
 	
 
 	return success;
