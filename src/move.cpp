@@ -17,13 +17,13 @@ void Board::movePiece(int mF, int mT) {
 	std::array<int, 3> cExtras; //For castling, it holds how far away
 			            //mF is from final pos of K, R, and corner
 	int killSquare = mT, epExtra = 0, mFVal = piece[board120[mF]].value;
-	bool s = piece[board120[mF]].color, passanting;
+	bool s = piece[board120[mF]].color, passanting = false;
 	int * temp = NULL;
 
 	movesMade.push_back(mF*100+mT);
 	
 	if (!castling) {	
-		if (piece[board120[mF]].value == P_VAL && ply > 0 && mT == epSq[ply-1]) { //Enpassanting
+		if (piece[board120[mF]].value == P_VAL && ply > 0 && mT == epSq.back()) { //Enpassanting
 			passanting = true;
 			killSquare = s ? mT-10 : mT+10;
 			epExtra = s ? -10 : 10;
@@ -51,11 +51,12 @@ void Board::movePiece(int mF, int mT) {
 		}
 		else pmSq.push_back(null);
 
-
 		prevOnMoveTo.push_back(board120[mT]);
 		pieceMoved.push_back(board120[mF]);
-		
 		pieceKilled.push_back(board120[killSquare]);
+		std::cout << "move pushing " << board120[killSquare] << " to pieceKilled\n";
+		std::cout << "killSquare: " << killSquare << '\n';
+
 		if (board120[mT+epExtra] != empty) {
 			piece[board120[mT+epExtra]].alive = false;
 			piece[board120[mT+epExtra]].pos = null;
@@ -96,29 +97,37 @@ void Board::movePiece(int mF, int mT) {
 }
 
 void Board::unmovePiece() {
-	int moveFrom2 = movesMade[movesMade.size()-1]/100;
-	int moveTo2 = movesMade[movesMade.size()-1]%100;
+	int moveFrom2 = movesMade.back() / 100;
+	int moveTo2 = movesMade.back() % 100;
 	unmovePiece(moveFrom2, moveTo2);
 }
 
 void Board::unmovePiece(int mF, int mT) {
 	std::array<int, 3> cExtras; //For castling, it holds how far away
+	std::cout << "0 unmoved.. pieceKilled: size: " << (int)pieceKilled.size() << " : ";
+	for (int i = 0; i < (int)pieceKilled.size(); i++) {
+		std::cout << pieceKilled[i] << ", ";
+	}
+	std::cout << '\n';
 			            //mF is from final pos of K, R, and corner
-	int diffMTMF = abs(mT-mF), epExtra = 0, fakeCounter;
+	int diffMTMF = abs(mT-mF), epExtra = 0, fakeCounter = 0;
 	int * temp;
-	bool s = piece[board120[mT]].color, unpassanting;
-
-	movesMade.erase(movesMade.size()-1+movesMade.begin());
+	bool s = piece[board120[mT]].color, unpassanting = false;
 
 	if (!castling) {
 		//Unpassanting
-		if (piece[pieceMoved[ply-1]].value == P_VAL && prevOnMoveTo[ply-1] == empty) {
+		if (piece[pieceMoved.back()].value == P_VAL && prevOnMoveTo[prevOnMoveTo.back()] == empty) {
 			if (diffMTMF == 11 || diffMTMF == 9) {
 				unpassanting = true;
 				epExtra = s ? -10 : 10;
 			}
 		}
-		if (mT == pmSq[ply-1]) { //Promoting
+	std::cout << "1.. pieceKilled: size: " << (int)pieceKilled.size() << " : ";
+	for (int i = 0; i < (int)pieceKilled.size(); i++) {
+		std::cout << pieceKilled[i] << ", ";
+	}
+	std::cout << '\n';
+		if (mT == pmSq.back()) { //Promoting
 			piece[board120[mT]].value = P_VAL;
 			piece[board120[mT]].name = "Pawn";
 			piece[board120[mT]].abbr = s ? 'P' : 'p';
@@ -128,18 +137,33 @@ void Board::unmovePiece(int mF, int mT) {
 			piece[board120[mT]].moveList = temp;	//Point at new moveList
 			generatePawnMoves(board120[mT], fakeCounter); //Regen moves
 		}	
-		board120[mF] = pieceMoved[ply-1];
+		board120[mF] = pieceMoved.back();
 		piece[board120[mF]].pos = mF;
 		piece[board120[mF]].moved--;
 	
-		board120[mT] = prevOnMoveTo[ply-1];
+	std::cout << "2 unmoved.. pieceKilled: size: " << (int)pieceKilled.size() << " : ";
+	for (int i = 0; i < (int)pieceKilled.size(); i++) {
+		std::cout << pieceKilled[i] << ", ";
+	}
+	std::cout << '\n';
+		board120[mT] = prevOnMoveTo.back();
 		if (unpassanting)
-			board120[mT+epExtra] = pieceKilled[ply-1];
+			board120[mT+epExtra] = pieceKilled.back();
 
+	std::cout << "3 in unmoved.. pieceKilled: size: " << (int)pieceKilled.size() << " : ";
+	for (int i = 0; i < (int)pieceKilled.size(); i++) {
+		std::cout << pieceKilled[i] << ", ";
+	}
+	std::cout << '\n';
 		if (unpassanting || board120[mT] != empty) {
 			piece[board120[mT+epExtra]].pos = mT+epExtra;
 			piece[board120[mT+epExtra]].alive = true;
 		}
+	std::cout << "4 in unmoved.. pieceKilled: size: " << (int)pieceKilled.size() << " : ";
+	for (int i = 0; i < (int)pieceKilled.size(); i++) {
+		std::cout << pieceKilled[i] << ", ";
+	}
+	std::cout << '\n';
 	}
 	else { //Castling
 		cExtras = {-2, -1, -4};		//Queenside
@@ -159,11 +183,24 @@ void Board::unmovePiece(int mF, int mT) {
 		piece[board120[mF+cExtras[2]]].moved--;	
 
 	}
-	pieceMoved.erase(pieceMoved.begin()+ply-1);
-	prevOnMoveTo.erase(prevOnMoveTo.begin()+ply-1);
-	pieceKilled.erase(pieceKilled.begin()+ply-1);
-	pmSq.erase(pmSq.begin()+ply-1);
-	epSq.erase(epSq.begin()+ply-1);
+
+	movesMade.pop_back();
+	pieceMoved.pop_back();
+	prevOnMoveTo.pop_back();
+	std::cout << "before removed in unmoved.. pieceKilled: size: " << (int)pieceKilled.size() << " : ";
+	for (int i = 0; i < (int)pieceKilled.size(); i++) {
+		std::cout << pieceKilled[i] << ", ";
+	}
+	std::cout << '\n';
+	pieceKilled.pop_back();
+	pmSq.pop_back();
+	epSq.pop_back();
+	std::cout << "end of unmove.. pieceKilled: size: " << (int)pieceKilled.size() << " : ";
+	for (int i = 0; i < (int)pieceKilled.size(); i++) {
+		std::cout << pieceKilled[i] << ", ";
+	}
+	std::cout << '\n';
+
 	ply--;
 }
 
