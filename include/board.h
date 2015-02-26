@@ -19,6 +19,7 @@ class LTexture;
 class Board {
 
 	friend void showMoveLists(Board&);
+	friend void showPieceMoveLists(Board&);
 	friend void drawPieces(const Board&, const int&, const int&);
 	friend void drawSquares(const Board&, const int&, const int&);
 	friend void setPiecesOnSquares(Board&);
@@ -110,8 +111,10 @@ class Board {
 	
 	private:
 		int board120[120], moveFrom, moveTo, ply;
-		int epSq, pmSq, castling;
+		int epSq, pmSq;
+		//for the line below.. 0: none, 1: white, 2: black 
 		int sideInCheck, sideInCheckmate;
+		int castling;
 		bool side;
 		std::vector<int> whiteMoveList, blackMoveList;
 		std::vector<int> movesMade;
