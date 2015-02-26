@@ -41,8 +41,6 @@ bool Board::checkStalemate() const {
 }
 
 bool Board::checkCheck(bool s) {
-	std::string checkStr = " ";
-
 	sideInCheck = 0;
 	sideInCheckmate = 0;
 	
@@ -51,17 +49,12 @@ bool Board::checkCheck(bool s) {
 		cleanMoveList(s);
 		if (inCheckmate(s)) { //Checkmate
 			sideInCheckmate = s ? 1 : 2;
-			checkStr = s ? "Black wins!" : "White wins!";
-			checkText.loadFromRenderedText(checkStr, textColor, Garamond26);
 			return true;
 		}
-		else {				  //Check
-			checkStr = s ? "White is in check" : "Black is in check";
-			checkText.loadFromRenderedText(checkStr, textColor, Garamond26);
+		else {		  //Check
 			return false;
 		}
 	}
-	checkText.loadFromRenderedText(" ", textColor, Garamond26);
 	return false;	//Neither check nor checkmate
 }
 
