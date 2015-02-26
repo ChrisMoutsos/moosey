@@ -17,6 +17,7 @@ Board::Board() {
 	placePiecesDefault();	
 	setSquarePositions(*this);
 	setSpriteClips();	
+	generateMoveLists();
 }
 
 Board::Board(std::string FEN) {
@@ -25,6 +26,7 @@ Board::Board(std::string FEN) {
 	initializePieces();
 	setSquarePositions(*this);
 	setSpriteClips();	
+	generateMoveLists();
 	//FEN stuff
 }
 
@@ -128,6 +130,7 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 			movePiece();
 			changeTurn();
 			generateMoveLists();
+			checkCheck(getSide());
 		}
 		mF = -1;
 		mT = -1;
