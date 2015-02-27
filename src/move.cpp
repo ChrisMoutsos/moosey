@@ -110,13 +110,13 @@ void Board::unmovePiece(int mF, int mT) {
 
 	if (!castling) {
 		//Unpassanting
-		if (piece[pieceMoved.back()-1].value == P_VAL && prevOnMoveTo[prevOnMoveTo.back()] == empty) {
+		if (piece[pieceMoved.back()].value == P_VAL && prevOnMoveTo.back() == empty) {
 			if (diffMTMF == 11 || diffMTMF == 9) {
 				unpassanting = true;
 				epExtra = s ? -10 : 10;
 			}
 		}
-		if (mT == pmSq.back()) { //Promoting
+		if (mT == pmSq.back()) { //Unpromoting
 			piece[board120[mT]].value = P_VAL;
 			piece[board120[mT]].name = "Pawn";
 			piece[board120[mT]].abbr = s ? 'P' : 'p';
