@@ -185,3 +185,10 @@ int Board::getFromMoveList(bool s, int i) const {
 	else 
 		return blackMoveList[i];
 }
+
+int Board::getMoveMade(int i) const {
+	if (i > -1)
+		return movesMade[i];
+	else
+		return 0;
+}

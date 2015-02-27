@@ -53,7 +53,7 @@ class Board {
 		int getEpSq(int i) const { return epSq[i]; };
 		int getPmSq(int i) const { return pmSq[i]; };
 		int getCastling() const { return castling; };
-		int getMoveMade(int i) const { return movesMade[i]; };
+		int getMoveMade(int i) const;
 		int getPrevOnMoveTo(int i) const { return prevOnMoveTo[i]; };
 		int getPieceMoved(int i) const { return pieceMoved[i]; };
 		int getSideInCheck() const { return sideInCheck; };
