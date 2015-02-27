@@ -72,6 +72,7 @@ void Board::movePiece(int mF, int mT) {
 		epSq.push_back(null);
 		pmSq.push_back(null);		
 
+		//cExtras = {kingmT-kingmF, rookmT-kingmF, emptymT-kingmF};
 		cExtras = {-2, -1, -4};		//Queenside
 		if (mT == _G1 || mT == _G8) 
 			cExtras = {2, 1, 3};	//Kingside
@@ -139,6 +140,7 @@ void Board::unmovePiece(int mF, int mT) {
 		}
 	}
 	else { //Castling
+		//cExtras = {kingmT-kingmF, rookmT-kingmF, emptymT-kingmF};
 		cExtras = {-2, -1, -4};		//Queenside
 		if (mT == _G1 || mT == _G8) 	
 			cExtras = {2, 1, 3};	//Kingside
@@ -173,8 +175,16 @@ void Board::changeTurn() {
 }
 
 void Board::undoMove() {
+	int mF2 = movesMade.back()/100;
+	int mT2 = movesMade.back()%100;
+	if (piece[pieceMoved.back()].value == K_VAL) {
+		if (mF2 == _E1 && (mT2 == _G1 || mT2 == _B1))
+			castling = true;
+		if (mF2 == _E8 && (mT2 == _G8 || mT2 == _B8))
+			castling = true;
+	}
 	unmovePiece();
 	changeTurn();
-	moveFrom = movesMade.back() / 100;
-	moveTo = movesMade.back() % 100;
+	moveFrom = mF2;
+	moveTo = mF2;
 }
