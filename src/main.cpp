@@ -12,8 +12,6 @@
  *	FEN parsing
  * 
  * Known issues:
- * Internals:
- * Undoing castling doesnt work
  * Algebraic notation:
  * Write dupMove code for Queens
  */
