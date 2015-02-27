@@ -248,6 +248,9 @@ void drawMoveTable(const Board& b) {
 	borderRect = {BXSTART+B_SIZE+24, BYSTART-1, 500, 650};
 	SDL_RenderDrawRect(renderer, &borderRect);
 
+	while ((int)plyStrings.size() > b.getPly()) 
+		plyStrings.pop_back();
+
 	if ((int)plyStrings.size() < b.getPly()) { //If a new move has been made
 		mF2 = b.getMoveMade(b.getPly()-1)/100;
 		mT2 = b.getMoveMade(b.getPly()-1)%100;	
