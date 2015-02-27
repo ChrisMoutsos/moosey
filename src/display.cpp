@@ -136,9 +136,9 @@ void drawSquares(const Board& b, const int& mF, const int& mT) {
 	for (int r = 1; r <= 8; r++) {
 		for (int f = 1; f <= 8; f++) {
 			sq = FR2SQ64(f, r)-1;
-			if (mF == sq+1 || to64(b.getMoveFrom()) == sq+1)	//moveFrom square
+			if (mF == sq+1 || to64(b.getMoveMade(b.getPly()-1)/100) == sq+1) //moveFrom square
 				SDL_SetRenderDrawColor(renderer, 248, 195, 248, 255);
-			else if (mT == sq+1 || to64(b.getMoveTo()) == sq+1)	//moveTo square
+			else if (mT == sq+1 || to64(b.getMoveMade(b.getPly()-1)%100) == sq+1) //moveTo square
 				SDL_SetRenderDrawColor(renderer, 238, 157, 242, 255);
 			else if ((r+f)%2 == 1)				//Light squares
 				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
