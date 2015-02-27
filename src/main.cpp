@@ -7,15 +7,13 @@
 */
 /*   ##To-Do List##
  *	SDL
- * 	- Add undo button
- *	- Draw king
  *	- Sounds
  *	- Splash screen
  *	FEN parsing
  * 
  * Known issues:
  * Internals:
- * ^^Do multiple undos work?
+ * Undoing castling doesnt work
  * Algebraic notation:
  * Write dupMove code for Queens
  */
