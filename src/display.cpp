@@ -175,7 +175,7 @@ void drawPieces(const Board& b, const int& mF, const int& mT) {
 		    	else if (p == wK)
 				clipSq = spriteClips[wKing];		
 		    	else if (p >= wPa && p <= wPh) {
-				if (b.getValue(b.getBoard120(from64(sq+1))) == P_VAL)
+				if (b.piece[b.getBoard120(from64(sq+1))].getValue() == P_VAL)
 					clipSq = spriteClips[wPawn];
 				else
 					clipSq = spriteClips[wQueen];
@@ -191,7 +191,7 @@ void drawPieces(const Board& b, const int& mF, const int& mT) {
 		    	else if (p == bK)
 				clipSq = spriteClips[bKing];		
 		    	else if (p >= bPa && p <= bPh) {
-				if (b.getValue(b.getBoard120(from64(sq+1))) == P_VAL)
+				if (b.piece[b.getBoard120(from64(sq+1))].getValue() == P_VAL)
 					clipSq = spriteClips[bPawn];
 				else
 					clipSq = spriteClips[bQueen];
@@ -248,9 +248,9 @@ void drawMoveTable(const Board& b) {
 		if ((b.getPly()-1)%2 == 0)	//Add number in front for white's moves
 			plyStr = std::to_string((b.getPly()-1)/2+1) + ". ";
 		p = b.getPieceMoved(b.getPly()-1);
-		if (b.getValue(p) == Q_VAL && b.getPmSq(b.getPly()-1) != mT2)
+		if (b.piece[p].getValue() == Q_VAL && b.getPmSq(b.getPly()-1) != mT2)
 			plyStr += "Q";
-		else if (b.getValue(p) == K_VAL) {
+		else if (b.piece[p].getValue() == K_VAL) {
 			if (mF2 == _E1 && (mT2 == _B1 || mT2 == _G1)) { //White castled
 				castling = true;
 				plyStr += (mT2 == _G1) ? "0-0" : "0-0-0";
@@ -262,13 +262,13 @@ void drawMoveTable(const Board& b) {
 			else
 				plyStr += "K";
 		}
-		else if (b.getValue(p) == R_VAL) {
+		else if (b.piece[p].getValue() == R_VAL) {
 			plyStr += "R";
 			//Check same side and same piecetype, for ambiguous moves
 			otherPiece = !b.getSide() ? (p == 0 ? 7 : 0) : (p == 16 ? 23 : 16);
-			int oPos = b.getPos(otherPiece), e = 0, small, big;
+			int oPos = b.piece[otherPiece].getPos(), e = 0, small, big;
 
-			if (b.getAlive(otherPiece))
+			if (b.piece[otherPiece].getAlive())
 				if (b.validateHozMove(oPos, mT2)) {
 					dupMove = true;
 					//Make sure we're not needlessly disambiguating
@@ -287,29 +287,29 @@ void drawMoveTable(const Board& b) {
 					}
 				}
 		}
-		else if (b.getValue(p) == B_VAL) 
+		else if (b.piece[p].getValue() == B_VAL) 
 			plyStr += "B";
-		else if (b.getValue(p) == N_VAL) { 
+		else if (b.piece[p].getValue() == N_VAL) { 
 			plyStr += "N";
 			//Check same side and same piecetype, for ambiguous moves
 			otherPiece = !b.getSide() ? (p == 1 ? 6 : 1) : (p == 17 ? 22 : 17);
-			if (b.getAlive(otherPiece))
-				if (b.validateKnightMove(b.getPos(otherPiece), mT2))
+			if (b.piece[otherPiece].getAlive())
+				if (b.validateKnightMove(b.piece[otherPiece].getPos(), mT2))
 					dupMove = true;
 		}
 		if (dupMove) { //If the move was ambiguous, de-ambiguate
-			if (mF2%10 != b.getPos(otherPiece)%10) //Not same file
+			if (mF2%10 != b.piece[otherPiece].getPos()%10) //Not same file
 				plyStr += char(mF2%10+int('a')-1); //so, file is sufficient
 			else 					//Same file
 				plyStr += char(mF2/10+int('1')-2); //so, rank is sufficient
 		}
 		if (b.getPrevOnMoveTo(b.getPly()-1) != empty) { //If move was a capture
 			//Special case for pawns, display the file of departure
-			if (b.getValue(p) == P_VAL || b.getPmSq(b.getPly()-1) == mT2)
+			if (b.piece[p].getValue() == P_VAL || b.getPmSq(b.getPly()-1) == mT2)
 				plyStr += char(mF2%10+int('a')-1);
 			plyStr += "x";
 		}
-		else if (b.getValue(p) == P_VAL)
+		else if (b.piece[p].getValue() == P_VAL)
 			if (abs(mF2 - mT2) == 9 || abs(mF2 - mT2) == 11) { //En passant
 				plyStr += char(mF2%10+int('a')-1);
 				plyStr += 'x';
@@ -340,10 +340,10 @@ void showPieceMoveLists(const Board &b) {
 	int mF, mT;
 	std::cout << "Piece movelists: " << std::endl;
 	for (int i = wqR; i <= bPh; i++) {
-		std::cout << b.getName(i) << " (" << b.getPieceMoveListSize(i) << "): ";
-		for (int j = 0; j < b.getPieceMoveListSize(i); j++) {
-			mF = b.getPos(i);
-			mT = b.getFromPieceMoveList(i, j);
+		std::cout << b.piece[i].getName() << " (" << b.piece[i].getMoveListSize() << "): ";
+		for (int j = 0; j < b.piece[i].getMoveListSize(); j++) {
+			mF = b.piece[i].getPos();
+			mT = b.piece[i].getFromMoveList(j);
 			if (mT != 0) {
 				std::cout << mF << " to " << mT << ", ";
 			}
