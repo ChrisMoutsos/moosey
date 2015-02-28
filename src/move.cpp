@@ -48,6 +48,7 @@ void Board::movePiece(int mF, int mT) {
 			piece[board120[mF]].moveList = temp;	//Point at new array
 			for (int i = 4; i < 27; i++ )	//Fill rest of array with zeroes
 				piece[board120[mF]].moveList[i] = 0;
+			piece[board120[mF]].moveListSize = 27; //Update moveListSize
 		}
 		else pmSq.push_back(null);
 
@@ -104,7 +105,7 @@ void Board::unmovePiece() {
 void Board::unmovePiece(int mF, int mT) {
 	std::array<int, 3> cExtras; //For castling, it holds how far away
 			            //mF is from final pos of K, R, and corner
-	int diffMTMF = abs(mT-mF), epExtra = 0, fakeCounter = 0;
+	int diffMTMF = abs(mT-mF), epExtra = 0;
 	int * temp;
 	bool s = piece[board120[mT]].color, unpassanting = false;
 
@@ -124,7 +125,7 @@ void Board::unmovePiece(int mF, int mT) {
 			temp = new int[4]; //Create smaller movelist
 			delete [] piece[board120[mT]].moveList; //Free old moveList
 			piece[board120[mT]].moveList = temp;	//Point at new moveList
-			generatePawnMoves(board120[mT], fakeCounter); //Regen moves
+			piece[board120[mT]].moveListSize = 4; //Update moveListSize
 		}	
 		board120[mF] = pieceMoved.back();
 		piece[board120[mF]].pos = mF;
@@ -183,8 +184,17 @@ void Board::undoMove() {
 		if (mF2 == _E8 && (mT2 == _G8 || mT2 == _B8))
 			castling = true;
 	}
-	unmovePiece();
 	changeTurn();
+	unmovePiece();
+	generateMoveLists();
+	checkCheck(side);
 	moveFrom = mF2;
 	moveTo = mF2;
+}
+
+void Board::restart() {
+	while (ply > 0)
+		undoMove();	
+	moveTo = null;
+	moveFrom = null;
 }
