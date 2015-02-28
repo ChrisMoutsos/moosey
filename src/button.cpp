@@ -43,13 +43,13 @@ bool Button::handleEvent(SDL_Event* e, Board& b) {
 					case SDL_MOUSEBUTTONDOWN:
 					clicking = true;
 					if (butt == 1 && b.getPly() > 0) {
-					//	std::cout << "undoing move\n";
 						b.undoMove();
-					//	std::cout << "undid move\n";
 						return true;
 					}
-					//else if (butt == 2)
-					//	b.restart();
+					else if (butt == 0 && b.getPly() > 0) {
+						b.restart();
+						return true;
+					}
 					break;
 					case SDL_MOUSEBUTTONUP:
 					clicking = false;
