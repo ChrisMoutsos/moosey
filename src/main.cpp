@@ -7,11 +7,14 @@
 */
 /*   ##To-Do List##
  *	SDL
+ * 	- Restart button
  *	- Sounds
  *	- Splash screen
  *	FEN parsing
  * 
  * Known issues:
+ * Internal:
+ * Are pawn movelists correct after promoting, unpromoting?
  * Algebraic notation:
  * Write dupMove code for Queens
  */
