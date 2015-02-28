@@ -24,6 +24,7 @@ const int BYSTART = 25;
 void displayBoard(Board& b, const int& mF = -1, const int& mT = -1);
 void setButtonPositions();
 void setSpriteClips();
+void updateText(const Board& b, bool& sidey);
 void drawButtons(const Board& b);
 void drawSquares(const Board& b, const int& mF = -1, const int& mT = -1);
 void drawPieces(const Board& b, const int& mF = -1, const int& mT = -1);
