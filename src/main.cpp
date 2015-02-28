@@ -9,11 +9,10 @@
  *	SDL
  *	- Sounds
  *	- Splash screen
+ *	- Program icon
  *	FEN parsing
  * 
  * Known issues:
- * Internal:
- * Are pawn movelists correct after promoting, unpromoting?
  * Algebraic notation:
  * Write dupMove code for Queens
  */
@@ -51,6 +50,8 @@ int main(int argc, char* args[]) {
 				quit = true;
 			board.handleInput(mF, mT, &e);
 			displayBoard(board, mF, mT);
+
+		//	showMoveLists(board);
 		}
 	}
 
