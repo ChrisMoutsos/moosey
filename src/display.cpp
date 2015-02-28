@@ -22,6 +22,8 @@ LTexture spriteSheetTexture, buttonTexture;
 LTexture turnText, checkText, moveText, rankText, fileText;
 SDL_Color textColor;
 
+void showPieceMoveLists(const Board& b);
+
 void displayBoard(Board& b, const int& mF, const int& mT) {
 	using std::string;
 
@@ -104,7 +106,7 @@ void updateText(const Board& b, bool& sidey) {
 		}
 		checkText.loadFromRenderedText(checkStr, textColor, Garamond26);
 		
-	//	showPieceMoveLists(b);
+		//showPieceMoveLists(b);
 	}
 }
 
@@ -334,11 +336,11 @@ void drawMoveTable(const Board& b) {
 	}
 }
 
-void showPieceMoveLists(Board &b) {
+void showPieceMoveLists(const Board &b) {
 	int mF, mT;
 	std::cout << "Piece movelists: " << std::endl;
 	for (int i = wqR; i <= bPh; i++) {
-		std::cout << b.getName(i) << ": ";
+		std::cout << b.getName(i) << " (" << b.getPieceMoveListSize(i) << "): ";
 		for (int j = 0; j < b.getPieceMoveListSize(i); j++) {
 			mF = b.getPos(i);
 			mT = b.getFromPieceMoveList(i, j);
