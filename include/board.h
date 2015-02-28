@@ -13,13 +13,13 @@
 #include <string>
 #include <vector>
 #include "square.h"
+#include "piece.h"
 
 class Board {
 	public:
 		//BOARD.CPP
 		Board();
 		Board(std::string FEN);
-		~Board();
 		void initializeVars();
 		void emptyBoard();
 		void placePiece(int p, int sq);
@@ -29,7 +29,6 @@ class Board {
 		void setSquarePositions();
 		void setPiecesOnSquares();
 		//ACCESSORS
-		//---Board
 		int getMoveFrom() const { return moveFrom; };
 		int getMoveTo() const { return moveTo; };
 		int getPly() const { return ply; };
@@ -45,17 +44,7 @@ class Board {
 		int getMoveMade(int i) const;
 		int getPrevOnMoveTo(int i) const;
 		int getPieceMoved(int i) const;
-		//---Pieces
-		char getPieceAbbr(int p) const;
-		int getTimesMoved(int p) const;
-		std::string getName(int p) const;
-		bool getAlive(int p) const;
-		int getFromPieceMoveList(int p, int i) const;
-		int getPieceMoveListSize(int p) const;
-		int getValue(int p) const;
-		int getPos(int p) const;
 		//MUTATORSS
-		//---Board
 		void setMove(int mF, int mT) { moveFrom = mF; moveTo = mT; };
 		void setPly(int newPly) { ply = newPly; };
 		void setSide(bool newSide) { side = newSide; };
@@ -65,12 +54,6 @@ class Board {
 		void setBoard120(int i, int v);
 		void addToMovelist(bool s, int v);
 		void clearMoveList(bool s);
-		//---Pieces
-		void killPiece(int p);
-		void unkillPiece(int p);
-		void setPiecePos(int p, int newPos);
-		void incrMoved(int p);
-		void decrMoved(int p);
 	
 		//MOVE.CPP 
 		void movePiece();
@@ -107,6 +90,7 @@ class Board {
 	
 		Square squares[64]; //For the display
 
+		Piece piece[32];	//The pieces
 	private:
 		int board120[120], moveFrom, moveTo, ply;
 		//For the line below.. 0: none, 1: white, 2: black 
@@ -116,19 +100,6 @@ class Board {
 		std::vector<int> whiteMoveList, blackMoveList;
 		std::vector<int> movesMade, pmSq, epSq;
 		std::vector<int> pieceMoved, prevOnMoveTo, pieceKilled;
-
-		struct pieceEntry {
-       		 	std::string name;	//"Pawn", "Rook", etc.
-       		 	char abbr;		//'P' (white), 'p' (black)
-       		 	int value;      
-       		 	int pos;        	//Board64 position
-	       	 	int moved;      	//>=0
-	       	 	bool alive;    
-	       	 	bool promoted;   	//Only queen promotions
-			bool color;
-        		int* moveList;  	
-			int moveListSize;
-		} piece[32];
 };
 
 //INLINE CONVERSION FUNCTIONS
