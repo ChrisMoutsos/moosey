@@ -162,6 +162,84 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 	}
 }
 
+//ACCESSORS
+//---Board
+int Board::getBoard120(int sq) const {
+	return (sq > -1 && sq < 99) ? board120[sq] : invalid;
+}
+
+int Board::getFromMoveList(bool s, int i) const {
+	if (s && i > -1 && i < (int)whiteMoveList.size()) 
+		return whiteMoveList[i];
+	else if (!s && i > -1 && i < (int)blackMoveList.size())
+		return blackMoveList[i];
+	else
+		return -1;
+}
+
+int Board::getMoveListSize(bool s) const {
+	return s ? (int)whiteMoveList.size() : (int)blackMoveList.size();
+}
+
+int Board::getEpSq(int i) const {
+	return (i > -1 && i < (int)epSq.size()) ? epSq[i] : -1;
+}
+
+int Board::getPmSq(int i) const {
+	return (i > -1 && i < (int)pmSq.size()) ? pmSq[i] : -1;
+}
+
+int Board::getMoveMade(int i) const {
+	return (i > -1 && i < (int)movesMade.size()) ? movesMade[i] : -1;
+}
+
+int Board::getPrevOnMoveTo(int i) const {
+	return (i > -1 && i < (int)prevOnMoveTo.size()) ? prevOnMoveTo[i] : invalid;
+}
+
+int Board::getPieceMoved(int i) const {
+	return (i > -1 && i < (int)pieceMoved.size()) ? pieceMoved[i] : -1;
+}
+//---Pieces
+char Board::getPieceAbbr(int p) const {
+	return (p >= wqR && p <= bPh) ? piece[p].abbr : '0';
+}
+
+int Board::getTimesMoved(int p) const {
+	return (p >= wqR && p <= bPh) ? piece[p].moved : -1;
+}
+
+std::string Board::getName(int p) const {
+	return (p >= wqR && p <= bPh) ? piece[p].name : "0";
+}
+
+bool Board::getAlive(int p) const {
+	return (p >= wqR && p <= bPh) ? piece[p].alive : -1;
+}
+
+int Board::getFromPieceMoveList(int p, int i) const {
+	if (!(p >= wqR && p <= bPh)) return -1;
+	if (!(i > -1 && i < piece[p].moveListSize)) return -1;
+	return piece[p].moveList[i];
+}
+
+int Board::getPieceMoveListSize(int p) const {
+	return (p >= wqR && p <= bPh) ? piece[p].moveListSize : -1;
+}
+
+int Board::getValue(int p) const {
+	return (p >= wqR && p <= bPh) ? piece[p].value : -1;
+}
+
+int Board::getPos(int p) const {
+	return (p >= wqR && p <= bPh) ? piece[p].pos : -1;
+}
+
+//MUTATORS
+//---Board
+void Board::setBoard120(int i, int v) {
+	if (i > -1 && i < 120) board120[i] = v;
+}
 
 void Board::addToMovelist(bool s, int v) {
 	if (s) whiteMoveList.push_back(v);
@@ -172,23 +250,23 @@ void Board::clearMoveList(bool s) {
 	if (s) whiteMoveList.clear();
 	else blackMoveList.clear();
 }
-
-int Board::getMoveListSize(bool s) const {
-	if (s) 
-		return (int)whiteMoveList.size();
-	else 
-		return (int)blackMoveList.size();
-}
-int Board::getFromMoveList(bool s, int i) const {
-	if (s) 
-		return whiteMoveList[i];
-	else 
-		return blackMoveList[i];
+//---Pieces
+void Board::killPiece(int p) {
+	if (p >= wqR && p <= bPh) piece[p].alive = false;
 }
 
-int Board::getMoveMade(int i) const {
-	if (i > -1)
-		return movesMade[i];
-	else
-		return 0;
+void Board::unkillPiece(int p) {
+	if (p >= wqR && p <= bPh) piece[p].alive = true;
+}
+
+void Board::setPiecePos(int p, int newPos) {
+	if (p >= wqR && p <= bPh) piece[p].pos = newPos;
+}
+
+void Board::incrMoved(int p) {
+	if (p >= wqR && p <= bPh) piece[p].moved++;
+}
+
+void Board::decrMoved(int p) {
+	if (p >= wqR && p <= bPh) piece[p].moved--;
 }

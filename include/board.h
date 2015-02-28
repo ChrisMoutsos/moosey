@@ -15,12 +15,6 @@
 #include "square.h"
 
 class Board {
-
-	friend void showMoveLists(Board&);
-	friend void showPieceMoveLists(Board&);
-	friend void drawPieces(const Board&, const int&, const int&);
-	friend void drawSquares(const Board&, const int&, const int&);
-	
 	public:
 		//BOARD.CPP
 		Board();
@@ -35,44 +29,48 @@ class Board {
 		void setSquarePositions();
 		void setPiecesOnSquares();
 		//ACCESSORS
+		//---Board
 		int getMoveFrom() const { return moveFrom; };
 		int getMoveTo() const { return moveTo; };
 		int getPly() const { return ply; };
 		bool getSide() const { return side; };
-		int getBoard120(int sq) const { return board120[sq]; };
-		int getPieceAbbr(int p) const { return piece[p].abbr; };
-		int getFromMoveList(bool s, int i) const;
-		int getMoveListSize(bool s) const;
-		int getTimesMoved(int p) const { return piece[p].moved; };
-		std::string getName(int p) const { return piece[p].name; };
-		bool getAlive(int p) const { return piece[p].alive; };
-		int getFromPieceMoveList(int p, int i) const { return piece[p].moveList[i]; };
-		int getPieceMoveListSize(int p) const { return piece[p].moveListSize; };
-		int getValue(int p) const { return piece[p].value; };
-		int getPos(int p) const { return piece[p].pos; };
-		int getEpSq(int i) const { return epSq[i]; };
-		int getPmSq(int i) const { return pmSq[i]; };
-		int getCastling() const { return castling; };
-		int getMoveMade(int i) const;
-		int getPrevOnMoveTo(int i) const { return prevOnMoveTo[i]; };
-		int getPieceMoved(int i) const { return pieceMoved[i]; };
 		int getSideInCheck() const { return sideInCheck; };
 		int getSideInCheckmate() const { return sideInCheckmate; };
+		int getCastling() const { return castling; };
+		int getBoard120(int sq) const;
+		int getFromMoveList(bool s, int i) const;
+		int getMoveListSize(bool s) const;
+		int getEpSq(int i) const;
+		int getPmSq(int i) const;
+		int getMoveMade(int i) const;
+		int getPrevOnMoveTo(int i) const;
+		int getPieceMoved(int i) const;
+		//---Pieces
+		char getPieceAbbr(int p) const;
+		int getTimesMoved(int p) const;
+		std::string getName(int p) const;
+		bool getAlive(int p) const;
+		int getFromPieceMoveList(int p, int i) const;
+		int getPieceMoveListSize(int p) const;
+		int getValue(int p) const;
+		int getPos(int p) const;
 		//MUTATORSS
+		//---Board
 		void setMove(int mF, int mT) { moveFrom = mF; moveTo = mT; };
 		void setPly(int newPly) { ply = newPly; };
 		void setSide(bool newSide) { side = newSide; };
-		void setBoard120(int i, int v) { board120[i] = v; };
-		void addToMovelist(bool s, int v);
-		void clearMoveList(bool s);
-		void killPiece(int p) { piece[p].alive = false; };
-		void unkillPiece(int p) { piece[p].alive = true; };
-		void setPiecePos(int p, int newPos) { piece[p].pos = newPos; };
-		void incrMoved(int p) { piece[p].moved++; };
-		void decrMoved(int p) { piece[p].moved--; };
 		void setCastling(int c) { castling = c; };
 		void setSideInCheck(int i) { sideInCheck = i; };
 		void setSideInCheckmate(int i) { sideInCheckmate = i; };
+		void setBoard120(int i, int v);
+		void addToMovelist(bool s, int v);
+		void clearMoveList(bool s);
+		//---Pieces
+		void killPiece(int p);
+		void unkillPiece(int p);
+		void setPiecePos(int p, int newPos);
+		void incrMoved(int p);
+		void decrMoved(int p);
 	
 		//MOVE.CPP 
 		void movePiece();
@@ -106,9 +104,11 @@ class Board {
 		void generateKingMoves(int p, int& counter);
 		void generatePawnMoves(int p, int& counter);
 	
+		Square squares[64]; //For the display
+
 	private:
 		int board120[120], moveFrom, moveTo, ply;
-		//for the line below.. 0: none, 1: white, 2: black 
+		//For the line below.. 0: none, 1: white, 2: black 
 		int sideInCheck, sideInCheckmate;
 		int castling;
 		bool side;
@@ -128,8 +128,6 @@ class Board {
         		int* moveList;  	
 			int moveListSize;
 		} piece[32];
-	
-		Square squares[64]; //For the display
 };
 
 //INLINE CONVERSION FUNCTIONS
@@ -156,7 +154,6 @@ inline std::string intToSquare(int square) { //Board120 to A1, etc
 }
 
 //ENUMERATIONS
-
 enum side_t { BLACK = 0, WHITE = 1 
 };
 
