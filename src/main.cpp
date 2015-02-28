@@ -67,10 +67,10 @@ void showMoveLists(Board &board) {
 	cout << endl << endl;
 	for (int i = 0; i <= wPh; i++) {
 		cout << board.getName(i) << ": ";
-		for (int j = 0; j < board.getMoveListSize(WHITE); j++) {
-			if (board.piece[i].moveList[j] != null) {
+		for (int j = 0; j < board.getPieceMoveListSize(i); j++) {
+			if (board.getFromPieceMoveList(i, j) != null) {
 				mF = board.getPos(i);
-				mT = board.piece[i].moveList[j]%100;
+				mT = board.getFromPieceMoveList(i, j)%100;
 				cout << intToSquare(mF) << " to " << intToSquare(mT) << ", ";
 			}
 		}
