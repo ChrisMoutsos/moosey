@@ -65,7 +65,7 @@ bool Board::inCheckmate(bool s) const {
 
 bool Board::inCheck(bool s) const {
 	int kPos, pIndex, i, v, d;
-	kPos = s ? piece[wK].pos : piece[bK].pos;
+	kPos = s ? piece[wK].getPos() : piece[bK].getPos();
 
 	/* Search ranks/files/diagonals for appropriate piece. */
 	for (int c = 1; c <= 8; c++) {
@@ -74,8 +74,8 @@ bool Board::inCheck(bool s) const {
 		pIndex = kPos+d*i;
 		while (board120[pIndex] != invalid) { 
 			if (board120[pIndex] != empty) { 
-				if (piece[board120[pIndex]].color != s) { 
-					v = piece[board120[pIndex]].value;
+				if (piece[board120[pIndex]].getColor() != s) { 
+					v = piece[board120[pIndex]].getValue();
 					if (v == Q_VAL)	//Queen on hoz or diag
 						return true;
 					if (c >= 1 && c <= 4) {
@@ -107,8 +107,8 @@ bool Board::inCheck(bool s) const {
 		d = c==1 ? K1 : c==2 ? K2 : c==3 ? K3 : c==4 ? K4 : c==5 ? K5 : c==6 ? K6 : c==7 ? K7 : K8;
 		pIndex = kPos + d;
 		if (board120[pIndex] != empty && board120[pIndex] != invalid)
-			if (piece[board120[pIndex]].color == !s)
-				if (piece[board120[pIndex]].value == N_VAL)
+			if (piece[board120[pIndex]].getColor() == !s)
+				if (piece[board120[pIndex]].getValue() == N_VAL)
 					return true;
 		
 	}
@@ -117,16 +117,16 @@ bool Board::inCheck(bool s) const {
 }
 
 bool Board::validateMove(int mF, int mT, bool s) {
-	int onMF = board120[mF], onMT = board120[mT], value = piece[onMF].value;
+	int onMF = board120[mF], onMT = board120[mT], value = piece[onMF].getValue();
 
 	//Moving empty square, to null square, or invalid square
 	if (onMF == -1 || mT == 0 || board120[mT] == invalid) 
 		return false;
 	//Trying to capture your own piece
-	if (onMT != empty && piece[onMF].color == piece[onMT].color && !castling) 
+	if (onMT != empty && piece[onMF].getColor() == piece[onMT].getColor() && !castling) 
 		return false;
 	//Trying to move enemy piece
-	if (piece[onMF].color != s) 
+	if (piece[onMF].getColor() != s) 
 		return false;
 
 	if (value == R_VAL)
@@ -158,7 +158,7 @@ bool Board::validatePawnMove(int mF, int mT, bool s) const {
 	if (diff == 10 && onMT == empty)	//Moving forward one square
 		return true;
 	if (diff == 20 && onMT == empty) {	//Moving forward two squares
-		if (board120[mF+extra] == empty && piece[onMF].moved == 0) 
+		if (board120[mF+extra] == empty && piece[onMF].getMoved() == 0) 
 			return true;
 		else return false;
 	}
@@ -170,7 +170,7 @@ bool Board::validatePawnMove(int mF, int mT, bool s) const {
 					return true;
 			return false;	
 		}
-		if (s != piece[onMT].color) return true;
+		if (s != piece[onMT].getColor()) return true;
 		else return false;
 	}
 	return false;
@@ -236,13 +236,13 @@ bool Board::canCastle(int dir, bool s) {
 	int r = s ? dir == KINGSIDE ? wkR : wqR : dir == KINGSIDE ? bkR : bqR;
 	int kSq, c = dir == KINGSIDE ? 1 : -1;
 
-	if (piece[k].moved || piece[r].moved) return false;
+	if (piece[k].getMoved() || piece[r].getMoved()) return false;
 	for (int i = 1; i <= 2; i++)	//Verify it's empty between K and R
-		if (board120[piece[k].pos+i*c] != empty) return false;
+		if (board120[piece[k].getPos()+i*c] != empty) return false;
 	if (inCheck(s)) return false;	//Verify not in check
 	
 	for (int j = 1; j <= 2; j++) {	//Verify not going through/to check
-		kSq = piece[k].pos;
+		kSq = piece[k].getPos();
 		movePiece(kSq, kSq+j*c);
 		if (inCheck(s)) {
 			unmovePiece(kSq, kSq+j*c);
