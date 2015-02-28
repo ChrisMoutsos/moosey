@@ -187,18 +187,17 @@ void Board::undoMove() {
 
 	changeTurn();
 	if (piece[pieceMoved.back()].getValue() == K_VAL) {
-		std::cout << "UNDOING KING MOVE\n";
 		if (mF2 == _E1) {
-			if (mT2 == _G1) { castling = KINGSIDE; std::cout << "hi\n"; }
+			if (mT2 == _G1) castling = KINGSIDE;
 			else if (mT2 == _B1) castling = QUEENSIDE;
 		}
 		else if (mF2 == _E8) {
 			if (mT2 == _G8) castling = KINGSIDE;
 			else if (mT2 == _B8) castling = QUEENSIDE;
 		}
-		std::cout << "castling: " << castling << '\n';
 	}
 	unmovePiece();
+	castling = 0;
 	generateMoveLists();
 	checkCheck(side);
 	moveFrom = mF2;
