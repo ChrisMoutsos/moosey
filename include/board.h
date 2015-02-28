@@ -78,6 +78,7 @@ class Board {
 		void unmovePiece();
 		void unmovePiece(int mF, int mT);
 		void undoMove();
+		void restart();
 		void changeTurn();
 	
 		//LEGAL.CPP
