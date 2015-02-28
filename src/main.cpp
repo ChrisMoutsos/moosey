@@ -13,8 +13,6 @@
  *	FEN parsing
  * 
  * Known issues:
- * Internal:
- * Should pawns be a class?
  * Algebraic notation:
  * Write dupMove code for Queens
  */
