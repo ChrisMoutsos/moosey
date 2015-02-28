@@ -7,7 +7,6 @@
 */
 /*   ##To-Do List##
  *	SDL
- * 	- Restart button
  *	- Sounds
  *	- Splash screen
  *	FEN parsing
