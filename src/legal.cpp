@@ -51,11 +51,8 @@ bool Board::checkCheck(bool s) {
 			sideInCheckmate = s ? 1 : 2;
 			return true;
 		}
-		else {		  //Check
-			return false;
-		}
 	}
-	return false;	//Neither check nor checkmate
+	return false;	//Not checkmate
 }
 
 bool Board::inCheckmate(bool s) const { 
