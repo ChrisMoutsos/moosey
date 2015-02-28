@@ -88,7 +88,7 @@ void updateText(const Board& b, bool& sidey) {
 	using std::string;
 	
 	string turnStr, checkStr = " ";
-	if (sidey != b.getSide()) {
+	if (sidey != b.getSide() || b.getPly() == 0) {
 		sidey = b.getSide();
 		turnStr = sidey ? "White to move" : "Black to move"; //Load turn text
 		turnText.loadFromRenderedText(turnStr, textColor, Garamond26);
@@ -102,7 +102,7 @@ void updateText(const Board& b, bool& sidey) {
 			else if (b.getSideInCheck() == 2)
 				checkStr = "Black is in check";
 		}
-		checkText.loadFromRenderedText(checkStr, textColor, Cicero26);
+		checkText.loadFromRenderedText(checkStr, textColor, Garamond26);
 		
 	//	showPieceMoveLists(b);
 	}
