@@ -88,6 +88,8 @@ bool loadMedia() {
 	if (!buttonTexture.loadFromFile("../res/buttons.bmp"))
 		success = false;
 	
+	SDL_Surface* icon = IMG_Load("../res/icon.png");	
+	SDL_SetWindowIcon(window, icon);
 
 	return success;
 }
