@@ -73,6 +73,9 @@ void Board::movePiece(int mF, int mT) {
 		piece[board120[mT]].incrMoved();
 	}
 	else { //Castling
+		if (s) whiteCastled = true;
+		else blackCastled = true;
+
 		epSq.push_back(null);
 		pmSq.push_back(null);		
 
@@ -147,6 +150,9 @@ void Board::unmovePiece(int mF, int mT) {
 		}
 	}
 	else { //Castling
+		if (s) whiteCastled = false;
+		else blackCastled = false;
+
 		//cExtras = {kingmT-kingmF, rookmT-kingmF, emptymT-kingmF};
 		cExtras = {-2, -1, -4};		//Queenside
 		if (mT == _G1 || mT == _G8) 	
