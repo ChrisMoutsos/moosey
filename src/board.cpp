@@ -49,9 +49,8 @@ void Board::setPiecesOnSquares() {
 void Board::initializeVars() {
 	moveFrom = moveTo = ply =  null;
 	side = WHITE;
-	castling = 0;
-	sideInCheck = 0; 
-	sideInCheckmate = 0;
+	whiteCastled = blackCastled = false;
+	castling = sideInCheck = sideInCheckmate = 0;
 }
 
 void Board::emptyBoard() {
