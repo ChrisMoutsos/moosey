@@ -146,7 +146,7 @@ void Board::unmovePiece(int mF, int mT) {
 
 		if (unpassanting || board120[mT] != empty) {
 			piece[board120[mT+epExtra]].setPos(mT+epExtra);
-			piece[board120[mT+epExtra]].kill();
+			piece[board120[mT+epExtra]].unkill();
 		}
 	}
 	else { //Castling
