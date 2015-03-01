@@ -87,6 +87,9 @@ class Board {
 		void generateKnightMoves(int p, int& counter);
 		void generateKingMoves(int p, int& counter);
 		void generatePawnMoves(int p, int& counter);
+
+		//EVAL.CPP
+		int eval();
 	
 		Square squares[64]; //For the display
 
