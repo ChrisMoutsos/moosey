@@ -96,7 +96,7 @@ class Board {
 		//For the line below.. 0: none, 1: white, 2: black 
 		int sideInCheck, sideInCheckmate;
 		int castling;
-		bool side;
+		bool side, whiteCastled, blackCastled;
 		std::vector<int> whiteMoveList, blackMoveList;
 		std::vector<int> movesMade, pmSq, epSq;
 		std::vector<int> pieceMoved, prevOnMoveTo, pieceKilled;
