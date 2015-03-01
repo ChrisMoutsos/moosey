@@ -7,7 +7,7 @@
 */
 /*   ##To-Do List##
  *	SDL
- *	- Sounds
+ *	- Add mute button
  *	- Splash screen
  *	FEN parsing
  * 
