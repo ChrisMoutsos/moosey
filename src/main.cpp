@@ -9,7 +9,6 @@
  *	SDL
  *	- Sounds
  *	- Splash screen
- *	- Program icon
  *	FEN parsing
  * 
  * Known issues:
