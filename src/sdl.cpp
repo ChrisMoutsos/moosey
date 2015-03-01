@@ -8,6 +8,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <iostream>
 #include <stdio.h>
 #include <string>
@@ -21,6 +22,7 @@ SDL_Window* window = NULL; //The window we'll be rendering to
 SDL_Renderer* renderer = NULL; //The window renderer
 TTF_Font* Garamond26 = NULL, * Garamond28 = NULL, 
 	* Cicero22= NULL, * Cicero26 = NULL;
+Mix_Chunk * mFSound = NULL, * mTSound = NULL;
 
 bool init_SDL() {
 	bool success = true;
@@ -62,6 +64,11 @@ bool init_SDL() {
 					printf("SDL_ttf could not be initialized.\n");
 					success = false;
 				}
+		
+				if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+					printf("SDL_mixer could not be initialized.\n");
+					success = false;
+				}
 			}
 		}
 	}
@@ -82,6 +89,13 @@ bool loadMedia() {
 		success = false;
 	else 
 		textColor = {0, 0, 0};
+
+	mFSound = Mix_LoadWAV("../res/moveFrom.wav");
+	if (mFSound == NULL)
+		success = false;
+	mTSound = Mix_LoadWAV("../res/moveTo.wav");	
+	if (mTSound == NULL)
+		success = false;
 	
 	if (!spriteSheetTexture.loadFromFile("../res/spritesheet2.bmp"))
 		success = false;
@@ -97,6 +111,14 @@ bool loadMedia() {
 void close_SDL() {
 	//Free loaded images
 	spriteSheetTexture.free();
+	buttonTexture.free();
+
+	//Free sounds
+	Mix_FreeChunk(mFSound);
+	Mix_FreeChunk(mTSound);
+	mFSound = NULL;
+	mTSound = NULL;
+
 	//Free global font
 	TTF_CloseFont(Garamond26);
 	TTF_CloseFont(Garamond28);
@@ -114,6 +136,7 @@ void close_SDL() {
 	renderer = NULL;
 
 	//Quit SDL subsystems
+	Mix_Quit();
 	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();

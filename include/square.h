@@ -10,6 +10,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 
 class LTexture;
 
@@ -40,5 +41,6 @@ class Square {
 
 extern SDL_Rect spriteClips[12];
 extern LTexture spriteSheetTexture;
+extern Mix_Chunk * mFSound, * mTSound;
 
 #endif
