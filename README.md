@@ -1,3 +1,3 @@
 	This is a work in progress.
 
-    ![Screenshot](res/screenshot.png)
+![Screenshot](https://raw.githubusercontent.com/ChrisMoutsos/moosey/master/res/screenshot.png)
