@@ -23,7 +23,8 @@ void Board::movePiece(int mF, int mT) {
 	movesMade.push_back(mF*100+mT);
 	
 	if (!castling) {	
-		if (piece[board120[mF]].getValue() == P_VAL && ply > 0 && mT == epSq.back()) { //Enpassanting
+		//If the move is an en passant
+		if (piece[board120[mF]].getValue() == P_VAL && ply > 0 && mT == epSq.back()) {
 			passanting = true;
 			killSquare = s ? mT-10 : mT+10;
 			epExtra = s ? -10 : 10;
@@ -35,7 +36,8 @@ void Board::movePiece(int mF, int mT) {
 			else epSq.push_back(mF-10);
 		else epSq.push_back(null);
 
-		if (mFVal == P_VAL && ((s && mT/10 == 9) || (!s && mT/10 == 2))) { //Promoting
+		//If the move is a promotion
+		if (mFVal == P_VAL && ((s && mT/10 == 9) || (!s && mT/10 == 2))) {
 			pmSq.push_back(mT);
 			piece[board120[mF]].setValue(Q_VAL);
 			piece[board120[mF]].setName("Queen");
@@ -44,12 +46,13 @@ void Board::movePiece(int mF, int mT) {
 			else
 				piece[board120[mF]].setAbbr('q');
 			piece[board120[mF]].setPromoted(true);
-			temp = new int[27]; //Make bigger movelist
-			for (int i = 0; i < 4; i++) //Copy any old values over
+
+			temp = new int[27]; 			//Make bigger movelist
+			for (int i = 0; i < 4; i++)	 	//Copy any old values over
 				temp[i] = piece[board120[mF]].getFromMoveList(i);
 			piece[board120[mF]].freeMoveList();	//Free old moveList
 			piece[board120[mF]].setMoveList(temp);	//Point at new array
-			for (int i = 4; i < 27; i++ )	//Fill rest of array with zeroes
+			for (int i = 4; i < 27; i++ )		//Fill rest of array with zeroes
 				piece[board120[mF]].setInMoveList(i, 0);
 			piece[board120[mF]].setMoveListSize(27); //Update moveListSize
 		}
@@ -59,6 +62,7 @@ void Board::movePiece(int mF, int mT) {
 		pieceMoved.push_back(board120[mF]);
 		pieceKilled.push_back(board120[killSquare]);
 
+		//If move is a capture
 		if (board120[mT+epExtra] != empty) {
 			piece[board120[mT+epExtra]].kill();
 			piece[board120[mT+epExtra]].setPos(null);
@@ -80,20 +84,21 @@ void Board::movePiece(int mF, int mT) {
 		pmSq.push_back(null);		
 
 		//cExtras = {kingmT-kingmF, rookmT-kingmF, emptymT-kingmF};
-		cExtras = {-2, -1, -4};		//Queenside
 		if (mT == _G1 || mT == _G8) 
 			cExtras = {2, 1, 3};	//Kingside
+		else
+			cExtras = {-2, -1, 4};  //Queenside
 	
 		prevOnMoveTo.push_back(empty);
 		pieceMoved.push_back(board120[mF]);
 		pieceKilled.push_back(empty);
 		
-		board120[mF+cExtras[0]] = board120[mF];
-		board120[mF] = empty;
-		board120[mF+cExtras[1]] = board120[mF+cExtras[2]];
-		board120[mF+cExtras[2]] = empty;
+		board120[mF+cExtras[0]] = board120[mF]; //Move king
+		board120[mF] = empty;			//Empty old king sq
+		board120[mF+cExtras[1]] = board120[mF+cExtras[2]]; //Move rook
+		board120[mF+cExtras[2]] = empty;		   //Empty old rook sq
 
-		piece[board120[mF+cExtras[0]]].setPos(mF+cExtras[0]);
+		piece[board120[mF+cExtras[0]]].setPos(mF+cExtras[0]); 
 		piece[board120[mF+cExtras[1]]].setPos(mF+cExtras[1]);
 	
 		piece[board120[mF+cExtras[0]]].incrMoved();
@@ -123,7 +128,8 @@ void Board::unmovePiece(int mF, int mT) {
 				epExtra = s ? -10 : 10;
 			}
 		}
-		if (mT == pmSq.back()) { //Unpromoting
+		//Unpromoting
+		if (mT == pmSq.back()) {
 			piece[board120[mT]].setValue(P_VAL);
 			piece[board120[mT]].setName("Pawn");
 			if (s)
@@ -131,8 +137,9 @@ void Board::unmovePiece(int mF, int mT) {
 			else
 				piece[board120[mT]].setAbbr('p');
 			piece[board120[mT]].setPromoted(false);
-			temp = new int[4]; //Create smaller movelist
-			piece[board120[mT]].freeMoveList(); //Free old moveList
+	
+			temp = new int[4]; 		        //Create smaller movelist
+			piece[board120[mT]].freeMoveList();     //Free old moveList
 			piece[board120[mT]].setMoveList(temp);	//Point at new moveList
 			piece[board120[mT]].setMoveListSize(4); //Update moveListSize
 		}	
@@ -144,7 +151,7 @@ void Board::unmovePiece(int mF, int mT) {
 		if (unpassanting)
 			board120[mT+epExtra] = pieceKilled.back();
 
-		if (unpassanting || board120[mT] != empty) {
+		if (unpassanting || board120[mT] != empty) { 
 			piece[board120[mT+epExtra]].setPos(mT+epExtra);
 			piece[board120[mT+epExtra]].unkill();
 		}
@@ -154,13 +161,14 @@ void Board::unmovePiece(int mF, int mT) {
 		else blackCastled = false;
 
 		//cExtras = {kingmT-kingmF, rookmT-kingmF, emptymT-kingmF};
-		cExtras = {-2, -1, -4};		//Queenside
 		if (mT == _G1 || mT == _G8) 	
 			cExtras = {2, 1, 3};	//Kingside
+		else
+			cExtras = {-2, -1, -4};	//Queenside
 
-		board120[mF] = board120[mF+cExtras[0]];
+		board120[mF] = board120[mF+cExtras[0]];		   //Set king
 		board120[mT] = empty;
-		board120[mF+cExtras[2]] = board120[mF+cExtras[1]];
+		board120[mF+cExtras[2]] = board120[mF+cExtras[1]]; //Set rook
 		board120[mF+cExtras[0]] = empty;
 		board120[mF+cExtras[1]] = empty;
 
@@ -192,6 +200,8 @@ void Board::undoMove() {
 	int mT2 = movesMade.back()%100;
 
 	changeTurn();
+
+	//Set castling flag if necessary
 	if (piece[pieceMoved.back()].getValue() == K_VAL) {
 		if (mF2 == _E1) {
 			if (mT2 == _G1) castling = KINGSIDE;
@@ -203,11 +213,11 @@ void Board::undoMove() {
 		}
 	}
 	unmovePiece();
-	castling = 0;
-	generateMoveLists();
-	checkCheck(side);
-	moveFrom = mF2;
-	moveTo = mF2;
+	castling = 0;	     //Reset castling flag
+	generateMoveLists(); //Regen moves
+	checkCheck(side);    //Re-checkCheck
+	moveFrom = mF2;     
+	moveTo = mF2;	   
 }
 
 void Board::restart() {
