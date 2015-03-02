@@ -60,7 +60,7 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 					else if (square != mF) {
 						mT = square;
 						Mix_PlayChannel(-1, mTSound, 0);
-				`	}
+					}
 					else
 						mT = -1;
 				}
