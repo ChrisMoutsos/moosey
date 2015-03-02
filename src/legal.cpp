@@ -22,7 +22,7 @@ bool Board::legalMove(int mF, int mT, bool s, bool v) {
 		return true;
 	
 	movePiece(mF, mT);	//Move the piece,
-	isInCheck = inCheck(s);		//see if we put our king in check
+	isInCheck = inCheck(s);	//see if we put our king in check
 	unmovePiece(mF, mT);	//unmove the piece
 	
 	if (isInCheck) { 
@@ -68,52 +68,54 @@ bool Board::inCheck(bool s) const {
 	kPos = s ? piece[wK].getPos() : piece[bK].getPos();
 
 	/* Search ranks/files/diagonals for appropriate piece. */
-	for (int c = 1; c <= 8; c++) {
+	for (int c = 1; c <= 8; c++) {	//Checking eight directions
+		//Pick the appropriate direction depending on which check we're on
+		std::cout << "c: " << c << '\n';
 		d = c==1 ? L : c==2 ? R : c==3 ? U : c==4 ? D : c==5 ? UL : c==6 ? UR : c==7 ? DL : DR;
 		i = 1;
 		pIndex = kPos+d*i;
-		while (board120[pIndex] != invalid) { 
-			if (board120[pIndex] != empty) { 
-				if (piece[board120[pIndex]].getColor() != s) { 
-					v = piece[board120[pIndex]].getValue();
-					if (v == Q_VAL)	//Queen on hoz or diag
-						return true;
-					if (c >= 1 && c <= 4) {
-						if (v == R_VAL) //Rook on hoz
-							return true;
-
-					} 
-					else 
-						if (v == B_VAL) //Bishop on diag
-							return true;
-					if (i == 1) { //First index
-						if (c >= 5 && v == P_VAL) { //Pawns
-							if (!s != (d==UL || d==UR))
-								return true;
-						}
-						else if (v == K_VAL) //Kings
-							return true;
-					}
-				}
-				break;
+		while (board120[pIndex] != invalid) {
+			//If square is empty, continue in that direction
+			if (board120[pIndex] == empty) {
+				i++;
+				pIndex = kPos+d*i;
+				continue; 
 			}
-			i++;
-			pIndex = kPos+d*i;
+			//If we run into a piece of our own color, change direction
+			if (piece[board120[pIndex]].getColor() == s) 
+				break;
+			//If we run into a piece of enemy color, check its type
+			v = piece[board120[pIndex]].getValue();
+			if (v == Q_VAL)		//Queen on hoz or diag
+				return true;
+			if (c >= 1 && c <= 4) {
+				if (v == R_VAL) //Rook on hoz
+					return true;
+			} 
+			else if (v == B_VAL)    //Bishop on diag
+				return true;
+			if (i == 1) {		//First square from king in direction d
+				if (c >= 5 && v == P_VAL) { //Pawns
+					if (!s != (d==UL || d==UR))
+						return true;
+				}
+				if (v == K_VAL) //Can't be next to a king
+					return true;
+			}
+			break;			 //Change direction
 		}
 	}
 	
 	/* Search the knight squares around the king for a knight. */
 	for (int c = 1; c <= 8; c++) {
 		d = c==1 ? K1 : c==2 ? K2 : c==3 ? K3 : c==4 ? K4 : c==5 ? K5 : c==6 ? K6 : c==7 ? K7 : K8;
-		pIndex = kPos + d;
-		if (board120[pIndex] != empty && board120[pIndex] != invalid)
-			if (piece[board120[pIndex]].getColor() == !s)
-				if (piece[board120[pIndex]].getValue() == N_VAL)
-					return true;
-		
+		pIndex = kPos + d; 
+		if (board120[pIndex] == empty || board120[pIndex] == invalid) continue;
+		if (piece[board120[pIndex]].getColor() == s) continue;
+		if (piece[board120[pIndex]].getValue() == N_VAL) return true;
 	}
 
-	return false;
+	return false; //Not in check
 }
 
 bool Board::validateMove(int mF, int mT, bool s) {
