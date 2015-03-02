@@ -42,7 +42,7 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 	drawBorder();		//Draw border around board
 
 	drawButtons(b);		//Draw buttons (undo, restart)
-	updateText(b, sidey);		//Updates text if someone moved
+	updateText(b, sidey);	//Updates text if someone moved
 	drawMoveTable(b);	//Draw movetable (with text)
 
 	//Draw rank numbers
@@ -147,7 +147,7 @@ void drawSquares(const Board& b, const int& mF, const int& mT) {
 				SDL_SetRenderDrawColor(renderer, 0, 153, 153, 255);
 			sqPos = {b.squares[sq].getX(),	//X start
 				 b.squares[sq].getY(),	//Y start
-				 SQ_SIZE, SQ_SIZE};	 //Width, height of square
+				 SQ_SIZE, SQ_SIZE};	//Width, height of square
 			SDL_RenderFillRect(renderer, &sqPos);
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		}
@@ -302,7 +302,7 @@ void drawMoveTable(const Board& b) {
 		if (dupMove) { //If the move was ambiguous, de-ambiguate
 			if (mF2%10 != b.piece[otherPiece].getPos()%10) //Not same file
 				plyStr += char(mF2%10+int('a')-1); //so, file is sufficient
-			else 					//Same file
+			else 					   //Same file
 				plyStr += char(mF2/10+int('1')-2); //so, rank is sufficient
 		}
 		if (b.getPrevOnMoveTo(b.getPly()-1) != empty) { //If move was a capture
@@ -326,12 +326,12 @@ void drawMoveTable(const Board& b) {
 		if (b.getSideInCheck())
 			plyStr += b.getSideInCheckmate() ? '#' : '+';
 
-		plyStrings.push_back(plyStr); //Add it to the list of ply-moves
+		plyStrings.push_back(plyStr);	    //Add it to the list of ply-moves
 	}
 	for (int i = 0; i < (int)plyStrings.size(); i+=2) { //Loop through moves
-		plyStr = plyStrings[i];			//Load white move
-		if (i+1 < (int)plyStrings.size())	//If black has moved,
-			plyStr += " " + plyStrings[i+1];  //load their move, too
+		plyStr = plyStrings[i];	   		    //Load white move
+		if (i+1 < (int)plyStrings.size())	    //If black has moved,
+			plyStr += " " + plyStrings[i+1];    //load their move, too
 		moveText.loadFromRenderedText(plyStr, textColor, Cicero22);
 		moveText.render(BXSTART+(i/42*180)+B_SIZE+40, 
 				BYSTART+10+((i/2)%21)*30); 
