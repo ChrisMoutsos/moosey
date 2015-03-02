@@ -57,14 +57,12 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 							Mix_PlayChannel(-1, mFSound, 0);
 						}	
 					}
+					else if (square != mF) {
+						mT = square;
+						Mix_PlayChannel(-1, mTSound, 0);
+				`	}
 					else
-						if (square != mF) {
-							mT = square;
-							Mix_PlayChannel(-1, mTSound, 0);
-						}
-						else {
-							mT = -1;
-						}
+						mT = -1;
 				}
 			break;
 			case SDL_MOUSEBUTTONUP:
