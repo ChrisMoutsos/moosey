@@ -211,8 +211,10 @@ void Board::undoMove() {
 	castling = 0;	     //Reset castling flag
 	generateMoveLists(); //Regen moves
 	checkCheck(side);    //Re-checkCheck
-	moveFrom = mF2;     
-	moveTo = mF2;	   
+	
+	//Update moveFrom and moveTo
+	moveFrom = movesMade.back()/100;     
+	moveTo = movesMade.back()%100;	   
 }
 
 void Board::restart() {
