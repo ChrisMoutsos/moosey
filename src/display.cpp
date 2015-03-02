@@ -62,6 +62,8 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 
 	//Update screen
 	SDL_RenderPresent(renderer);
+
+//	std::cout << "eval (" << b.getSide() << "): " << b.eval() << '\n';
 }
 
 void setButtonPositions() {
@@ -331,7 +333,7 @@ void drawMoveTable(const Board& b) {
 		if (i+1 < (int)plyStrings.size())	//If black has moved,
 			plyStr += " " + plyStrings[i+1];  //load their move, too
 		moveText.loadFromRenderedText(plyStr, textColor, Cicero22);
-		moveText.render(BXSTART+(i/42*150)+B_SIZE+40, 
+		moveText.render(BXSTART+(i/42*180)+B_SIZE+40, 
 				BYSTART+10+((i/2)%21)*30); 
 	}
 }
