@@ -70,7 +70,6 @@ bool Board::inCheck(bool s) const {
 	/* Search ranks/files/diagonals for appropriate piece. */
 	for (int c = 1; c <= 8; c++) {	//Checking eight directions
 		//Pick the appropriate direction depending on which check we're on
-		std::cout << "c: " << c << '\n';
 		d = c==1 ? L : c==2 ? R : c==3 ? U : c==4 ? D : c==5 ? UL : c==6 ? UR : c==7 ? DL : DR;
 		i = 1;
 		pIndex = kPos+d*i;

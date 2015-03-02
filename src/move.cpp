@@ -14,11 +14,8 @@ void Board::movePiece() {
 }
 
 void Board::movePiece(int mF, int mT) {
-	std::array<int, 3> cExtras; //For castling, it holds how far away
-			            //mF is from final pos of K, R, and corner
 	int killSquare = mT, epExtra = 0, mFVal = piece[board120[mF]].getValue();
 	bool s = piece[board120[mF]].getColor(), passanting = false;
-	int * temp = NULL;
 
 	movesMade.push_back(mF*100+mT);
 	
@@ -47,7 +44,7 @@ void Board::movePiece(int mF, int mT) {
 				piece[board120[mF]].setAbbr('q');
 			piece[board120[mF]].setPromoted(true);
 
-			temp = new int[27]; 			//Make bigger movelist
+			int * temp = new int[27]; 		//Make bigger movelist
 			for (int i = 0; i < 4; i++)	 	//Copy any old values over
 				temp[i] = piece[board120[mF]].getFromMoveList(i);
 			piece[board120[mF]].freeMoveList();	//Free old moveList
@@ -84,6 +81,7 @@ void Board::movePiece(int mF, int mT) {
 		pmSq.push_back(null);		
 
 		//cExtras = {kingmT-kingmF, rookmT-kingmF, emptymT-kingmF};
+		std::array<int, 3> cExtras;
 		if (mT == _G1 || mT == _G8) 
 			cExtras = {2, 1, 3};	//Kingside
 		else
@@ -108,21 +106,17 @@ void Board::movePiece(int mF, int mT) {
 }
 
 void Board::unmovePiece() {
-	int moveFrom2 = movesMade.back() / 100;
-	int moveTo2 = movesMade.back() % 100;
-	unmovePiece(moveFrom2, moveTo2);
+	unmovePiece(movesMade.back()/100, movesMade.back()%100);
 }
 
 void Board::unmovePiece(int mF, int mT) {
-	std::array<int, 3> cExtras; //For castling, it holds how far away
-			            //mF is from final pos of K, R, and corner
-	int diffMTMF = abs(mT-mF), epExtra = 0;
-	int * temp;
+	int epExtra = 0;
 	bool s = piece[board120[mT]].getColor(), unpassanting = false;
 
 	if (!castling) {
 		//Unpassanting
 		if (piece[pieceMoved.back()].getValue() == P_VAL && prevOnMoveTo.back() == empty) {
+			int diffMTMF = abs(mT - mF);
 			if (diffMTMF == 11 || diffMTMF == 9) {
 				unpassanting = true;
 				epExtra = s ? -10 : 10;
@@ -138,7 +132,7 @@ void Board::unmovePiece(int mF, int mT) {
 				piece[board120[mT]].setAbbr('p');
 			piece[board120[mT]].setPromoted(false);
 	
-			temp = new int[4]; 		        //Create smaller movelist
+			int * temp = new int[4]; 		//Create smaller movelist
 			piece[board120[mT]].freeMoveList();     //Free old moveList
 			piece[board120[mT]].setMoveList(temp);	//Point at new moveList
 			piece[board120[mT]].setMoveListSize(4); //Update moveListSize
@@ -161,6 +155,7 @@ void Board::unmovePiece(int mF, int mT) {
 		else blackCastled = false;
 
 		//cExtras = {kingmT-kingmF, rookmT-kingmF, emptymT-kingmF};
+		std::array<int, 3> cExtras;
 		if (mT == _G1 || mT == _G8) 	
 			cExtras = {2, 1, 3};	//Kingside
 		else
