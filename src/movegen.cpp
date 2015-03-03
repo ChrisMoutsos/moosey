@@ -23,9 +23,7 @@ void Board::generateMoveLists(std::vector<int> & wMoveList, std::vector<int> & b
 	for (int i = bqR; i <= bPh; i++)
 		generateMoveListFor(i);
 
-	//whiteMoveList.clear();
 	wMoveList.clear();
-	//blackMoveList.clear();
 	bMoveList.clear();
 
 	for (int i = wqR; i <= bPh; i++)
@@ -34,10 +32,8 @@ void Board::generateMoveLists(std::vector<int> & wMoveList, std::vector<int> & b
 				mF = piece[i].getPos();
 				mT = piece[i].getFromMoveList(j);
 				if (piece[i].getColor()) 
-					//whiteMoveList.push_back(mF*100 + mT);
 					wMoveList.push_back(mF*100 + mT);
 				else
-					//blackMoveList.push_back(mF*100 + mT);
 					bMoveList.push_back(mF*100 + mT);
 			}
 
@@ -59,8 +55,8 @@ void Board::cleanMoveList(bool s, std::vector<int> & moveList) {
 
 	size = moveList.size();
 	for (int i = 0; i < size; i++) {
-		mT = moveList[i]/100;
-		mF = moveList[i]%100;
+		mF = moveList[i]/100;
+		mT = moveList[i]%100;
 		if (!legalMove(mF, mT, s)) {
 			moveList.erase(moveList.begin()+i);
 			size--;
