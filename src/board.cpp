@@ -133,7 +133,7 @@ void Board::initializePieces() {
 	for (int i = wqR; i <= bPh; i++) {
 		v = piece[i].getValue();
 		if (v == K_VAL)
-			piece[i].setMoveListSize(8);
+			piece[i].setMoveListSize(10);
 		else if (v == Q_VAL)
 			piece[i].setMoveListSize(27);
 		else if (v == R_VAL)
