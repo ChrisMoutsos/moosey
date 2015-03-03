@@ -18,7 +18,7 @@ bool Board::legalMove(int mF, int mT, bool s, bool v) {
 		if (v) std::cout << "Invalid move..\n";
 		return false;
 	}
-	if (castling)		//Legalization occurs in validateMove
+	if (castling) 		//Legalization occurs in validateMove
 		return true;
 	
 	movePiece(mF, mT);	//Move the piece,
@@ -65,6 +65,10 @@ bool Board::inCheckmate(bool s) const {
 
 bool Board::inCheck(bool s) const {
 	int kPos, pIndex, i, v, d;
+	
+	if (s && !piece[wK].getAlive()) return true;
+	if (!s && !piece[bK].getAlive()) return true;
+
 	kPos = s ? piece[wK].getPos() : piece[bK].getPos();
 
 	/* Search ranks/files/diagonals for appropriate piece. */
