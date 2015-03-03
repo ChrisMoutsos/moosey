@@ -82,10 +82,10 @@ void Board::movePiece(int mF, int mT) {
 
 		//cExtras = {kingmT-kingmF, rookmT-kingmF, emptymT-kingmF};
 		std::array<int, 3> cExtras;
-		if (mT == _G1 || mT == _G8) 
+		if (mT == _G1 || mT == _G8)
 			cExtras = {2, 1, 3};	//Kingside
-		else
-			cExtras = {-2, -1, 4};  //Queenside
+		else 
+			cExtras = {-2, -1, -4};  //Queenside
 	
 		prevOnMoveTo.push_back(empty);
 		pieceMoved.push_back(board120[mF]);
