@@ -38,19 +38,32 @@ int main(int argc, char* args[]) {
 	}
 
 	int mF = -1, mT = -1;
+	int botMove = 0;
 	bool quit = false;
 	SDL_Event e; //Event handler
 
 	Board board;
 
 	while (!quit) {
-		while (SDL_PollEvent(&e) != 0) {
-			if (e.type == SDL_QUIT) 
-				quit = true;
-			board.handleInput(mF, mT, &e);
+//		if (!board.getSide()) {
+		if (1) {
+			while (SDL_PollEvent(&e) != 0) {
+				if (e.type == SDL_QUIT) 
+					quit = true;
+				board.handleInput(mF, mT, &e);
+				displayBoard(board, mF, mT);
+	
+			//	showMoveLists(board);
+			}
+		}
+		else {
+			botMove = search(board);
+			board.setMove(botMove/100, botMove%100);
+			board.movePiece();
+			board.changeTurn();
+			board.generateMoveLists();
+			board.checkCheck(board.getSide());
 			displayBoard(board, mF, mT);
-
-		//	showMoveLists(board);
 		}
 	}
 
