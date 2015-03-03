@@ -9,6 +9,7 @@
 #include <iostream>
 
 int Board::eval() {
+	//FIX INDEXES
 	static int pawnTable[64] = { 0,  0,  0,  0,  0,  0,  0,  0,
 				    50, 50, 50, 50, 50, 50, 50, 50,
 				    10, 10, 20, 30, 30, 20, 10, 10,
@@ -166,6 +167,20 @@ int Board::eval() {
 	if (whiteCastled) score += 300;
 	if (blackCastled) score -= 300;
 
+	//Passed pawns
+	int filesWithBlackPawns[8] = {0}, filesWithWhitePawns[8] = {0};
+	for (int p = wPa; p <= wPh; p++)
+		filesWithWhitePawns[piece[p].getPos()%10-1] = 1;
+	for (int p = bPa; p <= bPh; p++)
+		filesWithBlackPawns[piece[p].getPos()%10-1] = 1;
+	for (int p = wPa; p <= wPh; p++)
+		if (filesWithBlackPawns[piece[p].getPos()%10-1] == 0)
+			score += 200;
+	for (int p = bPa; p <= bPh; p++)
+		if (filesWithWhitePawns[piece[p].getPos()%10-1] == 0)
+			score -= 200;
+
+
 	//Doubled pawns
 	int doubled = 0, pos;
 	for (int i = wPa; i <= wPh; i++) {
@@ -177,7 +192,7 @@ int Board::eval() {
 					doubled++;
 		}
 	}
-	score -= doubled*25;
+	score -= doubled*10;
 	doubled = 0;
 	for (int i = bPa; i <= bPh; i++) {
 		if (!piece[i].getAlive()) continue;
@@ -188,7 +203,7 @@ int Board::eval() {
 					doubled++;
 		}
 	}
-	score += doubled*25;
+	score += doubled*10;
 
 	//Open filed rooks
 	for (int j = wqR; j <= bqR; j += (bqR-wqR)) {
@@ -200,15 +215,19 @@ int Board::eval() {
 			int checkPiece;
 			for (int r = rank; r <= 9; r++) { //Up
 				checkPiece = board120[r*10+file];
-				if (checkPiece != empty)
+				if (checkPiece != empty) {
 					if (piece[checkPiece].getColor() != piece[i].getColor())
 						open = false;
+					break;
+				}
 			}
 			for (int r = rank; r >= 2; r--) { //Down
 				checkPiece = board120[r*10+file];
-				if (checkPiece != empty)
+				if (checkPiece != empty) {
 					if (piece[checkPiece].getColor() != piece[i].getColor())
 						open = false;
+					break;
+				}
 			}
 			if (open)
 				score = (j == wqR) ? score+100 : score-100;
