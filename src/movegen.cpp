@@ -9,6 +9,10 @@
 #include "board.h"
 
 void Board::generateMoveLists() {	
+	generateMoveLists(&whiteMoveList, &blackMoveList);
+}
+
+void Board::generateMoveLists(std::vector<int> * wMoveList, std::vector<int> * bMoveList) {	
 	int mF, mT;
 	bool realSide = side;
 
@@ -19,17 +23,22 @@ void Board::generateMoveLists() {
 	for (int i = bqR; i <= bPh; i++)
 		generateMoveListFor(i);
 
-	whiteMoveList.clear();
-	blackMoveList.clear();
+	//whiteMoveList.clear();
+	wMoveList->clear();
+	//blackMoveList.clear();
+	bMoveList->clear();
+
 	for (int i = wqR; i <= bPh; i++)
 		for (int j = 0; j < piece[i].getMoveListSize(); j++) 
 			if (piece[i].getFromMoveList(j) != null) {
 				mF = piece[i].getPos();
 				mT = piece[i].getFromMoveList(j);
 				if (piece[i].getColor()) 
-					whiteMoveList.push_back(mF*100 + mT);
+					//whiteMoveList.push_back(mF*100 + mT);
+					wMoveList->push_back(mF*100 + mT);
 				else
-					blackMoveList.push_back(mF*100 + mT);
+					//blackMoveList.push_back(mF*100 + mT);
+					bMoveList->push_back(mF*100 + mT);
 			}
 
 	side = realSide;	
