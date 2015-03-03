@@ -9,35 +9,45 @@
 #include "board.h"
 
 void Board::generateMoveLists() {	
-	generateMoveLists(whiteMoveList, blackMoveList);
+	generateMoveListFor(WHITE, whiteMoveList);
+	generateMoveListFor(BLACK, blackMoveList);
 }
 
-void Board::generateMoveLists(std::vector<int> & wMoveList, std::vector<int> & bMoveList) {	
+void Board::generateMoveListFor(bool s, std::vector<int> & moveList) {	
+	/* Generates psuedo-legal moves for side s, stores it in moveList */
+
 	int mF, mT;
 	bool realSide = side;
 
-	side = WHITE;
-	for (int i = wqR; i <= wPh; i++)
-		generateMoveListFor(i);
-	side = BLACK;
-	for (int i = bqR; i <= bPh; i++)
-		generateMoveListFor(i);
+	side = s;
+	for (int p = bqR-(s*bqR); p <= bPh-(s*bqR); p++)
+		generatePieceMoveListFor(p);
 
-	wMoveList.clear();
-	bMoveList.clear();
-
-	for (int i = wqR; i <= bPh; i++)
-		for (int j = 0; j < piece[i].getMoveListSize(); j++) 
-			if (piece[i].getFromMoveList(j) != null) {
-				mF = piece[i].getPos();
-				mT = piece[i].getFromMoveList(j);
-				if (piece[i].getColor()) 
-					wMoveList.push_back(mF*100 + mT);
-				else
-					bMoveList.push_back(mF*100 + mT);
+	moveList.clear();
+	for (int p = bqR-(s*bqR); p <= bPh-(s*bqR); p++)
+		for (int j = 0; j < piece[p].getMoveListSize(); j++) 
+			if (piece[p].getFromMoveList(j) != null) {
+				mF = piece[p].getPos();
+				mT = piece[p].getFromMoveList(j);
+				moveList.push_back(mF*100 + mT);
 			}
 
 	side = realSide;	
+}
+
+void Board::orderMoveList(bool s, std::vector<int> & moveList) {
+	int captures = 0;
+	int mF, mT, move;
+	for (int i = 0; i < (int)moveList.size(); i++) {
+		move = moveList[i];
+		mF = move/100;
+		mT = move%100;
+		if (board120[mT] != empty && piece[board120[mT]].getColor() != s) { //Captures
+			moveList[i] = moveList[captures];
+			moveList[captures] = move;
+			captures++;	
+		}
+	}
 }
 
 void Board::cleanMoveList(bool s) {
@@ -48,6 +58,8 @@ void Board::cleanMoveList(bool s) {
 }
 
 void Board::cleanMoveList(bool s, std::vector<int> & moveList) {
+	/* Erases any illegal moves (for side s) in moveList*/
+
 	int mF, mT, size;
 	bool realSide = side;
 	int realMoveFrom = moveFrom;
@@ -68,7 +80,9 @@ void Board::cleanMoveList(bool s, std::vector<int> & moveList) {
 	moveTo = realMoveTo;
 }
 
-void Board::generateMoveListFor(int p) {
+void Board::generatePieceMoveListFor(int p) {
+	/* Generates moves for an individual piece, stores them in the pieces moveList*/
+
 	int counter = 0;
 	if (piece[p].getAlive()) {	
 		if (piece[p].getValue() == R_VAL) 
