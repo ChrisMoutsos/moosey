@@ -79,16 +79,18 @@ class Board {
 		bool validateKingMove(int mF, int mT, bool s);
 		bool canCastle(int dir, bool s);
 		bool checkStalemate() const;
+		bool checkCheckForBot(bool s, std::vector<int> & moveList);
 		bool checkCheck(bool s);
 		bool inCheckmate(bool s) const;
 		bool inCheck(bool s) const;
 	
 		//MOVEGEN.CPP
 		void generateMoveLists();
-		void generateMoveLists(std::vector<int> & wMoveList, std::vector<int> & bMoveList);
+		void generateMoveListFor(bool s, std::vector<int> & moveList);
+		void orderMoveList(bool s, std::vector<int> & moveList);
 		void cleanMoveList(bool s);
 		void cleanMoveList(bool s, std::vector<int> & moveList);
-		void generateMoveListFor(int p);
+		void generatePieceMoveListFor(int p);
 		void generateHozMoves(int p, int& counter);
 		void generateDiagMoves(int p, int& counter);
 		void generateKnightMoves(int p, int& counter);
