@@ -18,6 +18,11 @@ void Board::movePiece(int mF, int mT) {
 	bool s = piece[board120[mF]].getColor(), passanting = false;
 
 	movesMade.push_back(mF*100+mT);
+
+	if (piece[board120[mF]].getValue() == K_VAL && abs(mF-mT) == 2) {
+		castling = mF < mT ? KINGSIDE : QUEENSIDE;
+		std::cout << "CASTLING\n";
+	}
 	
 	if (!castling) {	
 		//If the move is an en passant
@@ -82,7 +87,7 @@ void Board::movePiece(int mF, int mT) {
 
 		//cExtras = {kingmT-kingmF, rookmT-kingmF, emptymT-kingmF};
 		std::array<int, 3> cExtras;
-		if (mT == _G1 || mT == _G8)
+		if (castling == KINGSIDE)
 			cExtras = {2, 1, 3};	//Kingside
 		else 
 			cExtras = {-2, -1, -4};  //Queenside
@@ -103,6 +108,8 @@ void Board::movePiece(int mF, int mT) {
 		piece[board120[mF+cExtras[1]]].incrMoved();
 	}
 	ply++;
+
+	castling = 0;
 }
 
 void Board::unmovePiece() {
@@ -112,6 +119,13 @@ void Board::unmovePiece() {
 void Board::unmovePiece(int mF, int mT) {
 	int epExtra = 0;
 	bool s = piece[board120[mT]].getColor(), unpassanting = false;
+
+			castling = 0;
+//	std::cout << "board120[mT]: " << board120[mT] << " piece[board120[mT]].getValue() : " << piece[board120[mT]].getValue() << "\n";
+	if (piece[board120[mT]].getValue() == K_VAL && abs(mF-mT) == 2) {
+			castling = mF < mT ? KINGSIDE : QUEENSIDE;
+			std::cout << "UNCASTLING\n";
+	}
 
 	if (!castling) {
 		//Unpassanting
@@ -156,7 +170,7 @@ void Board::unmovePiece(int mF, int mT) {
 
 		//cExtras = {kingmT-kingmF, rookmT-kingmF, emptymT-kingmF};
 		std::array<int, 3> cExtras;
-		if (mT == _G1 || mT == _G8) 	
+		if (castling == KINGSIDE) 	
 			cExtras = {2, 1, 3};	//Kingside
 		else
 			cExtras = {-2, -1, -4};	//Queenside
@@ -183,11 +197,12 @@ void Board::unmovePiece(int mF, int mT) {
 	epSq.pop_back();
 
 	ply--;
+
+	castling = 0;
 }
 
 void Board::changeTurn() {
 	side = side ? BLACK : WHITE;
-	setCastling(0);
 }
 
 void Board::undoMove() {
@@ -198,17 +213,10 @@ void Board::undoMove() {
 
 	//Set castling flag if necessary
 	if (piece[pieceMoved.back()].getValue() == K_VAL) {
-		if (mF2 == _E1) {
-			if (mT2 == _G1) castling = KINGSIDE;
-			else if (mT2 == _B1) castling = QUEENSIDE;
-		}
-		else if (mF2 == _E8) {
-			if (mT2 == _G8) castling = KINGSIDE;
-			else if (mT2 == _B8) castling = QUEENSIDE;
-		}
+		if (mF2-mT2 == -2) castling = KINGSIDE;
+		else if (mF2-mT2 == 2) castling = QUEENSIDE;
 	}
 	unmovePiece();
-	castling = 0;	     //Reset castling flag
 	generateMoveLists(); //Regen moves
 	checkCheck(side);    //Re-checkCheck
 	

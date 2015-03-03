@@ -61,8 +61,7 @@ void Board::cleanMoveList(bool s) {
 				blackMoveList.erase(blackMoveList.begin()+i);
 			size--;
 			i--;
-			castling = 0;
-		}
+		} 
 	}
 	side = realSide;	
 	moveFrom = realMoveFrom;
@@ -166,9 +165,9 @@ void Board::generateKingMoves(int p, int& counter) {
 	}
 	if (canCastle(QUEENSIDE, s)) { 
 		if (s)
-			piece[p].setInMoveList(counter, _B1);
+			piece[p].setInMoveList(counter, _C1);
 		else
-			piece[p].setInMoveList(counter, _B8);
+			piece[p].setInMoveList(counter, _C8);
 		counter++;
 	}
 

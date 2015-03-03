@@ -18,8 +18,6 @@ bool Board::legalMove(int mF, int mT, bool s, bool v) {
 		if (v) std::cout << "Invalid move..\n";
 		return false;
 	}
-	if (castling) 		//Legalization occurs in validateMove
-		return true;
 	
 	movePiece(mF, mT);	//Move the piece,
 	isInCheck = inCheck(s);	//see if we put our king in check
@@ -223,13 +221,11 @@ bool Board::validateKingMove(int mF, int mT, bool s) {
 		return true;
 	if ((mF - mT) == -2) {	//Castling kingside
 		if (canCastle(KINGSIDE, s)) {
-			setCastling(KINGSIDE);
 			return true;
 		}
 	}
-	if ((mF - mT) == 3) {   //Castling queenside
+	if ((mF - mT) == 2) {   //Castling queenside
 		if (canCastle(QUEENSIDE, s)) {
-			setCastling(QUEENSIDE);
 			return true;
 		}
 	}
@@ -239,21 +235,30 @@ bool Board::validateKingMove(int mF, int mT, bool s) {
 bool Board::canCastle(int dir, bool s) {
 	int k = s ? wK : bK;
 	int r = s ? dir == KINGSIDE ? wkR : wqR : dir == KINGSIDE ? bkR : bqR;
-	int kSq, c = dir == KINGSIDE ? 1 : -1;
+	int c = dir == KINGSIDE ? 1 : -1;
 
+	if (!(piece[k].getAlive() && piece[r].getAlive())) return false;
 	if (piece[k].getMoved() || piece[r].getMoved()) return false;
 	for (int i = 1; i <= 2; i++)	//Verify it's empty between K and R
 		if (board120[piece[k].getPos()+i*c] != empty) return false;
+	if (dir == QUEENSIDE)
+		if (board120[piece[k].getPos()-3] != empty) return false;
+
 	if (inCheck(s)) return false;	//Verify not in check
-	
-	for (int j = 1; j <= 2; j++) {	//Verify not going through/to check
-		kSq = piece[k].getPos();
-		movePiece(kSq, kSq+j*c);
-		if (inCheck(s)) {
-			unmovePiece(kSq, kSq+j*c);
-			return false;
-		}
-		unmovePiece(kSq, kSq+j*c);
+	//Verify not going through/to check
+	movePiece(piece[k].getPos(), piece[k].getPos()+c);
+	if (inCheck(s)) {
+		unmovePiece();
+		return false;
 	}
+	movePiece(piece[k].getPos(), piece[k].getPos()+c);
+	if (inCheck(s)) {
+		unmovePiece();
+		unmovePiece();
+		return false;
+	}
+	unmovePiece();	
+	unmovePiece();
+	
 	return true;
 }
