@@ -38,6 +38,21 @@ bool Board::checkStalemate() const {
 	return false;
 }
 
+bool Board::checkCheckForBot(bool s, std::vector<int> & moveList) {
+	sideInCheck = 0;
+	sideInCheckmate = 0;
+	
+	if (inCheck(s)) {
+		sideInCheck = s ? 1 : 2;
+		cleanMoveList(s, moveList); //Clean the moveList provided
+		if (inCheckmate(s)) { //Checkmate
+			sideInCheckmate = s ? 1 : 2;
+			return true;
+		}
+	}
+	return false;	//Not checkmate
+}
+
 bool Board::checkCheck(bool s) {
 	sideInCheck = 0;
 	sideInCheckmate = 0;
