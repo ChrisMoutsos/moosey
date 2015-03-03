@@ -14,8 +14,13 @@
 #include <vector>
 #include "square.h"
 #include "piece.h"
+#include "search.h"
 
 class Board {
+	
+	friend int search(Board& b);
+	friend int alphaBeta(Board& b, int alpha, int beta, int depthLeft);
+	
 	public:
 		//BOARD.CPP
 		Board();
