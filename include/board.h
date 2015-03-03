@@ -85,8 +85,9 @@ class Board {
 	
 		//MOVEGEN.CPP
 		void generateMoveLists();
-		void generateMoveLists(std::vector<int> * wMoveList, std::vector<int> * bMoveList);
+		void generateMoveLists(std::vector<int> & wMoveList, std::vector<int> & bMoveList);
 		void cleanMoveList(bool s);
+		void cleanMoveList(bool s, std::vector<int> & moveList);
 		void generateMoveListFor(int p);
 		void generateHozMoves(int p, int& counter);
 		void generateDiagMoves(int p, int& counter);

@@ -19,10 +19,9 @@ void Board::movePiece(int mF, int mT) {
 
 	movesMade.push_back(mF*100+mT);
 
-	if (piece[board120[mF]].getValue() == K_VAL && abs(mF-mT) == 2) {
+	if (piece[board120[mF]].getValue() == K_VAL && abs(mF-mT) == 2)
 		castling = mF < mT ? KINGSIDE : QUEENSIDE;
-		std::cout << "CASTLING\n";
-	}
+	else castling = 0;
 	
 	if (!castling) {	
 		//If the move is an en passant
@@ -120,12 +119,9 @@ void Board::unmovePiece(int mF, int mT) {
 	int epExtra = 0;
 	bool s = piece[board120[mT]].getColor(), unpassanting = false;
 
-			castling = 0;
-//	std::cout << "board120[mT]: " << board120[mT] << " piece[board120[mT]].getValue() : " << piece[board120[mT]].getValue() << "\n";
-	if (piece[board120[mT]].getValue() == K_VAL && abs(mF-mT) == 2) {
+	if (piece[board120[mT]].getValue() == K_VAL && abs(mF-mT) == 2)
 			castling = mF < mT ? KINGSIDE : QUEENSIDE;
-			std::cout << "UNCASTLING\n";
-	}
+	else castling = 0;
 
 	if (!castling) {
 		//Unpassanting

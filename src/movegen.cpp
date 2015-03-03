@@ -9,10 +9,10 @@
 #include "board.h"
 
 void Board::generateMoveLists() {	
-	generateMoveLists(&whiteMoveList, &blackMoveList);
+	generateMoveLists(whiteMoveList, blackMoveList);
 }
 
-void Board::generateMoveLists(std::vector<int> * wMoveList, std::vector<int> * bMoveList) {	
+void Board::generateMoveLists(std::vector<int> & wMoveList, std::vector<int> & bMoveList) {	
 	int mF, mT;
 	bool realSide = side;
 
@@ -24,9 +24,9 @@ void Board::generateMoveLists(std::vector<int> * wMoveList, std::vector<int> * b
 		generateMoveListFor(i);
 
 	//whiteMoveList.clear();
-	wMoveList->clear();
+	wMoveList.clear();
 	//blackMoveList.clear();
-	bMoveList->clear();
+	bMoveList.clear();
 
 	for (int i = wqR; i <= bPh; i++)
 		for (int j = 0; j < piece[i].getMoveListSize(); j++) 
@@ -35,30 +35,34 @@ void Board::generateMoveLists(std::vector<int> * wMoveList, std::vector<int> * b
 				mT = piece[i].getFromMoveList(j);
 				if (piece[i].getColor()) 
 					//whiteMoveList.push_back(mF*100 + mT);
-					wMoveList->push_back(mF*100 + mT);
+					wMoveList.push_back(mF*100 + mT);
 				else
 					//blackMoveList.push_back(mF*100 + mT);
-					bMoveList->push_back(mF*100 + mT);
+					bMoveList.push_back(mF*100 + mT);
 			}
 
 	side = realSide;	
 }
 
 void Board::cleanMoveList(bool s) {
+	if (s)
+		cleanMoveList(s, whiteMoveList);
+	else
+		cleanMoveList(s, blackMoveList);
+}
+
+void Board::cleanMoveList(bool s, std::vector<int> & moveList) {
 	int mF, mT, size;
 	bool realSide = side;
 	int realMoveFrom = moveFrom;
 	int realMoveTo = moveTo;
 
-	size = s ? (int)whiteMoveList.size() : (int)blackMoveList.size();
+	size = moveList.size();
 	for (int i = 0; i < size; i++) {
-		mT = s ? whiteMoveList[i]%100 : blackMoveList[i]%100;
-		mF = s ? whiteMoveList[i]/100 : blackMoveList[i]/100;
+		mT = moveList[i]/100;
+		mF = moveList[i]%100;
 		if (!legalMove(mF, mT, s)) {
-			if (s) 
-				whiteMoveList.erase(whiteMoveList.begin()+i);
-			else
-				blackMoveList.erase(blackMoveList.begin()+i);
+			moveList.erase(moveList.begin()+i);
 			size--;
 			i--;
 		} 
