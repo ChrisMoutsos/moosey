@@ -45,8 +45,8 @@ int main(int argc, char* args[]) {
 	Board board;
 
 	while (!quit) {
-//		if (!board.getSide()) {
-		if (1) {
+		if (!board.getSide()) {
+//		if (1) {
 			while (SDL_PollEvent(&e) != 0) {
 				if (e.type == SDL_QUIT) 
 					quit = true;
@@ -64,6 +64,8 @@ int main(int argc, char* args[]) {
 			board.generateMoveLists();
 			board.checkCheck(board.getSide());
 			displayBoard(board, mF, mT);
+			std::cout << "\n\n\n";
+			showMoveLists(board);
 		}
 	}
 
@@ -81,6 +83,25 @@ void showMoveLists(Board &board) {
 	}
 	cout << endl << endl;
 	for (int i = wqR; i <= wPh; i++) {
+		cout << board.piece[i].getName() << ": ";
+		for (int j = 0; j < board.piece[i].getMoveListSize(); j++) {
+			if (board.piece[i].getFromMoveList(j) != null) {
+				mF = board.piece[i].getPos();
+				mT = board.piece[i].getFromMoveList(j)%100;
+				cout << intToSquare(mF) << " to " << intToSquare(mT) << ", ";
+			}
+		}
+		cout << "...";
+	}
+	cout << endl << endl;
+	cout << "Black movelist: " << endl;
+	for (int i = 0; i < board.getMoveListSize(BLACK); i++) {
+		mF = board.getFromMoveList(BLACK, i)/(100);
+		mT = board.getFromMoveList(BLACK, i)%(100);
+		cout << intToSquare(mF) << " to " << intToSquare(mT) << ", ";
+	}
+	cout << endl << endl;
+	for (int i = bqR; i <= bPh; i++) {
 		cout << board.piece[i].getName() << ": ";
 		for (int j = 0; j < board.piece[i].getMoveListSize(); j++) {
 			if (board.piece[i].getFromMoveList(j) != null) {
