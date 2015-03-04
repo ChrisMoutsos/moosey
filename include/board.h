@@ -41,6 +41,8 @@ class Board {
 		int getSideInCheck() const { return sideInCheck; };
 		int getSideInCheckmate() const { return sideInCheckmate; };
 		int getCastling() const { return castling; };
+		int getWhiteMaterial() const { return whiteMaterial; };
+		int getBlackMaterial() const { return blackMaterial; };
 		int getBoard120(int sq) const;
 		int getFromMoveList(bool s, int i) const;
 		int getMoveListSize(bool s) const;
@@ -105,6 +107,7 @@ class Board {
 		Piece piece[32];	//The pieces
 	private:
 		int board120[120], moveFrom, moveTo, ply;
+		int whiteMaterial, blackMaterial;
 		//For the line below.. 0: none, 1: white, 2: black 
 		int sideInCheck, sideInCheckmate;
 		int castling;

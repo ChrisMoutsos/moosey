@@ -51,6 +51,8 @@ void Board::initializeVars() {
 	side = WHITE;
 	whiteCastled = blackCastled = false;
 	castling = sideInCheck = sideInCheckmate = 0;
+	whiteMaterial = 8*P_VAL + 2*(R_VAL+B_VAL+N_VAL) + Q_VAL + K_VAL;
+	blackMaterial = whiteMaterial;
 }
 
 void Board::emptyBoard() {
