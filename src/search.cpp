@@ -13,7 +13,7 @@
 
 int nodes;
 
-int search(Board& b) {
+int search(Board& b, int depth) {
 	using std::vector;
 	
 	nodes = 0;
@@ -26,6 +26,7 @@ int search(Board& b) {
 	std::cout << "Current eval: " << b.eval() << '\n';
 //	std::cout << "\n\n\n\nNEWSEARCH, BOT SEARCHING FOR: " << b.getSide() << "\n\n";
 	b.generateMoveListFor(b.getSide(), moveList);
+	b.checkCheckForBot(b.getSide(), moveList);
 	b.orderMoveList(b.getSide(), moveList);
 
 	for (int i = 0; i < (int)moveList.size(); i++) {
@@ -40,7 +41,7 @@ int search(Board& b) {
 		b.setMove(mF, mT);
 		b.movePiece();
 
-		score = -alphaBeta(b, alpha, beta, 5);
+		score = -alphaBeta(b, alpha, beta, depth-1);
 
 		if (score > bestScore) {
 			bestScore = score;
@@ -60,7 +61,10 @@ int search(Board& b) {
 	std::cout << "Nodes searched: " << nodes << '\n';
 	std::cout << "Nodes/sec: " << nodes / (float(clock()-begin_time) / CLOCKS_PER_SEC) << '\n';
 	
-	if (bestMove == 0) std::cout << "CHECKMATED\n";
+//	if (bestScore < -9999) std::cout << "BESTSCORE < -9999\n";
+//	if (bestMove == 0) std::cout << "BESTMOVE: 0\n";
+	if (bestMove == 0) std::cout << "bestmove: 0\n";
+	if (bestScore < -9999) bestMove = 0;
 	return bestMove;
 }
 
@@ -72,9 +76,11 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft) {
 	vector<int> moveList;
 
 	b.changeTurn();
-	b.generateMoveListFor(b.getSide(), moveList);
-	b.checkCheckForBot(b.getSide(), moveList);
-	b.orderMoveList(b.getSide(), moveList);
+	if (depthLeft) {
+		b.generateMoveListFor(b.getSide(), moveList);
+		b.checkCheckForBot(b.getSide(), moveList);
+		b.orderMoveList(b.getSide(), moveList);
+	}
 
 	if (depthLeft == 0) {
 //		std::cout << "Scoring... " << b.eval() << '\n';

@@ -9,7 +9,7 @@
 
 class Board;
 
-int search(Board& b);
+int search(Board& b, int depth);
 int alphaBeta(Board& b, int alpha, int beta, int depthLeft);
 
 #endif
