@@ -11,7 +11,13 @@
 
 class Board;
 
-int search(Board& b, int depth);
-int alphaBeta(Board& b, int alpha, int beta, int depthLeft, std::vector<int> & PV);
+struct LINE {
+	int count;
+	int move[20];
+};
+
+int think(Board& b, int depth);
+int search(Board& b, int depth, std::vector<int>& moveList, int& bestMoveIndex, LINE* pline);
+int alphaBeta(Board& b, int alpha, int beta, int depthLeft, LINE* pline);
 
 #endif
