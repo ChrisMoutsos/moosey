@@ -40,34 +40,42 @@ int main(int argc, char* args[]) {
 	int mF = -1, mT = -1;
 	int botMove = 0;
 	bool quit = false;
+	int junk;
 	SDL_Event e; //Event handler
 
 	Board board;
 
 	while (!quit) {
-		if (!board.getSide()) {
-//		if (1) {
 			while (SDL_PollEvent(&e) != 0) {
 				if (e.type == SDL_QUIT) 
 					quit = true;
-				board.handleInput(mF, mT, &e);
-				displayBoard(board, mF, mT);
+				if (!board.getSide()) {
+					board.handleInput(mF, mT, &e);
+					displayBoard(board, mF, mT);
+				}
+				else {
+					if (board.getSideInCheckmate()) 
+					break;
+					botMove = 0;
+					botMove = think(board, 5);
+					if (!botMove) {
+						SDL_Delay(1000*60);
+						break;
+					}
+					board.setMove(botMove/100, botMove%100);
+					board.movePiece();
+					board.changeTurn();
+					board.generateMoveLists();
+					board.checkCheck(board.getSide());
+					displayBoard(board, mF, mT);
+					std::cout << "\n\n\n";
+//					showMoveLists(board);
+				}
 	
 			//	showMoveLists(board);
 			}
-		}
-		else {
-			botMove = search(board);
-			board.setMove(botMove/100, botMove%100);
-			board.movePiece();
-			board.changeTurn();
-			board.generateMoveLists();
-			board.checkCheck(board.getSide());
-			displayBoard(board, mF, mT);
-			std::cout << "\n\n\n";
-			showMoveLists(board);
-		}
 	}
+	cin >> junk;
 
 	close_SDL();
 	return 0;
