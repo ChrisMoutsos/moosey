@@ -108,7 +108,6 @@ class Board {
 		Square squares[64]; //For the display
 
 		Piece piece[32];	//The pieces
-		std::vector<int> whiteMoveList, blackMoveList;
 	private:
 		int board120[120], moveFrom, moveTo, ply;
 		int whiteMaterial, blackMaterial;
@@ -116,6 +115,7 @@ class Board {
 		int sideInCheck, sideInCheckmate;
 		int castling;
 		bool side, whiteCastled, blackCastled;
+		std::vector<int> whiteMoveList, blackMoveList;
 		std::vector<int> movesMade, pmSq, epSq;
 		std::vector<int> pieceMoved, prevOnMoveTo, pieceKilled;
 };
