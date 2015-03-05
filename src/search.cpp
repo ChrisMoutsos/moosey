@@ -54,7 +54,7 @@ int think(Board& b, int depth) {
 	else
 		totalTimeB += float(clock()-begin_time) / CLOCKS_PER_SEC;
 
-	std::cout << "Total time taken so far by ":
+	std::cout << "Total time taken so far by ";
 	if (b.getSide()) std::cout << " White: " << totalTimeW << '\n';
 	else std::cout << " Black: " << totalTimeB << '\n';
 
