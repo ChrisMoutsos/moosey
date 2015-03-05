@@ -5,11 +5,18 @@
 	      main.cpp
  ---------------------------------
 */
-/*   ##To-Do List##
- *	SDL
- *	- Add mute button
- *	- Splash screen
- *	FEN parsing
+
+/* ##Features##
+ * - Negamax with alpha-beta pruning
+ * - Quiescence search
+ * - Principal variation search
+ * - Next up: iterated deepening 
+ * 
+ * ##To-Do List##
+ * SDL:
+ * - Add mute button
+ * - Splash screen
+ * FEN parsing
  * 
  * Known issues:
  * Algebraic notation:
