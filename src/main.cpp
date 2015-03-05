@@ -56,8 +56,8 @@ int main(int argc, char* args[]) {
 			while (SDL_PollEvent(&e) != 0) {
 				if (e.type == SDL_QUIT) 
 					quit = true;
-				if (!board.getSide()) {
-				//if (1) {
+				if (board.getSide()) {
+	//			if (0) {
 					board.handleInput(mF, mT, &e);
 					displayBoard(board, mF, mT);
 				}
@@ -65,7 +65,7 @@ int main(int argc, char* args[]) {
 					if (board.getSideInCheckmate()) 
 					break;
 					botMove = 0;
-					botMove = think(board, 6);
+					botMove = think(board, 2);
 					if (!botMove) {
 						SDL_Delay(1000*60);
 						break;
