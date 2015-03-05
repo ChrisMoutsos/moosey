@@ -48,18 +48,18 @@ int think(Board& b, int depth) {
 int alphaBeta(Board& b, int alpha, int beta, int depthLeft, LINE* pline) {
 	using std::vector;
 
+	LINE line;
+
 	if (depthLeft == 0) {
 		pline->count = 0;
 		terminalNodes++;
 		nodes++;
-		return b.eval();
+		return quies(b, alpha, beta, &line);
 	}
 
 	bool foundPV = false;
 	int score, mF, mT;
 	vector<int> moveList;
-
-	LINE line;
 
 	b.generateMoveListFor(b.getSide(), moveList);
 	b.checkCheck(b.getSide(), moveList);
@@ -103,7 +103,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, LINE* pline) {
 	return alpha;
 }
 
-int Quies(Board& b, int alpha, int beta, LINE* pline) {
+int quies(Board& b, int alpha, int beta, LINE* pline) {
 	using std::vector;
 
 	LINE line;
@@ -127,7 +127,7 @@ int Quies(Board& b, int alpha, int beta, LINE* pline) {
 		b.setMove(mF, mT);
 		b.movePiece();
 		b.changeTurn();
-		score = -Quies(b, -beta, -alpha, &line);
+		score = -quies(b, -beta, -alpha, &line);
 		b.unmovePiece();
 		b.changeTurn();
 		
