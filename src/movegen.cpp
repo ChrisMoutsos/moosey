@@ -11,22 +11,27 @@
 void Board::orderMoveList(bool s, std::vector<int>& moveList) {
 	//int captures = 0;
 	std::vector<int> captures;
+	std::vector<int> castlings;
 	int mF, mT, move;
 	for (int i = 0; i < (int)moveList.size(); i++) {
 		move = moveList[i];
 		mF = move/100;
 		mT = move%100;
 		if (board120[mT] != empty && piece[board120[mT]].getColor() != s) { //Captures
-			/*moveList[i] = moveList[captures];
-			moveList[captures] = move;
-			captures++;*/
 			captures.push_back(move);
 			moveList.erase(moveList.begin()+i);
 		}
+		else if (piece[board120[mF]].getValue() == K_VAL) {
+			if (abs(mF-mT) == 2) {
+				castlings.push_back(move);
+				moveList.erase(moveList.begin()+i);
+			}
+		}
 	}
 	generateGoodCaptures(s, captures);
-	moveList.reserve(captures.size() + moveList.size());
+	moveList.reserve(captures.size() + moveList.size() + castlings.size());
 	moveList.insert(moveList.begin(), captures.begin(), captures.end());
+	moveList.insert(moveList.begin(), castlings.begin(), castlings.end());
 	
 }
 
