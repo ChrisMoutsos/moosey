@@ -65,6 +65,10 @@ void Board::movePiece(int mF, int mT) {
 
 		//If move is a capture
 		if (board120[mT+epExtra] != empty) {
+			if (piece[board120[mT+epExtra]].getColor()) 
+				whiteMaterial -= piece[board120[mT+epExtra]].getValue();
+			else
+				blackMaterial -= piece[board120[mT+epExtra]].getValue();
 			piece[board120[mT+epExtra]].kill();
 			piece[board120[mT+epExtra]].setPos(null);
 			if (passanting)
@@ -154,6 +158,13 @@ void Board::unmovePiece(int mF, int mT) {
 		board120[mT] = prevOnMoveTo.back();
 		if (unpassanting)
 			board120[mT+epExtra] = pieceKilled.back();
+		
+		if (pieceKilled.back() != empty) {
+			if (piece[pieceKilled.back()].getColor()) 
+				whiteMaterial += piece[pieceKilled.back()].getValue();
+			else
+				blackMaterial += piece[pieceKilled.back()].getValue();
+		}
 
 		if (unpassanting || board120[mT] != empty) { 
 			piece[board120[mT+epExtra]].setPos(mT+epExtra);
