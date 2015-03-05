@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include "cmath"
 #include "board.h"
 #include "ltexture.h"
@@ -38,28 +39,20 @@ bool Board::checkStalemate() const {
 	return false;
 }
 
-bool Board::checkCheckForBot(bool s, std::vector<int> & moveList) {
-	sideInCheck = 0;
-	sideInCheckmate = 0;
-	
-	if (inCheck(s)) {
-		sideInCheck = s ? 1 : 2;
-		cleanMoveList(s, moveList); //Clean the moveList provided
-		if (inCheckmate(s)) { //Checkmate
-			sideInCheckmate = s ? 1 : 2;
-			return true;
-		}
-	}
-	return false;	//Not checkmate
+bool Board::checkCheck(bool s) {
+	if (s)
+		return checkCheck(s, whiteMoveList);
+	else
+		return checkCheck(s, blackMoveList);
 }
 
-bool Board::checkCheck(bool s) {
+bool Board::checkCheck(bool s, std::vector<int>& moveList) {
 	sideInCheck = 0;
 	sideInCheckmate = 0;
 	
 	if (inCheck(s)) {
 		sideInCheck = s ? 1 : 2;
-		cleanMoveList(s);
+		cleanMoveList(s, moveList);
 		if (inCheckmate(s)) { //Checkmate
 			sideInCheckmate = s ? 1 : 2;
 			return true;
