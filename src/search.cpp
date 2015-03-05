@@ -18,8 +18,6 @@ int think(Board& b, int depth) {
 	using std::vector;
 
 	const clock_t begin_time = clock();
-	int bestMoveIndex;
-	int bestMove, temp;
 	int bestScore;
 	int alpha = -99999, beta = 99999;
 	vector<int> moveList;
@@ -35,11 +33,10 @@ int think(Board& b, int depth) {
 		bestScore = alphaBeta(b, alpha, beta, depth, &prinVarLine);
 		std::cout << "Total nodes searched: " << nodes << '\n';
 		std::cout << "Terminal nodes searched: " << terminalNodes << '\n';
-		std::cout << "Time elapsed: " << float(clock()-begin_time) << '\n';
+		std::cout << "Time elapsed: " << float(clock()-begin_time) / CLOCKS_PER_SEC << '\n';
 		std::cout << "Nodes / sec: " << nodes / (float(clock()-begin_time) / CLOCKS_PER_SEC) << '\n';
+		std::cout << "Best score: " << bestScore << '\n';
 	}
-	
-	std::cout << "\nThink time elapsed: " << float(clock()-begin_time) / CLOCKS_PER_SEC << '\n';
 	for (int i = 0; i < prinVarLine.count; i++) {
 		std::cout << intToSquare(prinVarLine.move[i]/100) << " to ";
 		std::cout << intToSquare(prinVarLine.move[i]%100) << "\n";
@@ -51,8 +48,8 @@ int think(Board& b, int depth) {
 int alphaBeta(Board& b, int alpha, int beta, int depthLeft, LINE* pline) {
 	using std::vector;
 
-	int score;
-	int mF, mT;
+	bool foundPV = false;
+	int score, mF, mT;
 	vector<int> moveList;
 
 	LINE line;
@@ -83,8 +80,13 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, LINE* pline) {
 		b.setMove(mF, mT);
 		b.movePiece();
 		b.changeTurn();
-		
-		score = -alphaBeta(b, -beta, -alpha, depthLeft - 1, &line);
+		if (foundPV) {
+			score = -alphaBeta(b, -alpha-1, -alpha, depthLeft-1, &line);
+			if ((score > alpha) && (score < beta))
+				score = -alphaBeta(b, -beta, -alpha, depthLeft - 1, &line);
+		}	
+		else
+			score = -alphaBeta(b, -beta, -alpha, depthLeft - 1, &line);
 		b.changeTurn();
 
 		if (score >= beta) {
@@ -93,6 +95,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, LINE* pline) {
 		}
 		if (score > alpha) {
 			alpha = score;
+			foundPV = true;
 			pline->move[0] = mF*100 + mT;
 			memcpy(pline->move + 1, line.move, line.count * sizeof(int));
 			pline->count = line.count + 1;
