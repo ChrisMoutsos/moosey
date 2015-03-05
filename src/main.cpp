@@ -50,6 +50,7 @@ int main(int argc, char* args[]) {
 				if (e.type == SDL_QUIT) 
 					quit = true;
 				if (!board.getSide()) {
+				//if (1) {
 					board.handleInput(mF, mT, &e);
 					displayBoard(board, mF, mT);
 				}
@@ -57,7 +58,7 @@ int main(int argc, char* args[]) {
 					if (board.getSideInCheckmate()) 
 					break;
 					botMove = 0;
-					botMove = think(board, 5);
+					botMove = think(board, 6);
 					if (!botMove) {
 						SDL_Delay(1000*60);
 						break;
@@ -90,6 +91,7 @@ void showMoveLists(Board &board) {
 		cout << intToSquare(mF) << " to " << intToSquare(mT) << ", ";
 	}
 	cout << endl << endl;
+	/*
 	for (int i = wqR; i <= wPh; i++) {
 		cout << board.piece[i].getName() << ": ";
 		for (int j = 0; j < board.piece[i].getMoveListSize(); j++) {
@@ -101,14 +103,14 @@ void showMoveLists(Board &board) {
 		}
 		cout << "...";
 	}
-	cout << endl << endl;
+	cout << endl << endl;*/
 	cout << "Black movelist: " << endl;
 	for (int i = 0; i < board.getMoveListSize(BLACK); i++) {
 		mF = board.getFromMoveList(BLACK, i)/(100);
 		mT = board.getFromMoveList(BLACK, i)%(100);
 		cout << intToSquare(mF) << " to " << intToSquare(mT) << ", ";
 	}
-	cout << endl << endl;
+	cout << endl << endl;/*
 	for (int i = bqR; i <= bPh; i++) {
 		cout << board.piece[i].getName() << ": ";
 		for (int j = 0; j < board.piece[i].getMoveListSize(); j++) {
@@ -120,5 +122,5 @@ void showMoveLists(Board &board) {
 		}
 		cout << "...";
 	}
-	cout << endl;
+	cout << endl;*/
 }

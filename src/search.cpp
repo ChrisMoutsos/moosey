@@ -40,8 +40,8 @@ int think(Board& b, int depth) {
 	for (int i = 0; i < prinVarLine.count; i++) {
 		std::cout << intToSquare(prinVarLine.move[i]/100) << " to ";
 		std::cout << intToSquare(prinVarLine.move[i]%100) << "\n";
-
 	}
+
 	return prinVarLine.move[0];
 }
 
@@ -115,13 +115,16 @@ int quies(Board& b, int alpha, int beta, LINE* pline) {
 	int score = b.eval();
 	int mF, mT;
 	
-	if (score >= beta)
+	if (score >= beta) {
+		nodes++;
 		return beta;
+	}
 	if (score > alpha)
 		alpha = score;
 
 	b.generateGoodCaptures(b.getSide(), captureList); 
 	for (int i = 0; i < (int)captureList.size(); i++) {
+		nodes++;
 		mF = captureList[i]/100;
 		mT = captureList[i]%100;
 		b.setMove(mF, mT);
