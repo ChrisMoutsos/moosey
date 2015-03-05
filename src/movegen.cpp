@@ -8,12 +8,71 @@
 #include <iostream>
 #include "board.h"
 
+void Board::orderMoveList(bool s, std::vector<int>& moveList) {
+	int captures = 0;
+	int mF, mT, move;
+	for (int i = 0; i < (int)moveList.size(); i++) {
+		move = moveList[i];
+		mF = move/100;
+		mT = move%100;
+		if (board120[mT] != empty && piece[board120[mT]].getColor() != s) { //Captures
+			moveList[i] = moveList[captures];
+			moveList[captures] = move;
+			captures++;	
+		}
+	}
+}
+
+void Board::generateGoodCaptures(bool s, std::vector<int>& moveList) {
+	//Most valuable victim / least valuable attacker
+
+	//Clean all but captures
+	int mF, mT, move;
+	for (int i = 0; i < (int)moveList.size(); i++) {
+		move = moveList[i];
+		mF = move/100;
+		mT = move%100;
+		if (board120[mT] != empty && piece[board120[mT]].getColor() != s) { //Captures
+			
+		}
+		else {
+			moveList.erase(moveList.begin()+i);
+			i--;
+		}
+	}
+
+	//Bubble sort the rest	
+	int temp, j = 0, diff, diff2;
+	bool changed = true;
+	while (changed) {
+		changed = false;
+		j++;
+		for (int i = 0; i < (int)moveList.size() - j; i++) {
+			move = moveList[i];
+			mF = move/100;
+			mT = move%100;
+			diff = -piece[board120[mT]].getValue() 
+				+ piece[board120[mF]].getValue();
+			diff2 = -piece[board120[moveList[i+1]%100]].getValue() 
+				+ piece[board120[moveList[i+1]%100]].getValue();
+			//Sort from highest disparity between attacker/victim to lowest
+			if (diff > diff2) {
+				temp = moveList[i+1];
+				moveList[i+1] = move;
+				moveList[i] = temp;
+				changed = true;
+			}
+			
+		}
+	}
+}
+
 void Board::generateMoveLists() {	
 	generateMoveListFor(WHITE, whiteMoveList);
 	generateMoveListFor(BLACK, blackMoveList);
 }
 
-void Board::generateMoveListFor(bool s, std::vector<int> & moveList) {	
+void Board::generateMoveListFor(bool s, std::vector<int>& moveList) {	
 	/* Generates psuedo-legal moves for side s, stores it in moveList */
 
 	int mF, mT;
@@ -35,21 +94,6 @@ void Board::generateMoveListFor(bool s, std::vector<int> & moveList) {
 	side = realSide;	
 }
 
-void Board::orderMoveList(bool s, std::vector<int> & moveList) {
-	int captures = 0;
-	int mF, mT, move;
-	for (int i = 0; i < (int)moveList.size(); i++) {
-		move = moveList[i];
-		mF = move/100;
-		mT = move%100;
-		if (board120[mT] != empty && piece[board120[mT]].getColor() != s) { //Captures
-			moveList[i] = moveList[captures];
-			moveList[captures] = move;
-			captures++;	
-		}
-	}
-}
-
 void Board::cleanMoveList(bool s) {
 	if (s)
 		cleanMoveList(s, whiteMoveList);
@@ -57,7 +101,7 @@ void Board::cleanMoveList(bool s) {
 		cleanMoveList(s, blackMoveList);
 }
 
-void Board::cleanMoveList(bool s, std::vector<int> & moveList) {
+void Board::cleanMoveList(bool s, std::vector<int>& moveList) {
 	/* Erases any illegal moves (for side s) in moveList*/
 
 	int mF, mT, size;

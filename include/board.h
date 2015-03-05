@@ -16,6 +16,8 @@
 #include "piece.h"
 #include "search.h"
 
+void showMoveLists(Board& b);
+
 class Board {
 	
 	friend int search(Board& b);
@@ -81,17 +83,18 @@ class Board {
 		bool validateKingMove(int mF, int mT, bool s);
 		bool canCastle(int dir, bool s);
 		bool checkStalemate() const;
-		bool checkCheckForBot(bool s, std::vector<int> & moveList);
 		bool checkCheck(bool s);
+		bool checkCheck(bool s, std::vector<int>& moveList);
 		bool inCheckmate(bool s) const;
 		bool inCheck(bool s) const;
 	
 		//MOVEGEN.CPP
 		void generateMoveLists();
-		void generateMoveListFor(bool s, std::vector<int> & moveList);
-		void orderMoveList(bool s, std::vector<int> & moveList);
+		void generateMoveListFor(bool s, std::vector<int>& moveList);
+		void generateGoodCaptures(bool s, std::vector<int>& moveList);
+		void orderMoveList(bool s, std::vector<int>& moveList);
 		void cleanMoveList(bool s);
-		void cleanMoveList(bool s, std::vector<int> & moveList);
+		void cleanMoveList(bool s, std::vector<int>& moveList);
 		void generatePieceMoveListFor(int p);
 		void generateHozMoves(int p, int& counter);
 		void generateDiagMoves(int p, int& counter);
@@ -105,6 +108,7 @@ class Board {
 		Square squares[64]; //For the display
 
 		Piece piece[32];	//The pieces
+		std::vector<int> whiteMoveList, blackMoveList;
 	private:
 		int board120[120], moveFrom, moveTo, ply;
 		int whiteMaterial, blackMaterial;
@@ -112,7 +116,6 @@ class Board {
 		int sideInCheck, sideInCheckmate;
 		int castling;
 		bool side, whiteCastled, blackCastled;
-		std::vector<int> whiteMoveList, blackMoveList;
 		std::vector<int> movesMade, pmSq, epSq;
 		std::vector<int> pieceMoved, prevOnMoveTo, pieceKilled;
 };
