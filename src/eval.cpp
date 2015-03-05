@@ -230,9 +230,5 @@ int Board::eval() {
 		}
 	}
 
-	//Mobility
-	//score += (int)whiteMoveList.size();
-	//score -= (int)blackMoveList.size();
-
 	return side ? score : -score;
 }
