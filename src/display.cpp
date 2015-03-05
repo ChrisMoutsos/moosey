@@ -63,7 +63,6 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 	//Update screen
 	SDL_RenderPresent(renderer);
 
-//	std::cout << "eval (" << b.getSide() << "): " << b.eval() << '\n';
 }
 
 void setButtonPositions() {
