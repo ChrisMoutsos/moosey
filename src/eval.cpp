@@ -160,8 +160,8 @@ int Board::eval() {
 	}
 
 	//Castled
-	if (whiteCastled) score += 300;
-	if (blackCastled) score -= 300;
+	if (whiteCastled) score += 100;
+	if (blackCastled) score -= 100;
 
 	//Passed pawns
 	int filesWithBlackPawns[8] = {0}, filesWithWhitePawns[8] = {0};
@@ -171,10 +171,10 @@ int Board::eval() {
 		filesWithBlackPawns[piece[p].getPos()%10-1] = 1;
 	for (int p = wPa; p <= wPh; p++)
 		if (filesWithBlackPawns[piece[p].getPos()%10-1] == 0)
-			score += 200;
+			score += 50;
 	for (int p = bPa; p <= bPh; p++)
 		if (filesWithWhitePawns[piece[p].getPos()%10-1] == 0)
-			score -= 200;
+			score -= 50;
 
 
 	//Doubled pawns
