@@ -89,12 +89,14 @@ class Board {
 		bool inCheck(bool s) const;
 	
 		//MOVEGEN.CPP
-		void generateMoveLists();
-		void generateMoveListFor(bool s, std::vector<int>& moveList);
-		void generateGoodCaptures(bool s, std::vector<int>& moveList);
-		void orderMoveList(bool s, std::vector<int>& moveList);
+		void genOrderedMoveList();
+		void genOrderedMoveList(bool s, std::vector<int>& moveList);
+		void getGoodCaptures(bool s, std::vector<int>& moveList);
+		void getNonCaptures(bool s, std::vector<int>& moveList);
+		void removeNonCaptures(bool s, std::vector<int>& moveList);
 		void cleanMoveList(bool s);
 		void cleanMoveList(bool s, std::vector<int>& moveList);
+		void generatePieceMoveLists(bool s);
 		void generatePieceMoveListFor(int p);
 		void generateHozMoves(int p, int& counter);
 		void generateDiagMoves(int p, int& counter);
@@ -105,7 +107,7 @@ class Board {
 		//EVAL.CPP
 		int eval();
 	
-		Square squares[64]; //For the display
+		Square squares[64];	//For the display
 
 		Piece piece[32];	//The pieces
 	private:

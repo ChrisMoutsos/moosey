@@ -5,12 +5,12 @@
 ----------------------------------
 */
 
-#include <ctime>
 #include <cstring>
 #include "search.h"
 #include "board.h"
 #include <iostream>
 #include "display.h"
+#include <chrono>
 
 int nodes, terminalNodes;
 LINE prinVarLine, oldPrinVarLine;
@@ -19,18 +19,19 @@ double totalTimeW = 0, totalTimeB = 0;
 int think(Board& b, int depth) {
 	using std::vector;
 
-	const clock_t begin_time = clock();
+	auto beginTime1 = std::chrono::high_resolution_clock::now();
+	typedef std::chrono::duration<float> fsec;
+
 	int bestScore;
 	int alpha = -99999, beta = 99999;
 	vector<int> moveList;
 
-	b.generateMoveListFor(b.getSide(), moveList);
-	b.checkCheck(b.getSide(), moveList);
-	b.orderMoveList(b.getSide(), moveList);
+	b.genOrderedMoveList(b.getSide(), moveList);
 	
 	for (int i = 1; i <= depth; i++) {
 		oldPrinVarLine = prinVarLine;
-		clock_t begin_time2 = clock();
+
+		auto beginTime2 = std::chrono::high_resolution_clock::now();
 		nodes = 0;
 		terminalNodes = 0;
 		bestScore = alphaBeta(b, alpha, beta, i, 0, &prinVarLine);
@@ -38,8 +39,12 @@ int think(Board& b, int depth) {
 			std::cout << "Search to ply " << i << "...\n";
 			std::cout << "Total nodes searched: " << nodes << '\n';
 			std::cout << "Terminal nodes searched: " << terminalNodes << '\n';
-			std::cout << "Time elapsed: " << float(clock()-begin_time2) / CLOCKS_PER_SEC << '\n';
-			std::cout << "Nodes / sec: " << nodes / (float(clock()-begin_time2) / CLOCKS_PER_SEC) << '\n';
+			std::cout << "Time elapsed: ";
+			auto endTime1= std::chrono::high_resolution_clock::now();
+			fsec diff1 = endTime1 - beginTime2;
+			std::cout << diff1.count() << '\n';
+			std::cout << "Nodes / sec: ";
+			std::cout << nodes / diff1.count() << 'n';
 			std::cout << "Best score: " << bestScore << "\n\n";
 		}
 	}
@@ -47,12 +52,14 @@ int think(Board& b, int depth) {
 		std::cout << intToSquare(prinVarLine.move[i]/100) << " to ";
 		std::cout << intToSquare(prinVarLine.move[i]%100) << "\n";
 	}
-
-	std::cout << "Total time elapsed: " << float(clock()-begin_time) / CLOCKS_PER_SEC << '\n';
+	
+	auto endTime2 = std::chrono::high_resolution_clock::now();
+	fsec diff2 = endTime2 - beginTime1;
+	std::cout << "Total time elapsed: " << diff2.count() << '\n';
 	if (b.getSide())
-		totalTimeW += float(clock()-begin_time) / CLOCKS_PER_SEC;
+		totalTimeW += diff2.count();
 	else
-		totalTimeB += float(clock()-begin_time) / CLOCKS_PER_SEC;
+		totalTimeB += diff2.count();
 
 	std::cout << "Total time taken so far by ";
 	if (b.getSide()) std::cout << " White: " << totalTimeW << '\n';
@@ -69,7 +76,6 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 
 	if (depthLeft == 0) {
 		pline->count = 0;
-		terminalNodes++;
 		nodes++;
 		return quies(b, alpha, beta, depthGone, pline);
 	}
@@ -78,9 +84,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	int score, mF, mT;
 	vector<int> moveList;
 
-	b.generateMoveListFor(b.getSide(), moveList);
-	b.checkCheck(b.getSide(), moveList);
-	b.orderMoveList(b.getSide(), moveList);
+	b.genOrderedMoveList(b.getSide(), moveList);
 
 	int temp;
 	for (int i = 0; i < (int)moveList.size(); i++) {
@@ -130,21 +134,26 @@ int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline) {
 
 	vector<int> captureList;
 	
-	if (b.checkCheck(b.getSide(), captureList))
-		return alphaBeta(b, alpha, beta, 1, depthGone+1, pline); 
+
+	//if (b.checkCheck(b.getSide(), captureList))
+	//	return alphaBeta(b, alpha, beta, 1, depthGone+1, pline); 
 
 	int score = b.eval();
 	int mF, mT;
 	
 	if (score >= beta) {
 		nodes++;
+		terminalNodes++;
 		return beta;
 	}
 	if (score > alpha)
 		alpha = score;
 
-	b.generateGoodCaptures(b.getSide(), captureList); 
+	b.generatePieceMoveLists(b.getSide());
+	b.getGoodCaptures(b.getSide(), captureList);
+
 	for (int i = 0; i < (int)captureList.size(); i++) {
+		terminalNodes++;
 		nodes++;
 		mF = captureList[i]/100;
 		mT = captureList[i]%100;

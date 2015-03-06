@@ -8,52 +8,96 @@
 #include <iostream>
 #include "board.h"
 
-void Board::orderMoveList(bool s, std::vector<int>& moveList) {
-	//int captures = 0;
-	std::vector<int> captures;
-	std::vector<int> castlings;
+void Board::genOrderedMoveList() {
+	if (side)
+		genOrderedMoveList(side, whiteMoveList);
+	else
+		genOrderedMoveList(side, blackMoveList);
+}
+
+void Board::genOrderedMoveList(bool s, std::vector<int>& moveList) {
+	/* Generates psuedo-legal moves for side s, stores it in moveList */
+	/* Captures, castling, non-captures */
+
+	moveList.clear();
+	std::vector<int> captures, nonCaptures;
 	int mF, mT, move;
-	for (int i = 0; i < (int)moveList.size(); i++) {
-		move = moveList[i];
+		
+	generatePieceMoveLists(s);
+	getGoodCaptures(s, captures);
+	getNonCaptures(s, nonCaptures);
+
+	for (int i = 0; i < (int)nonCaptures.size(); i++) {
+		move = nonCaptures[i];
 		mF = move/100;
 		mT = move%100;
-		if (board120[mT] != empty && piece[board120[mT]].getColor() != s) { //Captures
-			captures.push_back(move);
-			moveList.erase(moveList.begin()+i);
-		}
-		else if (piece[board120[mF]].getValue() == K_VAL) {
+		if (piece[board120[mF]].getValue() == K_VAL) {
 			if (abs(mF-mT) == 2) {
-				castlings.push_back(move);
-				moveList.erase(moveList.begin()+i);
+				nonCaptures.erase(nonCaptures.begin()+i);
+				nonCaptures.insert(nonCaptures.begin(), move);
 			}
 		}
 	}
-	generateGoodCaptures(s, captures);
-	moveList.reserve(captures.size() + moveList.size() + castlings.size());
+
+	moveList.reserve(captures.size() + nonCaptures.size());
 	moveList.insert(moveList.begin(), captures.begin(), captures.end());
-	moveList.insert(moveList.begin(), castlings.begin(), castlings.end());
-	
+	moveList.insert(moveList.end(), nonCaptures.begin(), nonCaptures.end());
 }
 
-void Board::generateGoodCaptures(bool s, std::vector<int>& moveList) {
-	//Most valuable victim / least valuable attacker
 
-	//Clean all but captures
-	int mF, mT, move;
+void Board::removeNonCaptures(bool s, std::vector<int>& moveList) {
+	/* Remove any move in moveList that is a noncapture */
+	int mT, move;
 	for (int i = 0; i < (int)moveList.size(); i++) {
 		move = moveList[i];
-		mF = move/100;
 		mT = move%100;
-		if (board120[mT] != empty && piece[board120[mT]].getColor() != s) { //Captures
-			
-		}
-		else {
+		if (board120[mT] == empty) {
 			moveList.erase(moveList.begin()+i);
 			i--;
 		}
 	}
+}
 
-	//Bubble sort the rest	
+void Board::getNonCaptures(bool s, std::vector<int>& moveList) {
+	/* Put every noncapture for side s in moveList */
+
+	moveList.clear();
+	int startP, endP, mF, mT;
+	startP = s ? wqR : bqR;
+	endP = s ? wPh : bPh;
+
+	for (int i = startP; i <= endP; i++) {
+		if (!piece[i].getAlive()) continue;
+		mF = piece[i].getPos();
+		for (int j = 0; j < piece[i].getMoveListSize(); j++) {
+			mT = piece[i].getFromMoveList(j);
+			if (mT == 0) break;
+			if (board120[mT] != empty) continue;
+			moveList.push_back(mF*100+mT);
+		}
+	}
+}
+
+void Board::getGoodCaptures(bool s, std::vector<int>& moveList) {
+	/* Put every capture for side s in moveList, ordered */
+
+	moveList.clear();
+	int startP, endP, mF, mT, move;
+	startP = s ? wqR : bqR;
+	endP = s ? wPh : bPh;
+
+	for (int i = startP; i <= endP; i++) {
+		if (!piece[i].getAlive()) continue;
+		mF = piece[i].getPos();
+		for (int j = 0; j < piece[i].getMoveListSize(); j++) {
+			mT = piece[i].getFromMoveList(j);
+			if (mT == 0) break;
+			if (board120[mT] == empty) continue;
+			moveList.push_back(mF*100+mT);
+		}
+	}
+
+	//Bubble sort captures	
 	int temp, j = 0, diff, diff2;
 	bool changed = true;
 	while (changed) {
@@ -79,13 +123,14 @@ void Board::generateGoodCaptures(bool s, std::vector<int>& moveList) {
 	}
 }
 
+/*
 void Board::generateMoveLists() {	
 	generateMoveListFor(WHITE, whiteMoveList);
 	generateMoveListFor(BLACK, blackMoveList);
 }
 
 void Board::generateMoveListFor(bool s, std::vector<int>& moveList) {	
-	/* Generates psuedo-legal moves for side s, stores it in moveList */
+//	 Generates psuedo-legal moves for side s, stores it in moveList 
 
 	int mF, mT;
 	bool realSide = side;
@@ -105,7 +150,7 @@ void Board::generateMoveListFor(bool s, std::vector<int>& moveList) {
 
 	side = realSide;	
 }
-
+*/
 void Board::cleanMoveList(bool s) {
 	if (s)
 		cleanMoveList(s, whiteMoveList);
@@ -134,6 +179,14 @@ void Board::cleanMoveList(bool s, std::vector<int>& moveList) {
 	side = realSide;	
 	moveFrom = realMoveFrom;
 	moveTo = realMoveTo;
+}
+
+void Board::generatePieceMoveLists(bool s) {
+	int startP, endP;
+	startP = s ? wqR : bqR;
+	endP = s ? wPh : bPh;
+	for (int i = startP; i <= endP; i++)
+		generatePieceMoveListFor(i);
 }
 
 void Board::generatePieceMoveListFor(int p) {

@@ -53,34 +53,35 @@ int main(int argc, char* args[]) {
 	Board board;
 
 	while (!quit) {
-			while (SDL_PollEvent(&e) != 0) {
-				if (e.type == SDL_QUIT) 
-					quit = true;
-				if (board.getSide()) {
-	//			if (0) {
-					board.handleInput(mF, mT, &e);
-					displayBoard(board, mF, mT);
-				}
-				else {
-					if (board.getSideInCheckmate()) 
+		while (SDL_PollEvent(&e) != 0) {
+			if (e.type == SDL_QUIT) 
+				quit = true;
+
+			if (!board.getSide()) {
+//			if (1) {
+				board.handleInput(mF, mT, &e);
+				displayBoard(board, mF, mT);
+			}
+			else {
+				if (board.getSideInCheckmate()) 
 					break;
-					botMove = 0;
-					botMove = think(board, 2);
-					if (!botMove) {
-						SDL_Delay(1000*60);
-						break;
-					}
-					board.setMove(botMove/100, botMove%100);
-					board.movePiece();
-					board.changeTurn();
-					board.generateMoveLists();
-					board.checkCheck(board.getSide());
-					displayBoard(board, mF, mT);
-					std::cout << "\n\n\n";
-//					showMoveLists(board);
+				botMove = 0;
+				botMove = think(board, 6);
+				if (!botMove) {
+					SDL_Delay(1000*60);
+					break;
 				}
-	
-			//	showMoveLists(board);
+				board.setMove(botMove/100, botMove%100);
+				board.movePiece();
+				board.changeTurn();
+				board.genOrderedMoveList();
+				board.checkCheck(board.getSide());
+				displayBoard(board, mF, mT);
+				std::cout << "\n\n\n";
+//				showMoveLists(board);
+			}
+
+		//	showMoveLists(board);
 			}
 	}
 	cin >> junk;

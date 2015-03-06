@@ -19,7 +19,7 @@ Board::Board() {
 	setSquarePositions();
 	setButtonPositions();
 	setSpriteClips();	
-	generateMoveLists();
+	genOrderedMoveList();
 }
 
 Board::Board(std::string FEN) {
@@ -29,7 +29,7 @@ Board::Board(std::string FEN) {
 	setSquarePositions();
 	setButtonPositions();
 	setSpriteClips();	
-	generateMoveLists();
+	genOrderedMoveList();
 	//FEN stuff
 }
 
@@ -152,6 +152,7 @@ void Board::initializePieces() {
 
 void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 	bool clearMFMT = false;
+
 	for (int i = 0; i < 2; i++) 
 		if (buttons[i].handleEvent(e, *this))
 			clearMFMT = true;
@@ -169,7 +170,7 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 			setMove(mF, mT);
 			movePiece();
 			changeTurn();
-			generateMoveLists();
+			genOrderedMoveList();
 			checkCheck(getSide());
 		}
 		mF = -1;

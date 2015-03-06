@@ -224,7 +224,7 @@ void Board::undoMove() {
 		else if (mF2-mT2 == 2) castling = QUEENSIDE;
 	}
 	unmovePiece();
-	generateMoveLists(); //Regen moves
+	genOrderedMoveList(); //Regen moves
 	checkCheck(side);    //Re-checkCheck
 	
 	//Update moveFrom and moveTo
