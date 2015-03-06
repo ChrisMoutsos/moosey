@@ -166,20 +166,20 @@ int Board::eval() {
 	//Passed pawns
 	int filesWithBlackPawns[8] = {0}, filesWithWhitePawns[8] = {0};
 	for (int p = wPa; p <= wPh; p++) {
-		if (!piece[i].getAlive()) continue;
+		if (!piece[p].getAlive()) continue;
 		filesWithWhitePawns[piece[p].getPos()%10-1] = 1;
 	}
 	for (int p = bPa; p <= bPh; p++) {
-		if (!piece[i].getAlive()) continue;
+		if (!piece[p].getAlive()) continue;
 		filesWithBlackPawns[piece[p].getPos()%10-1] = 1;
 	}
 	for (int p = wPa; p <= wPh; p++) {
-		if (!piece[i].getAlive()) continue;
+		if (!piece[p].getAlive()) continue;
 		if (filesWithBlackPawns[piece[p].getPos()%10-1] == 0)
 			score += 50;
 	}
 	for (int p = bPa; p <= bPh; p++) {
-		if (!piece[i].getAlive()) continue;
+		if (!piece[p].getAlive()) continue;
 		if (filesWithWhitePawns[piece[p].getPos()%10-1] == 0)
 			score -= 50;
 	}
