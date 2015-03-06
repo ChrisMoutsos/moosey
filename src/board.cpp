@@ -197,11 +197,11 @@ int Board::getMoveListSize(bool s) const {
 }
 
 int Board::getEpSq(int i) const {
-	return (i > -1 && i < (int)epSq.size()) ? epSq[i] : -1;
+	return (i > -1 && i < (int)moveInfo.size()) ? moveInfo[i].epSq : -1;
 }
 
 int Board::getPmSq(int i) const {
-	return (i > -1 && i < (int)pmSq.size()) ? pmSq[i] : -1;
+	return (i > -1 && i < (int)moveInfo.size()) ? moveInfo[i].pmSq : -1;
 }
 
 int Board::getMoveMade(int i) const {
@@ -209,11 +209,11 @@ int Board::getMoveMade(int i) const {
 }
 
 int Board::getPrevOnMoveTo(int i) const {
-	return (i > -1 && i < (int)prevOnMoveTo.size()) ? prevOnMoveTo[i] : invalid;
+	return (i > -1 && i < (int)moveInfo.size()) ? moveInfo[i].prevOnMoveTo : invalid;
 }
 
 int Board::getPieceMoved(int i) const {
-	return (i > -1 && i < (int)pieceMoved.size()) ? pieceMoved[i] : -1;
+	return (i > -1 && i < (int)moveInfo.size()) ? moveInfo[i].pieceMoved : -1;
 }
 
 //MUTATORS

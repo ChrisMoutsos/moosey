@@ -27,6 +27,7 @@ int think(Board& b, int depth) {
 	vector<int> moveList;
 
 	b.genOrderedMoveList(b.getSide(), moveList);
+	b.checkCheck(b.getSide(), moveList);
 	
 	for (int i = 1; i <= depth; i++) {
 		oldPrinVarLine = prinVarLine;
@@ -44,7 +45,7 @@ int think(Board& b, int depth) {
 			fsec diff1 = endTime1 - beginTime2;
 			std::cout << diff1.count() << '\n';
 			std::cout << "Nodes / sec: ";
-			std::cout << nodes / diff1.count() << 'n';
+			std::cout << nodes / diff1.count() << '\n';
 			std::cout << "Best score: " << bestScore << "\n\n";
 		}
 	}
@@ -63,7 +64,7 @@ int think(Board& b, int depth) {
 
 	std::cout << "Total time taken so far by ";
 	if (b.getSide()) std::cout << " White: " << totalTimeW << '\n';
-	else std::cout << " Black: " << totalTimeB << '\n';
+	else std::cout << "Black: " << totalTimeB << '\n';
 
 	std::cout << "Best move: " << prinVarLine.move[0] << '\n';
 	return prinVarLine.move[0];
@@ -85,6 +86,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	vector<int> moveList;
 
 	b.genOrderedMoveList(b.getSide(), moveList);
+	b.checkCheck(b.getSide(), moveList);
 
 	int temp;
 	for (int i = 0; i < (int)moveList.size(); i++) {
@@ -133,10 +135,9 @@ int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline) {
 	using std::vector;
 
 	vector<int> captureList;
-	
 
-	//if (b.checkCheck(b.getSide(), captureList))
-	//	return alphaBeta(b, alpha, beta, 1, depthGone+1, pline); 
+	if (b.checkCheck(b.getSide(), captureList))
+		return alphaBeta(b, alpha, beta, 1, depthGone+1, pline); 
 
 	int score = b.eval();
 	int mF, mT;

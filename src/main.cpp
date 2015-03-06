@@ -57,7 +57,7 @@ int main(int argc, char* args[]) {
 			if (e.type == SDL_QUIT) 
 				quit = true;
 
-			if (!board.getSide()) {
+			if (board.getSide()) {
 //			if (1) {
 				board.handleInput(mF, mT, &e);
 				displayBoard(board, mF, mT);

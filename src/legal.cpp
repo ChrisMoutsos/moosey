@@ -175,9 +175,9 @@ bool Board::validatePawnMove(int mF, int mT, bool s) const {
 	}
 	if (diff == 9 || diff == 11) {		//Attacking
 		if (onMT == empty) { 	
-			if (ply > 0 && mT == epSq[ply-1]) 	//En passanting
-				if ((s && epSq[ply-1] > _H5) 
-				   || (!s && epSq[ply-1] < _A4))
+			if (ply > 0 && mT == moveInfo[ply-1].epSq) 	//En passanting
+				if ((s && moveInfo[ply-1].epSq > _H5) 
+				   || (!s && moveInfo[ply-1].epSq < _A4))
 					return true;
 			return false;	
 		}

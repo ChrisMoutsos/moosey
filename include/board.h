@@ -18,6 +18,13 @@
 
 void showMoveLists(Board& b);
 
+struct info {
+	int pmSq;
+	int epSq;
+	int pieceMoved;
+	int prevOnMoveTo;
+};
+
 class Board {
 	
 	friend int search(Board& b);
@@ -118,8 +125,10 @@ class Board {
 		int castling;
 		bool side, whiteCastled, blackCastled;
 		std::vector<int> whiteMoveList, blackMoveList;
-		std::vector<int> movesMade, pmSq, epSq;
-		std::vector<int> pieceMoved, prevOnMoveTo, pieceKilled;
+		std::vector<int> movesMade; 
+		std::vector<info> moveInfo;
+		//std::vector<int> pmSq, epSq;
+		//std::vector<int> pieceMoved, prevOnMoveTo, pieceKilled;
 };
 
 //INLINE CONVERSION FUNCTIONS
