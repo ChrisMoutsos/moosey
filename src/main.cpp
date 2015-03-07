@@ -10,7 +10,8 @@
  * - Negamax with alpha-beta pruning
  * - Quiescence search
  * - Principal variation search
- * - Next up: iterated deepening 
+ * - Iterated deepening,
+ * - using old princ. var. as first nodes 
  * 
  * ##To-Do List##
  * SDL:
@@ -26,9 +27,12 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include "common.h"
 #include "sdl.h"
 #include "board.h"
 #include "display.h"
+
+bool quit = false;
 
 void showMoveLists(Board& board);
 
@@ -45,24 +49,39 @@ int main(int argc, char* args[]) {
 	}
 
 	int mF = -1, mT = -1;
-	int botMove = 0;
-	bool quit = false;
-	int junk;
 	SDL_Event e; //Event handler
 
 	Board board;
 
 	while (!quit) {
-		while (SDL_PollEvent(&e) != 0) {
-			if (e.type == SDL_QUIT) 
+		while (SDL_PollEvent(&e)) {
+			if (e.type == SDL_QUIT)
 				quit = true;
+			else if (e.type == SDL_KEYDOWN) {
+				switch (e.key.keysym.sym) {
+					case SDLK_SPACE:
+						mF = mT = -1;
+						displayBoard(board, mF, mT);
+						board.botMove();
+					break;
+					case SDLK_LEFT:
+						board.undoMove();
+					break;
+					case SDLK_BACKSPACE:
+						board.restart();
+					break;
+				}
+			}
+			board.handleInput(mF, mT, &e);
+			displayBoard(board, mF, mT);
 
-			if (board.getSide()) {
-//			if (1) {
+/*
+			if (!board.getSide()) {
 				board.handleInput(mF, mT, &e);
 				displayBoard(board, mF, mT);
 			}
-			else {
+			else if (board.getSide()) {
+				std::cout << "white's turn\n";
 				if (board.getSideInCheckmate()) 
 					break;
 				botMove = 0;
@@ -80,12 +99,11 @@ int main(int argc, char* args[]) {
 				std::cout << "\n\n\n";
 //				showMoveLists(board);
 			}
-
-		//	showMoveLists(board);
-			}
+*/
+		}
 	}
-	cin >> junk;
 
+	SDL_Delay(2000);
 	close_SDL();
 	return 0;
 }
