@@ -8,7 +8,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "cmath"
+#include <cmath>
+#include "common.h"
 #include "board.h"
 #include "ltexture.h"
 
@@ -252,20 +253,14 @@ bool Board::canCastle(int dir, bool s) {
 	if (dir == QUEENSIDE)
 		if (board120[piece[k].getPos()-3] != empty) return false;
 
-	if (inCheck(s)) return false;	//Verify not in check
-	//Verify not going through/to check
+	if (inCheck(s)) return false; //Make sure not currently in check
+
+	//Verify not going through check
 	movePiece(piece[k].getPos(), piece[k].getPos()+c);
 	if (inCheck(s)) {
 		unmovePiece();
 		return false;
 	}
-	movePiece(piece[k].getPos(), piece[k].getPos()+c);
-	if (inCheck(s)) {
-		unmovePiece();
-		unmovePiece();
-		return false;
-	}
-	unmovePiece();	
 	unmovePiece();
 	
 	return true;
