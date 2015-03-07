@@ -13,7 +13,7 @@
 #include "board.h"
 #include "display.h"
 
-int nodes, terminalNodes;
+int nodes, qNodes;
 LINE prinVarLine, oldPrinVarLine;
 double totalTimeW = 0, totalTimeB = 0;
 
@@ -23,8 +23,9 @@ int think(Board& b, int depth) {
 	auto beginTime1 = std::chrono::high_resolution_clock::now();
 	typedef std::chrono::duration<float> fsec;
 
-	int bestScore;
+	int bestScore = 0;
 	int alpha = -99999, beta = 99999;
+	int asp = 100;
 	vector<int> moveList;
 
 	b.genOrderedMoveList(b.getSide(), moveList);
@@ -35,18 +36,39 @@ int think(Board& b, int depth) {
 
 		auto beginTime2 = std::chrono::high_resolution_clock::now();
 		nodes = 0;
-		terminalNodes = 0;
-		bestScore = alphaBeta(b, alpha, beta, i, 0, &prinVarLine);
+		qNodes = 0;
+		
+		//bestScore = alphaBeta(b, alpha, beta, i, 0, &prinVarLine);
+
+		alpha = bestScore - asp;
+		beta = bestScore + asp;
+		for (;;) {
+			int times = 1;
+			bestScore = alphaBeta(b, alpha, beta, i, 0, &prinVarLine);
+			if (bestScore <= alpha)  {
+				//if (i == depth)
+				std::cout << "FAIL LOW DEPTH " << i << "\n";
+				alpha = -99999;
+				alpha -= times++*asp;
+			}
+			else if (bestScore >=beta) { 
+				//if (i == depth)
+				std::cout << "FAIL HIGH DEPTH " << i << "\n";
+				beta += times++*asp;
+			}
+			else break;
+		}
+
 		if (i == depth) {
 			std::cout << "Search to ply " << i << "...\n";
-			std::cout << "Total nodes searched: " << nodes << '\n';
-			std::cout << "Terminal nodes searched: " << terminalNodes << '\n';
+			std::cout << "Main nodes searched: " << nodes << '\n';
+			std::cout << "Quies nodes searched: " << qNodes << '\n';
 			std::cout << "Time elapsed: ";
 			auto endTime1= std::chrono::high_resolution_clock::now();
 			fsec diff1 = endTime1 - beginTime2;
 			std::cout << diff1.count() << '\n';
 			std::cout << "Nodes / sec: ";
-			std::cout << nodes / diff1.count() << '\n';
+			std::cout << (nodes+qNodes) / diff1.count() << '\n';
 			std::cout << "Best score: " << bestScore << "\n\n";
 		}
 	}
@@ -78,7 +100,6 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 
 	if (depthLeft == 0) {
 		pline->count = 0;
-		nodes++;
 		return quies(b, alpha, beta, depthGone, pline);
 	}
 
@@ -87,7 +108,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	vector<int> moveList;
 
 	b.genOrderedMoveList(b.getSide(), moveList);
-	b.checkCheck(b.getSide(), moveList);
+	//b.checkCheck(b.getSide(), moveList);
 
 	int temp;
 	for (int i = 0; i < (int)moveList.size(); i++) {
@@ -107,6 +128,10 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		mT = moveList[i]%100;
 		b.setMove(mF, mT);
 		b.movePiece();
+/*		if (b.inCheck(b.getSide())) {
+			b.unmovePiece();
+			continue;
+		}*/
 		b.changeTurn();
 		if (foundPV) {
 			score = -alphaBeta(b, -alpha-1, -alpha, depthLeft-1, depthGone+1, &line);
@@ -115,6 +140,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		}	
 		else
 			score = -alphaBeta(b, -beta, -alpha, depthLeft-1, depthGone+1, &line);
+
 		b.unmovePiece();
 		b.changeTurn();
 
@@ -137,30 +163,33 @@ int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline) {
 
 	vector<int> captureList;
 
-	if (b.checkCheck(b.getSide(), captureList))
-		return alphaBeta(b, alpha, beta, 1, depthGone+1, pline); 
+	//if (b.checkCheck(b.getSide(), captureList))
+	//	return alphaBeta(b, alpha, beta, 1, depthGone+1, pline); 
 
 	int score = b.eval();
 	int mF, mT;
 	
-	if (score >= beta) {
-		nodes++;
-		terminalNodes++;
+	if (score >= beta)
 		return beta;
-	}
 	if (score > alpha)
 		alpha = score;
 
 	b.generatePieceMoveLists(b.getSide());
 	b.getGoodCaptures(b.getSide(), captureList);
 
+	if ((int)captureList.size() == 0)
+		return b.eval();
+	
 	for (int i = 0; i < (int)captureList.size(); i++) {
-		terminalNodes++;
-		nodes++;
+		qNodes++;
 		mF = captureList[i]/100;
 		mT = captureList[i]%100;
 		b.setMove(mF, mT);
 		b.movePiece();
+		if (b.inCheck(b.getSide())) {
+			b.unmovePiece();
+			continue;
+		}
 		b.changeTurn();
 		score = -quies(b, -beta, -alpha, depthGone+1, pline);
 		b.unmovePiece();
