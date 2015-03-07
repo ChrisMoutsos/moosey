@@ -5,12 +5,13 @@
 ----------------------------------
 */
 
+#include <iostream>
 #include <cstring>
+#include <chrono>
+#include "common.h"
 #include "search.h"
 #include "board.h"
-#include <iostream>
 #include "display.h"
-#include <chrono>
 
 int nodes, terminalNodes;
 LINE prinVarLine, oldPrinVarLine;
@@ -66,7 +67,7 @@ int think(Board& b, int depth) {
 	if (b.getSide()) std::cout << " White: " << totalTimeW << '\n';
 	else std::cout << "Black: " << totalTimeB << '\n';
 
-	std::cout << "Best move: " << prinVarLine.move[0] << '\n';
+	std::cout << "Best move: " << prinVarLine.move[0] << "\n\n";
 	return prinVarLine.move[0];
 }
 

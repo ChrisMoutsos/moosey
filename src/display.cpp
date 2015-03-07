@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "common.h"
 #include "sdl.h"
 #include "board.h"
 #include "ltexture.h"

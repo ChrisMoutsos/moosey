@@ -5,8 +5,9 @@
 ----------------------------------
 */
 
-#include "board.h"
 #include <iostream>
+#include "common.h"
+#include "board.h"
 
 int Board::eval() {
 	static int reverse[64] = { 56, 57, 58, 59, 60, 61, 62, 63,

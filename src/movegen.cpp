@@ -6,6 +6,7 @@
 */
 
 #include <iostream>
+#include "common.h"
 #include "board.h"
 
 void Board::genOrderedMoveList() {

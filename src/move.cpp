@@ -6,15 +6,16 @@
 */
 
 #include <iostream>
-#include "board.h"
 #include <array>
+#include "common.h"
+#include "board.h"
 
 void Board::movePiece() {
 	movePiece(moveFrom, moveTo);
 }
 
 void Board::movePiece(int mF, int mT) {
-	int killSquare = mT, epExtra = 0, mFVal = piece[board120[mF]].getValue();
+	int epExtra = 0, mFVal = piece[board120[mF]].getValue();
 	bool s = piece[board120[mF]].getColor(), passanting = false;
 	int localEpSq = null, localPmSq = null;
 	int localPieceMoved = board120[mF], localPrevOnMoveTo = board120[mT];
@@ -29,7 +30,6 @@ void Board::movePiece(int mF, int mT) {
 		//If the move is an en passant
 		if (piece[board120[mF]].getValue() == P_VAL && ply > 0 && mT == moveInfo.back().epSq) {
 			passanting = true;
-			killSquare = s ? mT-10 : mT+10;
 			epExtra = s ? -10 : 10;
 			if (s) 
 				whiteMaterial -= P_VAL;
@@ -40,13 +40,9 @@ void Board::movePiece(int mF, int mT) {
 		//Set potential en passant square
 		if (piece[board120[mF]].getValue() == P_VAL && abs(mF-mT) == 20)
 			localEpSq = s ? mF+10 : mF-10;
-			//if (s) epSq.push_back(mF+10);
-			//else epSq.push_back(mF-10);
-	//	else epSq.push_back(null);
 
 		//If the move is a promotion
 		if (mFVal == P_VAL && ((s && mT/10 == 9) || (!s && mT/10 == 2))) {
-			//pmSq.push_back(mT);
 			localPmSq = mT;
 			piece[board120[mF]].setValue(Q_VAL);
 			piece[board120[mF]].setName("Queen");
@@ -65,11 +61,6 @@ void Board::movePiece(int mF, int mT) {
 				piece[board120[mF]].setInMoveList(i, 0);
 			piece[board120[mF]].setMoveListSize(27); //Update moveListSize
 		}
-		//else pmSq.push_back(null);
-
-		//prevOnMoveTo.push_back(board120[mT]);
-		//pieceMoved.push_back(board120[mF]);
-		//pieceKilled.push_back(board120[killSquare]);
 
 		//If move is a capture
 		if (board120[mT+epExtra] != empty) {
@@ -94,20 +85,18 @@ void Board::movePiece(int mF, int mT) {
 		if (s) whiteCastled = true;
 		else blackCastled = true;
 
-		//epSq.push_back(null);
-		//pmSq.push_back(null);		
-
-		//cExtras = {kingmT-kingmF, rookmT-kingmF, emptymT-kingmF};
-		std::array<int, 3> cExtras;
-		if (castling == KINGSIDE)
-			cExtras = {2, 1, 3};	//Kingside
-		else 
-			cExtras = {-2, -1, -4};  //Queenside
+		int cExtras[3];
+		if (castling == KINGSIDE) {
+			cExtras[0] = 2; //kingmT - kingmf
+			cExtras[1] = 1; //rookmT - kingmF
+			cExtras[2] = 3; //emptymT - kingmF
+		}
+		else {
+			cExtras[0] = -2; //kingmT - kingmf
+			cExtras[1] = -1; //rookmT - kingmF
+			cExtras[2] = -4; //emptymT - kingmF
+		}
 	
-		//prevOnMoveTo.push_back(empty);
-		//pieceMoved.push_back(board120[mF]);
-		//pieceKilled.push_back(empty);
-		
 		board120[mF+cExtras[0]] = board120[mF]; //Move king
 		board120[mF] = empty;			//Empty old king sq
 		board120[mF+cExtras[1]] = board120[mF+cExtras[2]]; //Move rook
@@ -120,29 +109,9 @@ void Board::movePiece(int mF, int mT) {
 		piece[board120[mF+cExtras[1]]].incrMoved();
 
 	}
-/*
-	std::cout << "MOVEINFO BEFORE MOVE: ";
-	for (int i = 0; i < (int)moveInfo.size(); i++) {
-		std::cout << "i... pmSq: " << moveInfo[i].pmSq;
-		std::cout << ", epSq: " << moveInfo[i].epSq;
-		std::cout << ", pieceMoved: " << moveInfo[i].pieceMoved;
-		std::cout << ", prevOnMoveTo: " << moveInfo[i].prevOnMoveTo;
-		std::cout << '\n';
-	}
-	std::cout << '\n';
-*/
+
 	moveInfo.push_back({localPmSq, localEpSq, localPieceMoved, localPrevOnMoveTo});
-/*
-	std::cout << "MOVEINFO AFTER MOVE: ";
-	for (int i = 0; i < (int)moveInfo.size(); i++) {
-		std::cout << "i... pmSq: " << moveInfo[i].pmSq;
-		std::cout << ", epSq: " << moveInfo[i].epSq;
-		std::cout << ", pieceMoved: " << moveInfo[i].pieceMoved;
-		std::cout << ", prevOnMoveTo: " << moveInfo[i].prevOnMoveTo;
-		std::cout << '\n';
-	} 
-	std::cout << "\n\n";
-*/	ply++;
+	ply++;
 	castling = 0;
 }
 
@@ -153,7 +122,6 @@ void Board::unmovePiece() {
 void Board::unmovePiece(int mF, int mT) {
 	int epExtra = 0;
 	bool s = piece[board120[mT]].getColor(), unpassanting = false;
-	int localEpSq = null, localPmSq = null;
 
 	if (piece[board120[mT]].getValue() == K_VAL && abs(mF-mT) == 2)
 			castling = mF < mT ? KINGSIDE : QUEENSIDE;
@@ -189,7 +157,6 @@ void Board::unmovePiece(int mF, int mT) {
 	
 		board120[mT] = moveInfo.back().prevOnMoveTo;
 		if (unpassanting) {
-			//board120[mT+epExtra] = moveInfo.back().pieceKilled;
 			board120[mT+epExtra] = mT%10 - 1 + (s ? wPa : bPa);
 			if (s) 
 				whiteMaterial += piece[moveInfo.back().prevOnMoveTo].getValue();
@@ -213,12 +180,17 @@ void Board::unmovePiece(int mF, int mT) {
 		if (s) whiteCastled = false;
 		else blackCastled = false;
 
-		//cExtras = {kingmT-kingmF, rookmT-kingmF, emptymT-kingmF};
-		std::array<int, 3> cExtras;
-		if (castling == KINGSIDE) 	
-			cExtras = {2, 1, 3};	//Kingside
-		else
-			cExtras = {-2, -1, -4};	//Queenside
+		int cExtras[3];
+		if (castling == KINGSIDE) {
+			cExtras[0] = 2; //kingmT - kingmf
+			cExtras[1] = 1; //rookmT - kingmF
+			cExtras[2] = 3; //emptymT - kingmF
+		}
+		else {
+			cExtras[0] = -2; //kingmT - kingmf
+			cExtras[1] = -1; //rookmT - kingmF
+			cExtras[2] = -4; //emptymT - kingmF
+		}
 
 		board120[mF] = board120[mF+cExtras[0]];		   //Set king
 		board120[mT] = empty;
@@ -235,11 +207,6 @@ void Board::unmovePiece(int mF, int mT) {
 	}
 
 	movesMade.pop_back();
-	//prevOnMoveTo.pop_back();
-	//pieceMoved.pop_back();
-	//pieceKilled.pop_back();
-	//pmSq.pop_back();
-	//epSq.pop_back();
 	moveInfo.pop_back();
 	ply--;
 	castling = 0;
@@ -250,6 +217,10 @@ void Board::changeTurn() {
 }
 
 void Board::undoMove() {
+	if (ply == 0) return;
+	
+	std::cout << "\nUndid ply " << ply << '\n';
+
 	int mF2 = movesMade.back()/100;
 	int mT2 = movesMade.back()%100;
 
@@ -274,4 +245,5 @@ void Board::restart() {
 		undoMove();	
 	moveTo = null;
 	moveFrom = null;
+	std::cout << "\nRestarted game\n";
 }
