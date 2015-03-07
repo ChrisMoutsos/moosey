@@ -57,13 +57,11 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 		flag = true;
 	}
 	//Render all the rest of the text
-	turnText.render(BXSTART, BYSTART+B_SIZE+40);
 	checkText.render(BXSTART+B_SIZE-200, BYSTART+B_SIZE+40);
 	fileText.render(BXSTART+33, BYSTART+B_SIZE+10);
 
 	//Update screen
 	SDL_RenderPresent(renderer);
-
 }
 
 void setButtonPositions() {
@@ -88,14 +86,20 @@ void setSpriteClips() {
 	}
 }
 
+void displayBotText(const Board& b) {
+	std::string botStr;
+
+	botStr = b.getSide() ? "White" : "Black";
+	botStr += " is thinking..";
+	turnText.loadFromRenderedText(botStr, textColor, Garamond26);
+	turnText.render(BXSTART, BYSTART+B_SIZE+40);
+	SDL_RenderPresent(renderer);
+}
+
 void updateText(const Board& b, bool& sidey) {
-	using std::string;
-	
-	string turnStr, checkStr = " ";
+	std::string checkStr = " ";
 	if (sidey != b.getSide() || b.getPly() == 0) {
 		sidey = b.getSide();
-		turnStr = sidey ? "White to move" : "Black to move"; //Load turn text
-		turnText.loadFromRenderedText(turnStr, textColor, Garamond26);
 		if (b.getSideInCheck()) { //Load check text
 			if (b.getSideInCheckmate() == 1)
 				checkStr = "Black wins!";
@@ -107,8 +111,6 @@ void updateText(const Board& b, bool& sidey) {
 				checkStr = "Black is in check";
 		}
 		checkText.loadFromRenderedText(checkStr, textColor, Garamond26);
-		
-		//showPieceMoveLists(b);
 	}
 }
 

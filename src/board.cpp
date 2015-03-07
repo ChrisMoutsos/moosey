@@ -182,6 +182,7 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 void Board::botMove() {
 	std::cout << "Thinking for ";
 	side ? std::cout << "White...\n" : std::cout << "Black...\n";
+	displayBotText(*this);
 	int move = 0;
 	move = think(*this, 6);
 	if (!move) {
