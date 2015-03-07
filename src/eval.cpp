@@ -235,7 +235,7 @@ int Board::eval() {
 				}
 			}
 			if (open)
-				score = (j == wqR) ? score+100 : score-100;
+				score = (j == wqR) ? score+50 : score-50;
 		}
 	}
 

@@ -83,7 +83,7 @@ void Board::getGoodCaptures(bool s, std::vector<int>& moveList) {
 	/* Put every capture for side s in moveList, ordered */
 
 	moveList.clear();
-	int startP, endP, mF, mT, move;
+	int startP, endP, mF, mT, mF2, mT2, move;
 	startP = s ? wqR : bqR;
 	endP = s ? wPh : bPh;
 
@@ -108,12 +108,13 @@ void Board::getGoodCaptures(bool s, std::vector<int>& moveList) {
 			move = moveList[i];
 			mF = move/100;
 			mT = move%100;
-			diff = -piece[board120[mT]].getValue() 
-				+ piece[board120[mF]].getValue();
-			diff2 = -piece[board120[moveList[i+1]%100]].getValue() 
-				+ piece[board120[moveList[i+1]%100]].getValue();
+			mF2 = moveList[i+1]/100;
+			mT2 = moveList[i+1]%100;
+			diff = piece[board120[mT]].getValue() - piece[board120[mF]].getValue()/100;
+			diff2 = piece[board120[mT2]].getValue() - piece[board120[mF2]].getValue()/100;
+			
 			//Sort from highest disparity between attacker/victim to lowest
-			if (diff > diff2) {
+			if (diff < diff2) {
 				temp = moveList[i+1];
 				moveList[i+1] = move;
 				moveList[i] = temp;
