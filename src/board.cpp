@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include "common.h"
 #include "board.h"
 #include "display.h"
 #include "button.h"
@@ -176,6 +177,23 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 		mF = -1;
 		mT = -1;
 	}
+}
+
+void Board::botMove() {
+	std::cout << "Thinking for ";
+	side ? std::cout << "White...\n" : std::cout << "Black...\n";
+	int move = 0;
+	move = think(*this, 6);
+	if (!move) {
+		SDL_Delay(1000*60);
+		return;
+	}
+	setMove(move/100, move%100);
+	movePiece();
+	changeTurn();
+	genOrderedMoveList();
+	checkCheck(side);
+
 }
 
 //ACCESSORS
