@@ -13,7 +13,7 @@
 #include "board.h"
 #include "display.h"
 
-int nodes, qNodes;
+int nodes, qNodes, r = 2;
 LINE prinVarLine, oldPrinVarLine;
 double totalTimeW = 0, totalTimeB = 0;
 
@@ -32,6 +32,11 @@ int think(Board& b, int depth) {
 	b.checkCheck(b.getSide(), moveList);
 	
 	for (int i = 1; i <= depth; i++) {
+		for (int f = 0; f < 64; f++) {
+			for (int t = 0; t < 64; t++)
+				b.hh[b.getSide()][f][t] /= 2;
+		}
+
 		oldPrinVarLine = prinVarLine;
 
 		auto beginTime2 = std::chrono::high_resolution_clock::now();
@@ -43,18 +48,14 @@ int think(Board& b, int depth) {
 		alpha = bestScore - asp;
 		beta = bestScore + asp;
 		for (;;) {
-			int times = 1;
-			bestScore = alphaBeta(b, alpha, beta, i, 0, &prinVarLine);
+			bestScore = alphaBeta(b, alpha, beta, i, 0, &prinVarLine, 1);
 			if (bestScore <= alpha)  {
-				//if (i == depth)
 				std::cout << "FAIL LOW DEPTH " << i << "\n";
 				alpha = -99999;
-				alpha -= times++*asp;
 			}
 			else if (bestScore >=beta) { 
-				//if (i == depth)
 				std::cout << "FAIL HIGH DEPTH " << i << "\n";
-				beta += times++*asp;
+				beta = 99999;
 			}
 			else break;
 		}
@@ -93,26 +94,49 @@ int think(Board& b, int depth) {
 	return prinVarLine.move[0];
 }
 
-int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE* pline) {
+int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE* pline, bool allowNull) {
 	using std::vector;
 
 	LINE line;
 
+	//If our king is dead, return bad score
+	if (b.getSide() && !b.piece[wK].getAlive())
+		return -9999;
+	else if (!b.getSide() && !b.piece[bK].getAlive())
+		return -9999;
+
+	int score;
+
+	//Quiescence search the terminal nodes
 	if (depthLeft == 0) {
 		pline->count = 0;
 		return quies(b, alpha, beta, depthGone, pline);
 	}
 
+	//Null move
+	if (allowNull && depthLeft > r) {
+		if (!b.inCheck(b.getSide())) {
+			b.changeTurn();
+			score = -alphaBeta(b, -beta, -beta+1, depthLeft-1-r, depthGone-1-r, pline, 0);
+			b.changeTurn();
+			if (score >= beta) { 
+//				std::cout << "NULL MOVE CUTOFF AT DEPTH " << depthGone << "\n";
+				return score;
+			}
+		}
+	}
+
 	bool foundPV = false;
-	int score, mF, mT;
+	int mF, mT;
 	vector<int> moveList;
 
 	b.genOrderedMoveList(b.getSide(), moveList);
-	//b.checkCheck(b.getSide(), moveList);
+	b.checkCheck(b.getSide(), moveList);
 
+	//Put principal variation first
 	int temp;
 	for (int i = 0; i < (int)moveList.size(); i++) {
-		if (moveList[i] == oldPrinVarLine.move[depthGone]) {
+		if (moveList[i] == oldPrinVarLine.move[depthGone] && allowNull) {
 			temp = moveList[i];
 			moveList.erase(moveList.begin()+i);
 			moveList.insert(moveList.begin()+0, temp);
@@ -128,24 +152,24 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		mT = moveList[i]%100;
 		b.setMove(mF, mT);
 		b.movePiece();
-/*		if (b.inCheck(b.getSide())) {
-			b.unmovePiece();
-			continue;
-		}*/
 		b.changeTurn();
+		//If we had an alpha cutoff, do a zero-window search to make sure
 		if (foundPV) {
-			score = -alphaBeta(b, -alpha-1, -alpha, depthLeft-1, depthGone+1, &line);
-			if ((score > alpha) && (score < beta))
-				score = -alphaBeta(b, -beta, -alpha, depthLeft-1, depthGone+1, &line);
+			score = -alphaBeta(b, -alpha-1, -alpha, depthLeft-1, depthGone+1, &line, 1);
+			if ((score > alpha) && (score < beta)) //If we were wrong
+				score = -alphaBeta(b, -beta, -alpha, depthLeft-1, depthGone+1, &line, 1);
 		}	
 		else
-			score = -alphaBeta(b, -beta, -alpha, depthLeft-1, depthGone+1, &line);
+			score = -alphaBeta(b, -beta, -alpha, depthLeft-1, depthGone+1, &line, 1);
 
 		b.unmovePiece();
 		b.changeTurn();
 
-		if (score >= beta)
+		if (score >= beta) {
+			if (b.getBoard120(mT) != empty)
+				b.hh[b.getSide()][to64(mF)-1][to64(mT)-1] += depthGone*depthGone;
 			return beta;
+		}
 		if (score > alpha) {
 			alpha = score;
 			foundPV = true;
@@ -166,6 +190,11 @@ int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline) {
 	//if (b.checkCheck(b.getSide(), captureList))
 	//	return alphaBeta(b, alpha, beta, 1, depthGone+1, pline); 
 
+	if (b.getSide() && !b.piece[wK].getAlive())
+		return -9999;
+	else if (!b.getSide() && !b.piece[bK].getAlive())
+		return -9999;
+
 	int score = b.eval();
 	int mF, mT;
 	
@@ -178,7 +207,7 @@ int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline) {
 	b.getGoodCaptures(b.getSide(), captureList);
 
 	if ((int)captureList.size() == 0)
-		return b.eval();
+		return score;
 	
 	for (int i = 0; i < (int)captureList.size(); i++) {
 		qNodes++;
@@ -197,8 +226,10 @@ int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline) {
 		
 		if (score >= beta)
 			return beta;
-		if (score > alpha)
+		if (score > alpha) {
+			b.hh[b.getSide()][to64(mF)-1][to64(mT)-1] += depthGone;
 			alpha = score;
+		}
 	}
 
 	return alpha;

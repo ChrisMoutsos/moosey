@@ -17,7 +17,7 @@ struct LINE {
 };
 
 int think(Board& b, int depth);
-int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE* pline);
+int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE* pline, bool allowNull);
 int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline);
 
 #endif
