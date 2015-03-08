@@ -22,24 +22,53 @@ void Board::genOrderedMoveList(bool s, std::vector<int>& moveList) {
 
 	moveList.clear();
 	std::vector<int> captures, nonCaptures;
-	int mF, mT, move;
+	int mF, mT, mF2, mT2,  move, temp;
 		
 	generatePieceMoveLists(s);
 	getGoodCaptures(s, captures);
 	getNonCaptures(s, nonCaptures);
 
+	bool unsorted = true;
+	
+/*	std::cout << "NONCAPTURES BEFORE SORT: ";
 	for (int i = 0; i < (int)nonCaptures.size(); i++) {
-		move = nonCaptures[i];
-		mF = move/100;
-		mT = move%100;
-		if (piece[board120[mF]].getValue() == K_VAL) {
-			if (abs(mF-mT) == 2) {
-				nonCaptures.erase(nonCaptures.begin()+i);
-				nonCaptures.insert(nonCaptures.begin(), move);
+		std::cout << nonCaptures[i] << " ";
+	}
+	std::cout << '\n';
+*/
+	while (unsorted) {
+		unsorted = false;
+		for (int i = 0; i < (int)nonCaptures.size()-1; i++) {
+			move = nonCaptures[i];
+			mF = move/100;
+			mT = move%100;
+			mF2 = nonCaptures[i+1]/100;
+			mT2 = nonCaptures[i+1]%100;
+
+/*
+			if (hh[s][to64(mF)-1][to64(mT)-1] < hh[s][to64(mF2)-1][to64(mT2)-1]) {
+				nonCaptures[i] = mF2*100+mT2;
+				nonCaptures[i+1] = mF*100+mT;
+				unsorted = true;
 			}
+*/
+	/*
+			if (piece[board120[mF]].getValue() == K_VAL) {
+				if (abs(mF-mT) == 2) {
+					nonCaptures.erase(nonCaptures.begin()+i);
+					nonCaptures.insert(nonCaptures.begin(), move);
+				}
+			}
+		*/
 		}
 	}
-
+/*
+	std::cout << "NONCAPTURES AFTER SORT: ";
+	for (int i = 0; i < (int)nonCaptures.size(); i++) {
+		std::cout << nonCaptures[i] << " ";
+	}
+	std::cout << '\n';
+*/
 	moveList.reserve(captures.size() + nonCaptures.size());
 	moveList.insert(moveList.begin(), captures.begin(), captures.end());
 	moveList.insert(moveList.end(), nonCaptures.begin(), nonCaptures.end());
@@ -125,34 +154,6 @@ void Board::getGoodCaptures(bool s, std::vector<int>& moveList) {
 	}
 }
 
-/*
-void Board::generateMoveLists() {	
-	generateMoveListFor(WHITE, whiteMoveList);
-	generateMoveListFor(BLACK, blackMoveList);
-}
-
-void Board::generateMoveListFor(bool s, std::vector<int>& moveList) {	
-//	 Generates psuedo-legal moves for side s, stores it in moveList 
-
-	int mF, mT;
-	bool realSide = side;
-
-	side = s;
-	for (int p = bqR-(s*bqR); p <= bPh-(s*bqR); p++)
-		generatePieceMoveListFor(p);
-
-	moveList.clear();
-	for (int p = bqR-(s*bqR); p <= bPh-(s*bqR); p++)
-		for (int j = 0; j < piece[p].getMoveListSize(); j++) 
-			if (piece[p].getFromMoveList(j) != null) {
-				mF = piece[p].getPos();
-				mT = piece[p].getFromMoveList(j);
-				moveList.push_back(mF*100 + mT);
-			}
-
-	side = realSide;	
-}
-*/
 void Board::cleanMoveList(bool s) {
 	if (s)
 		cleanMoveList(s, whiteMoveList);

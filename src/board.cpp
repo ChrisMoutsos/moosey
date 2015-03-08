@@ -54,6 +54,10 @@ void Board::initializeVars() {
 	castling = sideInCheck = sideInCheckmate = 0;
 	whiteMaterial = 8*P_VAL + 2*(R_VAL+B_VAL+N_VAL) + Q_VAL + K_VAL;
 	blackMaterial = whiteMaterial;
+	for (int i = 0; i < 2; i++)
+		for (int f = 0; f < 64; f++)
+			for (int t = 0; t < 64; t++)
+				hh[i][f][t] = 0;
 }
 
 void Board::emptyBoard() {
@@ -181,14 +185,11 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 
 void Board::botMove() {
 	std::cout << "Thinking for ";
-	side ? std::cout << "White...\n" : std::cout << "Black...\n";
+	side ? std::cout << "White..." : std::cout << "Black...";
+	std::cout << " (ply " << ply << ")\n";
 	displayBotText(*this);
 	int move = 0;
-	move = think(*this, 6);
-	if (!move) {
-		SDL_Delay(1000*60);
-		return;
-	}
+	move = think(*this, 8);
 	setMove(move/100, move%100);
 	movePiece();
 	changeTurn();
