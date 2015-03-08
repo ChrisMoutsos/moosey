@@ -11,7 +11,10 @@
  * - Quiescence search
  * - Principal variation search
  * - Iterated deepening,
- * - using old princ. var. as first nodes 
+ * - using old princ. var. as first nodes
+ * - Aspiration window
+ * - Null move heuristic
+ * - (Removed history heuristic for now)
  * 
  * ##To-Do List##
  * SDL:
@@ -62,7 +65,8 @@ int main(int argc, char* args[]) {
 					case SDLK_SPACE:
 						mF = mT = -1;
 						displayBoard(board, mF, mT);
-						board.botMove();
+						if (!board.getSideInCheckmate())
+							board.botMove();
 					break;
 					case SDLK_LEFT:
 						board.undoMove();
