@@ -91,6 +91,7 @@ class Board {
 		bool validateKingMove(int mF, int mT, bool s);
 		bool canCastle(int dir, bool s);
 		bool checkStalemate() const;
+		void setCheck(bool s);
 		bool checkCheck(bool s);
 		bool checkCheck(bool s, std::vector<int>& moveList);
 		bool inCheckmate(bool s) const;
@@ -118,6 +119,8 @@ class Board {
 		Square squares[64];	//For the display
 
 		Piece piece[32];	//The pieces
+
+		int hh[2][64][64];		//History heuristic
 	private:
 		int board120[120], moveFrom, moveTo, ply;
 		int whiteMaterial, blackMaterial;
