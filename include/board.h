@@ -100,7 +100,11 @@ class Board {
 		//MOVEGEN.CPP
 		void genOrderedMoveList();
 		void genOrderedMoveList(bool s, std::vector<int>& moveList);
-		void getGoodCaptures(bool s, std::vector<int>& moveList);
+		void getCaptures(bool s, std::vector<int>& moveList);
+		void sortCaptures(std::vector<int>& moveList);
+		bool MVVLVA(int i, int j);
+		void sortNonCaptures(std::vector<int>& moveList);
+		bool nonCaptureSort(bool s, int i, int j);
 		void getNonCaptures(bool s, std::vector<int>& moveList);
 		void removeNonCaptures(bool s, std::vector<int>& moveList);
 		void cleanMoveList(bool s);
