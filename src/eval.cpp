@@ -161,8 +161,8 @@ int Board::eval() {
 	}
 
 	//Castled
-	if (whiteCastled) score += 100;
-	if (blackCastled) score -= 100;
+	if (whiteCastled) score += 50;
+	if (blackCastled) score -= 50;
 
 	//Passed pawns
 	int filesWithBlackPawns[8] = {0}, filesWithWhitePawns[8] = {0};
