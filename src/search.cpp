@@ -32,10 +32,10 @@ int think(Board& b, int depth) {
 	b.checkCheck(b.getSide(), moveList);
 	
 	for (int i = 1; i <= depth; i++) {
-		for (int f = 0; f < 64; f++) {
+		//Age HH tables
+		for (int f = 0; f < 64; f++)
 			for (int t = 0; t < 64; t++)
 				b.hh[b.getSide()][f][t] /= 2;
-		}
 
 		oldPrinVarLine = prinVarLine;
 
@@ -43,8 +43,6 @@ int think(Board& b, int depth) {
 		nodes = 0;
 		qNodes = 0;
 		
-		//bestScore = alphaBeta(b, alpha, beta, i, 0, &prinVarLine);
-
 		alpha = bestScore - asp;
 		beta = bestScore + asp;
 		for (;;) {
@@ -53,7 +51,7 @@ int think(Board& b, int depth) {
 				std::cout << "FAIL LOW DEPTH " << i << "\n";
 				alpha = -99999;
 			}
-			else if (bestScore >=beta) { 
+			else if (bestScore >= beta) { 
 				std::cout << "FAIL HIGH DEPTH " << i << "\n";
 				beta = 99999;
 			}
@@ -119,10 +117,8 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 			b.changeTurn();
 			score = -alphaBeta(b, -beta, -beta+1, depthLeft-1-r, depthGone-1-r, pline, 0);
 			b.changeTurn();
-			if (score >= beta) { 
-//				std::cout << "NULL MOVE CUTOFF AT DEPTH " << depthGone << "\n";
+			if (score >= beta) 
 				return score;
-			}
 		}
 	}
 
@@ -153,7 +149,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		b.setMove(mF, mT);
 		b.movePiece();
 		b.changeTurn();
-		//If we had an alpha cutoff, do a zero-window search to make sure
+		//If we had an alpha cutoff, do a zero-window search (guessing we were right)
 		if (foundPV) {
 			score = -alphaBeta(b, -alpha-1, -alpha, depthLeft-1, depthGone+1, &line, 1);
 			if ((score > alpha) && (score < beta)) //If we were wrong
@@ -166,7 +162,8 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		b.changeTurn();
 
 		if (score >= beta) {
-			if (b.getBoard120(mT) != empty)
+			//If it wasn't a capture, add it to the HH table
+			if (b.getBoard120(mT) == empty)
 				b.hh[b.getSide()][to64(mF)-1][to64(mT)-1] += depthGone*depthGone;
 			return beta;
 		}
@@ -204,13 +201,16 @@ int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline) {
 		alpha = score;
 
 	b.generatePieceMoveLists(b.getSide());
-	b.getGoodCaptures(b.getSide(), captureList);
+	b.getCaptures(b.getSide(), captureList);
 
 	if ((int)captureList.size() == 0)
 		return score;
 	
+	b.sortCaptures(captureList);
+
 	for (int i = 0; i < (int)captureList.size(); i++) {
 		qNodes++;
+
 		mF = captureList[i]/100;
 		mT = captureList[i]%100;
 		b.setMove(mF, mT);
@@ -227,7 +227,6 @@ int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline) {
 		if (score >= beta)
 			return beta;
 		if (score > alpha) {
-			b.hh[b.getSide()][to64(mF)-1][to64(mT)-1] += depthGone;
 			alpha = score;
 		}
 	}

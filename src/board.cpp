@@ -195,7 +195,6 @@ void Board::botMove() {
 	changeTurn();
 	genOrderedMoveList();
 	checkCheck(side);
-
 }
 
 //ACCESSORS
