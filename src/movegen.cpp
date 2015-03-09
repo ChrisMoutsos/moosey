@@ -6,7 +6,10 @@
 */
 
 #include <iostream>
+#include <algorithm>
 #include "common.h"
+#include "display.h"
+#include <SDL2/SDL.h>
 #include "board.h"
 
 void Board::genOrderedMoveList() {
@@ -22,58 +25,74 @@ void Board::genOrderedMoveList(bool s, std::vector<int>& moveList) {
 
 	moveList.clear();
 	std::vector<int> captures, nonCaptures;
-	int mF, mT, mF2, mT2,  move, temp;
+	int mF, mT, mF2, mT2, move;
 		
 	generatePieceMoveLists(s);
-	getGoodCaptures(s, captures);
+	getCaptures(s, captures);
 	getNonCaptures(s, nonCaptures);
 
-	bool unsorted = true;
-	
-/*	std::cout << "NONCAPTURES BEFORE SORT: ";
-	for (int i = 0; i < (int)nonCaptures.size(); i++) {
-		std::cout << nonCaptures[i] << " ";
-	}
-	std::cout << '\n';
-*/
-	while (unsorted) {
-		unsorted = false;
-		for (int i = 0; i < (int)nonCaptures.size()-1; i++) {
-			move = nonCaptures[i];
-			mF = move/100;
-			mT = move%100;
-			mF2 = nonCaptures[i+1]/100;
-			mT2 = nonCaptures[i+1]%100;
+	sortCaptures(captures);
+	sortNonCaptures(nonCaptures);
 
-/*
-			if (hh[s][to64(mF)-1][to64(mT)-1] < hh[s][to64(mF2)-1][to64(mT2)-1]) {
-				nonCaptures[i] = mF2*100+mT2;
-				nonCaptures[i+1] = mF*100+mT;
-				unsorted = true;
-			}
-*/
-	/*
-			if (piece[board120[mF]].getValue() == K_VAL) {
-				if (abs(mF-mT) == 2) {
+	if ((!whiteCastled && s) || (!blackCastled && s)) {
+		for (int i = 0; i < (int)nonCaptures.size(); i++) {
+			if (piece[board120[nonCaptures[i]/100]].getValue() == K_VAL) {
+				if (abs(nonCaptures[i]/100 - nonCaptures[i]%100) == 2) {
+					int move = nonCaptures[i];
 					nonCaptures.erase(nonCaptures.begin()+i);
 					nonCaptures.insert(nonCaptures.begin(), move);
 				}
 			}
-		*/
 		}
 	}
-/*
-	std::cout << "NONCAPTURES AFTER SORT: ";
-	for (int i = 0; i < (int)nonCaptures.size(); i++) {
-		std::cout << nonCaptures[i] << " ";
-	}
-	std::cout << '\n';
-*/
+
 	moveList.reserve(captures.size() + nonCaptures.size());
 	moveList.insert(moveList.begin(), captures.begin(), captures.end());
 	moveList.insert(moveList.end(), nonCaptures.begin(), nonCaptures.end());
 }
 
+void Board::sortCaptures(std::vector<int>& moveList) {
+	bool sorted = false;
+	int temp;
+	while (!sorted) {
+		sorted = true;
+		for (int i = 0; i < (int)moveList.size() - 1; i++) {
+			if (!MVVLVA(moveList[i], moveList[i+1])) {
+				temp = moveList[i];
+				moveList[i] = moveList[i+1];
+				moveList[i+1] = temp;
+				sorted = false;
+			}
+		}
+	}
+}
+
+bool Board::MVVLVA(int i, int j) {
+	return (piece[board120[i%100]].getValue() - piece[board120[i/100]].getValue()/10
+		 >= piece[board120[j%100]].getValue() - piece[board120[j/100]].getValue()/10);
+}
+
+void Board::sortNonCaptures(std::vector<int>& moveList) {
+	bool sorted = false, s;
+	int temp;
+	while (!sorted) {
+		sorted = true;
+		if ((int)moveList.size() > 0)
+			s = piece[board120[moveList[0]/100]].getColor();
+		for (int i = 0; i < (int)moveList.size() - 1; i++) {
+			if (!nonCaptureSort(s, moveList[i], moveList[i+1])) {
+				temp = moveList[i];
+				moveList[i] = moveList[i+1];
+				moveList[i+1] = temp;
+				sorted = false;
+			}
+		}
+	}
+}
+
+bool Board::nonCaptureSort(bool s, int i, int j) {
+	return (hh[s][to64(i/100)-1][to64(i%100)-1] >= hh[s][to64(j/100)-1][to64(j%100)-1]);
+}
 
 void Board::removeNonCaptures(bool s, std::vector<int>& moveList) {
 	/* Remove any move in moveList that is a noncapture */
@@ -108,48 +127,25 @@ void Board::getNonCaptures(bool s, std::vector<int>& moveList) {
 	}
 }
 
-void Board::getGoodCaptures(bool s, std::vector<int>& moveList) {
-	/* Put every capture for side s in moveList, ordered */
+void Board::getCaptures(bool s, std::vector<int>& moveList) {
+	/* Put every capture for side s in moveList */
 
 	moveList.clear();
-	int startP, endP, mF, mT, mF2, mT2, move;
+	int startP, endP, mF, mT;
 	startP = s ? wqR : bqR;
 	endP = s ? wPh : bPh;
 
+	int tempSize;
 	for (int i = startP; i <= endP; i++) {
 		if (!piece[i].getAlive()) continue;
+		generatePieceMoveListFor(i);
+		tempSize = piece[i].getMoveListSize();
 		mF = piece[i].getPos();
-		for (int j = 0; j < piece[i].getMoveListSize(); j++) {
+		for (int j = 0; j < tempSize; j++) {
 			mT = piece[i].getFromMoveList(j);
 			if (mT == 0) break;
 			if (board120[mT] == empty) continue;
 			moveList.push_back(mF*100+mT);
-		}
-	}
-
-	//Bubble sort captures	
-	int temp, j = 0, diff, diff2;
-	bool changed = true;
-	while (changed) {
-		changed = false;
-		j++;
-		for (int i = 0; i < (int)moveList.size() - j; i++) {
-			move = moveList[i];
-			mF = move/100;
-			mT = move%100;
-			mF2 = moveList[i+1]/100;
-			mT2 = moveList[i+1]%100;
-			diff = piece[board120[mT]].getValue() - piece[board120[mF]].getValue()/100;
-			diff2 = piece[board120[mT2]].getValue() - piece[board120[mF2]].getValue()/100;
-			
-			//Sort from highest disparity between attacker/victim to lowest
-			if (diff < diff2) {
-				temp = moveList[i+1];
-				moveList[i+1] = move;
-				moveList[i] = temp;
-				changed = true;
-			}
-			
 		}
 	}
 }
@@ -304,7 +300,7 @@ void Board::generatePawnMoves(int p, int& counter) {
 	int extra, mT;
         for (int i = 1; i <= 4; i++) {
                 extra = i==1 ? 10 : i==2 ? 20 : i==3 ? 11 : 9;
-		extra = side ? extra : -extra;
+		extra = s ? extra : -extra;
 		mT = piece[p].getPos() + extra;
                 if (validateMove(piece[p].getPos(), mT, s)) {
                         piece[p].setInMoveList(counter, mT);
