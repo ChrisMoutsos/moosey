@@ -96,24 +96,38 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	using std::vector;
 
 	LINE line;
+	bool s = b.getSide();
 
 	//If our king is dead, return bad score
-	if (b.getSide() && !b.piece[wK].getAlive())
-		return -9999;
-	else if (!b.getSide() && !b.piece[bK].getAlive())
-		return -9999;
+	if (s && !b.piece[wK].getAlive()) {
+		return -9999 + depthGone-1;
+	}
+	else if (!s && !b.piece[bK].getAlive()) {
+		return -9999 + depthGone-1;
+	}
 
-	int score;
-
-	//Quiescence search the terminal nodes
+	//Terminal nodes
 	if (depthLeft == 0) {
+		//If we're in check, search a little further
+		if (b.inCheck(s))
+			return alphaBeta(b, alpha, beta, 1, depthGone, pline, 0); 
+		//Otherwise, do a quiescence search
 		pline->count = 0;
+		//std::cout << "alphabeta callin quies\n";
 		return quies(b, alpha, beta, depthGone, pline);
 	}
 
+	int score;
+	
+	if (b.inCheck(s)) {
+		if (s) b.setSideInCheck(1);
+		else b.setSideInCheck(2);
+	}
+	else b.setSideInCheck(0);
+
 	//Null move
 	if (allowNull && depthLeft > r) {
-		if (!b.inCheck(b.getSide())) {
+		if (!((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
 			b.changeTurn();
 			score = -alphaBeta(b, -beta, -beta+1, depthLeft-1-r, depthGone-1-r, pline, 0);
 			b.changeTurn();
@@ -126,9 +140,23 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	int mF, mT;
 	vector<int> moveList;
 
-	b.genOrderedMoveList(b.getSide(), moveList);
-	b.checkCheck(b.getSide(), moveList);
+	b.genOrderedMoveList(s, moveList);
 
+	//If we are in checkmate
+	if ((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2)) {
+		b.cleanMoveList(s, moveList);
+		if ((int)moveList.size() == 0) {
+			pline->count = 0;
+			return -9999 + depthGone-1;
+		}
+	}
+
+/*
+	if (b.checkCheck(s, moveList)) {
+		pline->count = 0;
+		return -9999 + depthGone-1;
+	}
+*/
 	//Put principal variation first
 	int temp;
 	for (int i = 0; i < (int)moveList.size(); i++) {
@@ -164,12 +192,13 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		if (score >= beta) {
 			//If it wasn't a capture, add it to the HH table
 			if (b.getBoard120(mT) == empty)
-				b.hh[b.getSide()][to64(mF)-1][to64(mT)-1] += depthGone*depthGone;
+				b.hh[s][to64(mF)-1][to64(mT)-1] += depthGone*depthGone;
 			return beta;
 		}
 		if (score > alpha) {
 			alpha = score;
 			foundPV = true;
+			//Add it to the principal variation
 			pline->move[0] = mF*100 + mT;
 			memcpy(pline->move + 1, line.move, line.count * sizeof(int));
 			pline->count = line.count + 1;
@@ -183,14 +212,13 @@ int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline) {
 	using std::vector;
 
 	vector<int> captureList;
+	bool s = b.getSide();
 
-	//if (b.checkCheck(b.getSide(), captureList))
-	//	return alphaBeta(b, alpha, beta, 1, depthGone+1, pline); 
+	//if (b.inCheck(b.getSide()))
+	//	return alphaBeta(b, alpha, beta, 1, depthGone+1, pline, 1); 
 
-	if (b.getSide() && !b.piece[wK].getAlive())
-		return -9999;
-	else if (!b.getSide() && !b.piece[bK].getAlive())
-		return -9999;
+	if ((s && !b.piece[wK].getAlive()) || (!s && !b.piece[bK].getAlive()))
+		return -9999 + depthGone-1;
 
 	int score = b.eval();
 	int mF, mT;
@@ -200,8 +228,8 @@ int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline) {
 	if (score > alpha)
 		alpha = score;
 
-	b.generatePieceMoveLists(b.getSide());
-	b.getCaptures(b.getSide(), captureList);
+	b.generatePieceMoveLists(s);
+	b.getCaptures(s, captureList);
 
 	if ((int)captureList.size() == 0)
 		return score;
@@ -215,7 +243,7 @@ int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline) {
 		mT = captureList[i]%100;
 		b.setMove(mF, mT);
 		b.movePiece();
-		if (b.inCheck(b.getSide())) {
+		if (b.inCheck(s)) {
 			b.unmovePiece();
 			continue;
 		}
@@ -230,6 +258,6 @@ int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline) {
 			alpha = score;
 		}
 	}
-
+	
 	return alpha;
 }
