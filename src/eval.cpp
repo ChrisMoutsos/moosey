@@ -160,6 +160,12 @@ int Board::eval() {
 			score -= piece[i].getValue();
 	}
 
+	//Bishop pair
+	if (piece[wqB].getAlive() && piece[wkB].getAlive())
+		score += 50;
+	if (piece[bqB].getAlive() && piece[bkB].getAlive())
+		score -= 50;
+
 	//Castled
 	if (whiteCastled) score += 50;
 	if (blackCastled) score -= 50;
