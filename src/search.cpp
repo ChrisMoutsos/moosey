@@ -150,22 +150,17 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 			return -9999 + depthGone-1;
 		}
 	}
-
-/*
-	if (b.checkCheck(s, moveList)) {
-		pline->count = 0;
-		return -9999 + depthGone-1;
-	}
-*/
 	//Put principal variation first
 	int temp;
-	for (int i = 0; i < (int)moveList.size(); i++) {
-		if (moveList[i] == oldPrinVarLine.move[depthGone] && allowNull) {
-			temp = moveList[i];
-			moveList.erase(moveList.begin()+i);
-			moveList.insert(moveList.begin()+0, temp);
-		}
-	}	
+	if (allowNull) { //Except if we already null-moved, or checking a check
+		for (int i = 0; i < (int)moveList.size(); i++) {
+			if (moveList[i] == oldPrinVarLine.move[depthGone]) {
+				temp = moveList[i];
+				moveList.erase(moveList.begin()+i);
+				moveList.insert(moveList.begin()+0, temp);
+			}
+		}	
+	}
 
 
 	for (int i = 0; i < (int)moveList.size(); i++) {
@@ -213,9 +208,6 @@ int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline) {
 
 	vector<int> captureList;
 	bool s = b.getSide();
-
-	//if (b.inCheck(b.getSide()))
-	//	return alphaBeta(b, alpha, beta, 1, depthGone+1, pline, 1); 
 
 	if ((s && !b.piece[wK].getAlive()) || (!s && !b.piece[bK].getAlive()))
 		return -9999 + depthGone-1;
