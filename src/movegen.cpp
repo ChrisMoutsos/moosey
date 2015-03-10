@@ -32,7 +32,7 @@ void Board::genOrderedMoveList(bool s, std::vector<int>& moveList) {
 	getNonCaptures(s, nonCaptures);
 
 	sortCaptures(captures);
-	//sortNonCaptures(nonCaptures);
+	sortNonCaptures(nonCaptures);
 
 	if ((!whiteCastled && s) || (!blackCastled && s)) {
 		for (int i = 0; i < (int)nonCaptures.size(); i++) {

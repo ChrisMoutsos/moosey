@@ -18,6 +18,7 @@ int nodes, qNodes, r = 2;
 LINE prinVarLine, oldPrinVarLine;
 double totalTimeW = 0, totalTimeB = 0;
 SDL_Event e; //Event handler
+int killers[20][2];
 
 int think(Board& b, int depth) {
 	using std::vector;
@@ -42,6 +43,11 @@ int think(Board& b, int depth) {
 			prinVarLine.move[i] = 0;
 		for (int i = 0; i < oldPrinVarLine.count; i++)
 			oldPrinVarLine.move[i] = 0;
+	}
+
+	for (int i = 0; i < 20; i++) {
+		killers[i][0] = 0;
+		killers[i][1] = 0;
 	}
 
 	b.genOrderedMoveList(b.getSide(), moveList);
@@ -150,10 +156,10 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	if (allowNull && depthLeft > r) {
 		if (!((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
 			b.changeTurn();
-			score = -alphaBeta(b, -beta, -beta+1, depthLeft-1-r, depthGone-1-r, pline, 0);
+			score = -alphaBeta(b, -beta, -beta+1, depthLeft-1-r, depthGone+1, pline, 0);
 			b.changeTurn();
 			if (score >= beta) 
-				return score;
+				return beta;
 		}
 	}
 
@@ -183,7 +189,20 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 			moveList.insert(moveList.begin()+0, temp);
 		}
 	}
-
+	//Put killer moves after that
+	int killerMove;
+	for (int i = 1; i >= 0; i--) {
+		killerMove = killers[depthGone][i];
+		std::vector<int>::iterator kIndex;
+		kIndex = std::find(moveList.begin(), moveList.end(), killerMove);
+		if (kIndex != moveList.end()) {
+			moveList.erase(kIndex);
+			if (moveList[0] == oldPrinVarLine.move[depthGone])
+				moveList.insert(moveList.begin()+1, killerMove);
+			else
+				moveList.insert(moveList.begin()+0, killerMove);
+		}
+	}
 
 	for (int i = 0; i < (int)moveList.size(); i++) {
 		vector<int> localPV;
@@ -207,9 +226,12 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		b.changeTurn();
 
 		if (score >= beta) {
-			//If it wasn't a capture, add it to the HH table
-			if (b.getBoard120(mT) == empty)
+			//If it wasn't a capture, update HH table and killer moves
+			if (b.getBoard120(mT) == empty) {
 				b.hh[s][to64(mF)-1][to64(mT)-1] += depthGone*depthGone;
+				killers[depthGone][1] = killers[depthGone][0];
+				killers[depthGone][0] = mF*100+mT;
+			}
 			return beta;
 		}
 		if (score > alpha) {
