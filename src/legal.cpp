@@ -54,20 +54,12 @@ bool Board::checkCheck(bool s, std::vector<int>& moveList) {
 	if (inCheck(s)) {
 		sideInCheck = s ? 1 : 2;
 		cleanMoveList(s, moveList);
-		if (inCheckmate(s)) { //Checkmate
+		if ((int)moveList.size() == 0) { //Checkmate
 			sideInCheckmate = s ? 1 : 2;
 			return true;
 		}
 	}
 	return false;	//Not checkmate
-}
-
-bool Board::inCheckmate(bool s) const { 
-	if (s && (int)whiteMoveList.size() == 0) 
-		return true;
-	else if (!s && (int)blackMoveList.size() == 0) 
-		return true;
-	return false;
 }
 
 bool Board::inCheck(bool s) const {
@@ -242,6 +234,7 @@ bool Board::validateKingMove(int mF, int mT, bool s) {
 }
 
 bool Board::canCastle(int dir, bool s) {
+	/* Psuedo-legalizes castling. Meaning you can castle into check */
 	int k = s ? wK : bK;
 	int r = s ? dir == KINGSIDE ? wkR : wqR : dir == KINGSIDE ? bkR : bqR;
 	int c = dir == KINGSIDE ? 1 : -1;

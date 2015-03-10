@@ -94,7 +94,6 @@ class Board {
 		void setCheck(bool s);
 		bool checkCheck(bool s);
 		bool checkCheck(bool s, std::vector<int>& moveList);
-		bool inCheckmate(bool s) const;
 		bool inCheck(bool s) const;
 	
 		//MOVEGEN.CPP
