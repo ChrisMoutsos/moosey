@@ -17,6 +17,7 @@
 int nodes, qNodes, r = 2;
 LINE prinVarLine, oldPrinVarLine;
 double totalTimeW = 0, totalTimeB = 0;
+SDL_Event e; //Event handler
 
 int think(Board& b, int depth) {
 	using std::vector;
@@ -28,6 +29,20 @@ int think(Board& b, int depth) {
 	int alpha = -99999, beta = 99999;
 	int asp = 100;
 	vector<int> moveList;
+
+	if (b.getPly() == 0) {
+		totalTimeW = 0;
+		totalTimeB = 0;
+		for (int f = 0; f < 64; f++)
+			for (int t = 0; t < 64; t++) {
+				b.hh[BLACK][f][t] = 0;
+				b.hh[WHITE][f][t] = 0;
+			}
+		for (int i = 0; i < prinVarLine.count; i++)
+			prinVarLine.move[i] = 0;
+		for (int i = 0; i < oldPrinVarLine.count; i++)
+			oldPrinVarLine.move[i] = 0;
+	}
 
 	b.genOrderedMoveList(b.getSide(), moveList);
 	b.checkCheck(b.getSide(), moveList);
@@ -94,6 +109,11 @@ int think(Board& b, int depth) {
 }
 
 int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE* pline, bool allowNull) {
+	while (SDL_PollEvent(&e)) {
+		if (e.type == SDL_QUIT)
+			exit(0);
+	}
+
 	using std::vector;
 
 	LINE line;
