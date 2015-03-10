@@ -31,10 +31,6 @@ void Board::movePiece(int mF, int mT) {
 		if (piece[board120[mF]].getValue() == P_VAL && ply > 0 && mT == moveInfo.back().epSq) {
 			passanting = true;
 			epExtra = s ? -10 : 10;
-			if (s) 
-				whiteMaterial -= P_VAL;
-			else
-				blackMaterial -= P_VAL;
 		}
 
 		//Set potential en passant square
@@ -46,11 +42,16 @@ void Board::movePiece(int mF, int mT) {
 			localPmSq = mT;
 			piece[board120[mF]].setValue(Q_VAL);
 			piece[board120[mF]].setName("Queen");
-			if (s)
+			if (s) {
 				piece[board120[mF]].setAbbr('Q');
-			else
+				whiteMaterial += Q_VAL - P_VAL;
+			}
+			else {
 				piece[board120[mF]].setAbbr('q');
+				blackMaterial += Q_VAL - P_VAL;
+			}
 			piece[board120[mF]].setPromoted(true);
+
 
 			int * temp = new int[27]; 		//Make bigger movelist
 			for (int i = 0; i < 4; i++)	 	//Copy any old values over
@@ -64,7 +65,7 @@ void Board::movePiece(int mF, int mT) {
 
 		//If move is a capture
 		if (board120[mT+epExtra] != empty) {
-			if (s) 
+			if (!s) 
 				whiteMaterial -= piece[board120[mT+epExtra]].getValue();
 			else
 				blackMaterial -= piece[board120[mT+epExtra]].getValue();
@@ -140,10 +141,14 @@ void Board::unmovePiece(int mF, int mT) {
 		if (mT == moveInfo.back().pmSq) {
 			piece[board120[mT]].setValue(P_VAL);
 			piece[board120[mT]].setName("Pawn");
-			if (s)
+			if (s) {
 				piece[board120[mT]].setAbbr('P');
-			else
+				whiteMaterial -= Q_VAL - P_VAL;
+			}
+			else {
 				piece[board120[mT]].setAbbr('p');
+				blackMaterial -= Q_VAL - P_VAL;
+			}
 			piece[board120[mT]].setPromoted(false);
 	
 			int * temp = new int[4]; 		//Create smaller movelist
@@ -156,24 +161,18 @@ void Board::unmovePiece(int mF, int mT) {
 		piece[board120[mF]].decrMoved();
 	
 		board120[mT] = moveInfo.back().prevOnMoveTo;
+
 		if (unpassanting) {
 			board120[mT+epExtra] = mT%10 - 1 + (s ? wPa : bPa);
-			if (s) 
-				whiteMaterial += piece[moveInfo.back().prevOnMoveTo].getValue();
-			else
-				blackMaterial += piece[moveInfo.back().prevOnMoveTo].getValue();
 		}
 		
-		if (moveInfo.back().prevOnMoveTo != empty) {
-			if (s) 
-				whiteMaterial += piece[moveInfo.back().prevOnMoveTo].getValue();
-			else
-				blackMaterial += piece[moveInfo.back().prevOnMoveTo].getValue();
-		}
-
 		if (unpassanting || board120[mT] != empty) { 
 			piece[board120[mT+epExtra]].setPos(mT+epExtra);
 			piece[board120[mT+epExtra]].unkill();
+			if (!s) 
+				whiteMaterial += piece[board120[mT+epExtra]].getValue();
+			else
+				blackMaterial += piece[board120[mT+epExtra]].getValue();
 		}
 	}
 	else { //Castling
