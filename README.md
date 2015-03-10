@@ -10,13 +10,13 @@ The following features have been implemented.
 - Principal variation search
 - Iterated deepening, using old princ. var. as first nodes
 - Aspiration window
-- Null move heuristic
 - Sorting captures by MVVLVA
-- History heuristic (not using right now)
+- Null move heuristic
+- History heuristic
+- Killer heuristic
 
 ####In the Future
 - Better move ordering
-- Killer heuristic
 - Transposition tables
 - Static exchange evaluation (attempted, such a pain I gave up for now)
 - Futility pruning
