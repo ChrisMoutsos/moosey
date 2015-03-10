@@ -8,6 +8,7 @@
 #include <iostream>
 #include <cstring>
 #include <chrono>
+#include <algorithm>
 #include "common.h"
 #include "search.h"
 #include "board.h"
@@ -153,13 +154,14 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	//Put principal variation first
 	int temp;
 	if (allowNull) { //Except if we already null-moved, or checking a check
-		for (int i = 0; i < (int)moveList.size(); i++) {
-			if (moveList[i] == oldPrinVarLine.move[depthGone]) {
-				temp = moveList[i];
-				moveList.erase(moveList.begin()+i);
-				moveList.insert(moveList.begin()+0, temp);
-			}
-		}	
+		std::vector<int>::iterator pvIndex;
+		int pvmove = oldPrinVarLine.move[depthGone];
+		pvIndex = std::find(moveList.begin(), moveList.end(), pvmove);
+		if (pvIndex != moveList.end()) {
+			temp = *pvIndex;
+			moveList.erase(pvIndex);
+			moveList.insert(moveList.begin()+0, temp);
+		}
 	}
 
 
