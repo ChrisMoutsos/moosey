@@ -86,7 +86,6 @@ int Board::eval() {
 
 	//Piece-square table
 	//---White pieces
-	int wMat = 0, bMat = 0;
 	for (int i = wqR; i <= wkR; i += wkR-wqR)
 		if (piece[i].getAlive()) {
 			score += rookTable[to64(piece[i].getPos())-1];
@@ -103,17 +102,10 @@ int Board::eval() {
 		score += queenTable[to64(piece[wQ].getPos())-1];
 	}
 	if (piece[wK].getAlive()) {
-		for (int i = wqR; i <= wPh; i++)
-			if (piece[i].getAlive())
-				wMat += piece[i].getValue();
-		for (int i = bqR; i <= bPh; i++)
-			if (piece[i].getAlive())
-				bMat += piece[i].getValue();
-		
-		if (!(wMat <= 1310 && bMat <= 1310))
-			score += kingTable1[to64(piece[wK].getPos())-1];
-		else
+		if (whiteMaterial <= ENDGAME_VAL)
 			score += kingTable2[to64(piece[wK].getPos())-1];
+		else
+			score += kingTable1[to64(piece[wK].getPos())-1];
 	}
 	for (int i = wPa; i <= wPh; i++) {
 		if (piece[i].getAlive()) {
@@ -136,10 +128,10 @@ int Board::eval() {
 	if (piece[bQ].getAlive())
 		score -= queenTable[reverse[to64(piece[bQ].getPos())-1]];
 	if (piece[bK].getAlive()) {
-		if (!(wMat <= 1310 && bMat <= 1310))
-			score -= kingTable1[reverse[to64(piece[bK].getPos())-1]];
+		if (blackMaterial <= ENDGAME_VAL)
+			score -= kingTable2[reverse[to64(piece[wK].getPos())-1]];
 		else
-			score -= kingTable2[reverse[to64(piece[bK].getPos())-1]];
+			score -= kingTable1[reverse[to64(piece[wK].getPos())-1]];
 	}
 	for (int i = bPa; i <= bPh; i++) {
 		if (piece[i].getAlive()) {
@@ -151,14 +143,8 @@ int Board::eval() {
 	}
 
 	//Material
-	for (int i = wqR; i <= wPh; i++) {
-		if (piece[i].getAlive())
-			score += piece[i].getValue();
-	}
-	for (int i = bqR; i <= bPh; i++) {
-		if (piece[i].getAlive())
-			score -= piece[i].getValue();
-	}
+	score += whiteMaterial;
+	score -= blackMaterial;
 
 	//Bishop pair
 	if (piece[wqB].getAlive() && piece[wkB].getAlive())
