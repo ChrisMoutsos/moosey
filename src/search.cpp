@@ -134,10 +134,12 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	}
 
 	//Terminal nodes
-	if (depthLeft == 0) {
+	if (depthLeft <= 0) {
 		//If we're in check, search a little further
-		if (b.inCheck(s))
-			return alphaBeta(b, alpha, beta, 1, depthGone, pline, 0); 
+		if (allowNull) { //If allowNull is false, we already checked if we were in check
+			if (b.inCheck(s))
+				return alphaBeta(b, alpha, beta, 1, depthGone, pline, 0); 
+		}
 		//Otherwise, do a quiescence search
 		pline->count = 0;
 		//std::cout << "alphabeta callin quies\n";
@@ -153,13 +155,13 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	else b.setSideInCheck(0);
 
 	//Null move
-	if (allowNull && depthLeft > r) {
-		if (!((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
+	if (allowNull && !((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
+		if ((s && b.getWhiteMaterial() > ENDGAME_VAL) || (!s && b.getBlackMaterial() > ENDGAME_VAL)) {
 			b.changeTurn();
-			score = -alphaBeta(b, -beta, -beta+1, depthLeft-1-r, depthGone+1, pline, 0);
+			score = -alphaBeta(b, -beta, -beta+1, depthLeft-r-1, depthGone, pline, 0);
 			b.changeTurn();
-			if (score >= beta) 
-				return beta;
+			if (score >= beta)  //Fail-high
+				return score;
 		}
 	}
 
@@ -177,9 +179,10 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 			return -9999 + depthGone-1;
 		}
 	}
-	//Put principal variation first
+	//Put principal variation and killer moves first
 	int temp;
 	if (allowNull) { //Except if we already null-moved, or checking a check
+		//PV first
 		std::vector<int>::iterator pvIndex;
 		int pvmove = oldPrinVarLine.move[depthGone];
 		pvIndex = std::find(moveList.begin(), moveList.end(), pvmove);
@@ -188,19 +191,19 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 			moveList.erase(pvIndex);
 			moveList.insert(moveList.begin()+0, temp);
 		}
-	}
-	//Put killer moves after that
-	int killerMove;
-	for (int i = 1; i >= 0; i--) {
-		killerMove = killers[depthGone][i];
-		std::vector<int>::iterator kIndex;
-		kIndex = std::find(moveList.begin(), moveList.end(), killerMove);
-		if (kIndex != moveList.end()) {
-			moveList.erase(kIndex);
-			if (moveList[0] == oldPrinVarLine.move[depthGone])
-				moveList.insert(moveList.begin()+1, killerMove);
-			else
-				moveList.insert(moveList.begin()+0, killerMove);
+		//Killer moves after
+		int killerMove;
+		for (int i = 1; i >= 0; i--) {
+			killerMove = killers[depthGone][i];
+			std::vector<int>::iterator kIndex;
+			kIndex = std::find(moveList.begin(), moveList.end(), killerMove);
+			if (kIndex != moveList.end()) {
+				moveList.erase(kIndex);
+				if (moveList[0] == oldPrinVarLine.move[depthGone])
+					moveList.insert(moveList.begin()+1, killerMove);
+				else
+					moveList.insert(moveList.begin()+0, killerMove);
+			}
 		}
 	}
 
