@@ -14,7 +14,7 @@
 #include "board.h"
 #include "display.h"
 
-int nodes, qNodes, r = 2;
+int nodes, qNodes, r = 3;
 LINE prinVarLine, oldPrinVarLine;
 double totalTimeW = 0, totalTimeB = 0;
 SDL_Event e; //Event handler
