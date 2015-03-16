@@ -163,7 +163,7 @@ void Board::unmovePiece(int mF, int mT) {
 		board120[mT] = moveInfo.back().prevOnMoveTo;
 
 		if (unpassanting) {
-			board120[mT+epExtra] = mT%10 - 1 + (s ? wPa : bPa);
+			board120[mT+epExtra] = mT%10 - 1 + (!s ? wPa : bPa);
 		}
 		
 		if (unpassanting || board120[mT] != empty) { 
