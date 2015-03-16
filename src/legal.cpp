@@ -41,6 +41,8 @@ bool Board::checkStalemate() const {
 }
 
 bool Board::checkCheck(bool s) {
+	//Cleans wML or bML of illegal moves
+
 	if (s)
 		return checkCheck(s, whiteMoveList);
 	else
@@ -48,6 +50,8 @@ bool Board::checkCheck(bool s) {
 }
 
 bool Board::checkCheck(bool s, std::vector<int>& moveList) {
+	//Cleans moveList of illegal moves, sets sideInCheck(mate) appropriately
+
 	sideInCheck = 0;
 	sideInCheckmate = 0;
 	
@@ -63,14 +67,17 @@ bool Board::checkCheck(bool s, std::vector<int>& moveList) {
 }
 
 bool Board::inCheck(bool s) const {
+	//Statically looks at a position and tells you if side s is in check
+
 	int kPos, pIndex, i, v, d;
 	
+	//If the king is dead, you're most likely in check
 	if (s && !piece[wK].getAlive()) return true;
 	if (!s && !piece[bK].getAlive()) return true;
 
 	kPos = s ? piece[wK].getPos() : piece[bK].getPos();
 
-	/* Search ranks/files/diagonals for appropriate piece. */
+	// Search ranks/files/diagonals for appropriate piece.
 	for (int c = 1; c <= 8; c++) {	//Checking eight directions
 		//Pick the appropriate direction depending on which check we're on
 		d = c==1 ? L : c==2 ? R : c==3 ? U : c==4 ? D : c==5 ? UL : c==6 ? UR : c==7 ? DL : DR;
@@ -108,7 +115,7 @@ bool Board::inCheck(bool s) const {
 		}
 	}
 	
-	/* Search the knight squares around the king for a knight. */
+	// Search the knight squares around the king for a knight.
 	for (int c = 1; c <= 8; c++) {
 		d = c==1 ? K1 : c==2 ? K2 : c==3 ? K3 : c==4 ? K4 : c==5 ? K5 : c==6 ? K6 : c==7 ? K7 : K8;
 		pIndex = kPos + d; 
@@ -121,6 +128,8 @@ bool Board::inCheck(bool s) const {
 }
 
 bool Board::validateMove(int mF, int mT, bool s) {
+	//Pseudolegal verification that mF can move to mT (for side s)	
+
 	int onMF = board120[mF], onMT = board120[mT], value = piece[onMF].getValue();
 
 	//Moving empty square, to null square, or invalid square
@@ -234,13 +243,16 @@ bool Board::validateKingMove(int mF, int mT, bool s) {
 }
 
 bool Board::canCastle(int dir, bool s) {
-	/* Psuedo-legalizes castling. Meaning you can castle into check */
+	//Psuedo-legalizes castling. Meaning you can castle into check
+
 	int k = s ? wK : bK;
 	int r = s ? dir == KINGSIDE ? wkR : wqR : dir == KINGSIDE ? bkR : bqR;
 	int c = dir == KINGSIDE ? 1 : -1;
 
+	//If your king or rook is dead, you can't castle
 	if (!(piece[k].getAlive() && piece[r].getAlive())) return false;
 	if (piece[k].getMoved() || piece[r].getMoved()) return false;
+
 	for (int i = 1; i <= 2; i++)	//Verify it's empty between K and R
 		if (board120[piece[k].getPos()+i*c] != empty) return false;
 	if (dir == QUEENSIDE)

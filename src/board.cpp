@@ -35,6 +35,7 @@ Board::Board(std::string FEN) {
 }
 
 void Board::setSquarePositions() {
+	//Set positions of the squares in the display
 	for (int i = 0; i < 64; i++) {
 		squares[i].setPos(BXSTART+(SQ_SIZE*(i%8)),
 				  BYSTART+B_SIZE-(SQ_SIZE*(i/8+1)));
@@ -43,6 +44,7 @@ void Board::setSquarePositions() {
 }
 
 void Board::setPiecesOnSquares() {
+	//Update all of the pieces the display squares are holding
 	for (int i = 0; i < 64; i++)
 		squares[i].setPiece(board120[from64(i+1)]);
 }
@@ -54,6 +56,7 @@ void Board::initializeVars() {
 	castling = sideInCheck = sideInCheckmate = 0;
 	whiteMaterial = 8*P_VAL + 2*(R_VAL+B_VAL+N_VAL) + Q_VAL + K_VAL;
 	blackMaterial = whiteMaterial;
+	//Clear history heuristic tables
 	for (int i = 0; i < 2; i++)
 		for (int f = 0; f < 64; f++)
 			for (int t = 0; t < 64; t++)
@@ -90,6 +93,7 @@ void Board::placePiecesDefault() {
 void Board::initializePieces() {
 	int v;
 
+	//Set names, abbreviations, and values
 	for (int i = 0; i <= 16; i += 16) {
 		piece[wqR+i].setName("Rook");
 		piece[wqR+i].setAbbr(char(int('R') + 2*i));
@@ -130,6 +134,7 @@ void Board::initializePieces() {
 			piece[wPa+i+s].setValue(P_VAL);
 		}
 
+	//Set colors
 	for (int i = wqR; i <= wPh; i++)
 		piece[i].setColor(WHITE);
 	for (int i = bqR; i <= bPh; i++)
@@ -159,7 +164,7 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 	bool clearMFMT = false;
 
 	for (int i = 0; i < 2; i++) 
-		if (buttons[i].handleEvent(e, *this))
+		if (buttons[i].handleEvent(e, *this)) 
 			clearMFMT = true;
 	if (clearMFMT) {
 		mF = -1;
@@ -189,12 +194,13 @@ void Board::botMove() {
 	std::cout << " (ply " << ply << ")\n";
 	displayBotText(*this);
 	int move = 0;
-	move = think(*this, 8);
+	move = think(*this, 7);
 	setMove(move/100, move%100);
 	movePiece();
 	changeTurn();
 	genOrderedMoveList();
 	checkCheck(side);
+	std::cout << "WHITEMAT: " << whiteMaterial << " BLACKMAT: " << blackMaterial << '\n';
 }
 
 //ACCESSORS
