@@ -14,7 +14,7 @@
 #include "board.h"
 #include "display.h"
 
-int nodes, qNodes, r = 3;
+int nodes, qNodes, r = 0;
 LINE prinVarLine, oldPrinVarLine;
 double totalTimeW = 0, totalTimeB = 0;
 SDL_Event e; //Event handler
@@ -26,11 +26,12 @@ int think(Board& b, int depth) {
 	auto beginTime1 = std::chrono::high_resolution_clock::now();
 	typedef std::chrono::duration<float> fsec;
 
-	int bestScore = 0;
+	int bestMoveSoFar = 0, bestScore = 0;
 	int alpha = -99999, beta = 99999;
 	int asp = 100;
 	vector<int> moveList;
 
+	//Reset everything if you restart the game
 	if (b.getPly() == 0) {
 		totalTimeW = 0;
 		totalTimeB = 0;
@@ -39,25 +40,26 @@ int think(Board& b, int depth) {
 				b.hh[BLACK][f][t] = 0;
 				b.hh[WHITE][f][t] = 0;
 			}
-		for (int i = 0; i < prinVarLine.count; i++)
-			prinVarLine.move[i] = 0;
-		for (int i = 0; i < oldPrinVarLine.count; i++)
-			oldPrinVarLine.move[i] = 0;
 	}
-
-	for (int i = 0; i < 20; i++) {
-		killers[i][0] = 0;
-		killers[i][1] = 0;
-	}
+	//Clear prinVar, oldPrinVar
+	for (int i = 0; i < prinVarLine.count; i++)
+		prinVarLine.move[i] = 0;
+	for (int i = 0; i < oldPrinVarLine.count; i++)
+		oldPrinVarLine.move[i] = 0;
 
 	b.genOrderedMoveList(b.getSide(), moveList);
 	b.checkCheck(b.getSide(), moveList);
 	
-	for (int i = 1; i <= depth; i++) {
+	for (int i = 1; i <= depth; i += 2) {
 		//Age HH tables
 		for (int f = 0; f < 64; f++)
 			for (int t = 0; t < 64; t++)
 				b.hh[b.getSide()][f][t] /= 2;
+		//Clear killer moves
+		for (int i = 0; i < 20; i++) {
+			killers[i][0] = 0;
+			killers[i][1] = 0;
+		}
 
 		oldPrinVarLine = prinVarLine;
 
@@ -80,6 +82,12 @@ int think(Board& b, int depth) {
 			else break;
 		}
 
+		bestMoveSoFar = prinVarLine.move[0];
+
+		if (i < depth) {
+			std::cout << "Search to ply " << i << "... move: ";
+			std::cout << intToSquare(bestMoveSoFar/100) << " to " << intToSquare(bestMoveSoFar%100) << '\n';
+		}
 		if (i == depth) {
 			std::cout << "Search to ply " << i << "...\n";
 			std::cout << "Main nodes searched: " << nodes << '\n';
@@ -154,14 +162,20 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	}
 	else b.setSideInCheck(0);
 
-	//Null move
+	//Null move reduction
 	if (allowNull && !((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
 		if ((s && b.getWhiteMaterial() > ENDGAME_VAL) || (!s && b.getBlackMaterial() > ENDGAME_VAL)) {
+			r = depthLeft > 6 ? 4 : 3;
 			b.changeTurn();
 			score = -alphaBeta(b, -beta, -beta+1, depthLeft-r-1, depthGone, pline, 0);
 			b.changeTurn();
-			if (score >= beta)  //Fail-high
-				return score;
+			if (score >= beta) { //Fail-high
+				depthLeft -= 4;
+				if (depthLeft <= 0) {
+					pline->count = 0;
+					return quies(b, alpha, beta, depthGone, pline);
+				}
+			}
 		}
 	}
 
@@ -182,31 +196,30 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	//Put principal variation and killer moves first
 	int temp;
 	if (allowNull) { //Except if we already null-moved, or checking a check
-		//PV first
-		std::vector<int>::iterator pvIndex;
-		int pvmove = oldPrinVarLine.move[depthGone];
-		pvIndex = std::find(moveList.begin(), moveList.end(), pvmove);
-		if (pvIndex != moveList.end()) {
-			temp = *pvIndex;
-			moveList.erase(pvIndex);
-			moveList.insert(moveList.begin()+0, temp);
-		}
-		//Killer moves after
+		//Killer moves
 		int killerMove;
 		for (int i = 1; i >= 0; i--) {
 			killerMove = killers[depthGone][i];
+			if (killerMove == 0) continue;
 			std::vector<int>::iterator kIndex;
 			kIndex = std::find(moveList.begin(), moveList.end(), killerMove);
 			if (kIndex != moveList.end()) {
 				moveList.erase(kIndex);
-				if (moveList[0] == oldPrinVarLine.move[depthGone])
-					moveList.insert(moveList.begin()+1, killerMove);
-				else
-					moveList.insert(moveList.begin()+0, killerMove);
+				moveList.insert(moveList.begin()+0, killerMove);
+			}
+		}
+		//Then put PV first
+		std::vector<int>::iterator pvIndex;
+		int pvmove = oldPrinVarLine.move[depthGone];
+		if (pvmove != 0) {
+			pvIndex = std::find(moveList.begin(), moveList.end(), pvmove);
+			if (pvIndex != moveList.end()) {
+				temp = *pvIndex;
+				moveList.erase(pvIndex);
+				moveList.insert(moveList.begin()+0, temp);
 			}
 		}
 	}
-
 	for (int i = 0; i < (int)moveList.size(); i++) {
 		vector<int> localPV;
 		nodes++;
