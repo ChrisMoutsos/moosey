@@ -73,7 +73,6 @@ int main(int argc, char* args[]) {
 		}
 	}
 
-	SDL_Delay(2000);
 	close_SDL();
 	return 0;
 }
