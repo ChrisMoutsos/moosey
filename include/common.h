@@ -1,6 +1,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#define ENDGAME_VAL 11309 
+
 //GAME CONTROL
 extern bool quit;
 
