@@ -20,12 +20,11 @@ void Board::genOrderedMoveList() {
 }
 
 void Board::genOrderedMoveList(bool s, std::vector<int>& moveList) {
-	/* Generates psuedo-legal moves for side s, stores it in moveList */
-	/* Captures, castling, non-captures */
+	//Generates psuedo-legal moves for side s, stores it in moveList
+	//Order: Captures, castling, non-captures
 
 	moveList.clear();
 	std::vector<int> captures, nonCaptures;
-	int mF, mT, mF2, mT2, move;
 		
 	generatePieceMoveLists(s);
 	getCaptures(s, captures);
@@ -95,7 +94,7 @@ bool Board::nonCaptureSort(bool s, int i, int j) {
 }
 
 void Board::removeNonCaptures(bool s, std::vector<int>& moveList) {
-	/* Remove any move in moveList that is a noncapture */
+	//Remove any move in moveList that is a noncapture
 	int mT, move;
 	for (int i = 0; i < (int)moveList.size(); i++) {
 		move = moveList[i];
@@ -108,7 +107,7 @@ void Board::removeNonCaptures(bool s, std::vector<int>& moveList) {
 }
 
 void Board::getNonCaptures(bool s, std::vector<int>& moveList) {
-	/* Put every noncapture for side s in moveList */
+	//Put every noncapture for side s in moveList
 
 	moveList.clear();
 	int startP, endP, mF, mT;
@@ -128,7 +127,7 @@ void Board::getNonCaptures(bool s, std::vector<int>& moveList) {
 }
 
 void Board::getCaptures(bool s, std::vector<int>& moveList) {
-	/* Put every capture for side s in moveList */
+	//Put every capture for side s in moveList
 
 	moveList.clear();
 	int startP, endP, mF, mT;
@@ -158,7 +157,7 @@ void Board::cleanMoveList(bool s) {
 }
 
 void Board::cleanMoveList(bool s, std::vector<int>& moveList) {
-	/* Erases any illegal moves (for side s) in moveList*/
+	//Erases any illegal moves (for side s) in moveList
 
 	int mF, mT, size;
 	bool realSide = side;
@@ -189,7 +188,7 @@ void Board::generatePieceMoveLists(bool s) {
 }
 
 void Board::generatePieceMoveListFor(int p) {
-	/* Generates moves for an individual piece, stores them in the pieces moveList*/
+	//Generates moves for an individual piece, stores them in the pieces moveList
 
 	int counter = 0;
 	if (piece[p].getAlive()) {	
