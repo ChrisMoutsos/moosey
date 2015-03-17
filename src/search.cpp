@@ -42,8 +42,10 @@ int think(Board& b, int depth) {
 			}
 	}
 	//Clear prinVar, oldPrinVar
-	prinVarLine.count = 0;
-	oldPrinVarLine.count = 0;
+	for (int i = 0; i < 30; i++) {
+		prinVarLine.move[i] = 0;
+		oldPrinVarLine.move[i] = 0;
+	} 
 
 	b.genOrderedMoveList(b.getSide(), moveList);
 	b.checkCheck(b.getSide(), moveList);
@@ -135,14 +137,12 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	bool s = b.getSide();
 
 	//If our king is dead, return bad score
-	if (s && !b.piece[wK].getAlive()) {
-		return -9999 + depthGone-1;
-	}
-	else if (!s && !b.piece[bK].getAlive()) {
+	if ((s && !b.piece[wK].getAlive()) || (!s && !b.piece[bK].getAlive())) {
+		pline->count = 0;
 		return -9999 + depthGone-1;
 	}
 
-	//Terminal nodes
+	//Horizon nodes, quiescence search
 	if (depthLeft <= 0) {
 		//If we're in check, search a little further
 		if (allowNull) { //If allowNull is false, we already checked if we were in check
@@ -151,17 +151,17 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		}
 		//Otherwise, do a quiescence search
 		pline->count = 0;
-		//std::cout << "alphabeta callin quies\n";
 		return quies(b, alpha, beta, depthGone, pline);
 	}
 
-	int score;
 	
 	if (b.inCheck(s)) {
 		if (s) b.setSideInCheck(1);
 		else b.setSideInCheck(2);
 	}
 	else b.setSideInCheck(0);
+
+	int score;
 
 	//Null move reduction
 	if (allowNull && !((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
@@ -194,6 +194,17 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 			return -9999 + depthGone-1;
 		}
 	}
+
+	//Frontier nodes, futility pruning
+	if (depthLeft == 1 && !(abs(alpha) > 9000 || abs(beta) > 9000)) {
+		if (!((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
+			if (b.eval() + B_VAL < alpha) {
+				pline->count = 0;
+				return quies(b, alpha, beta, depthGone, pline);
+			}
+		}
+	}
+
 	//Put principal variation and killer moves first
 	int temp;
 	if (allowNull) { //Except if we already null-moved, or checking a check
