@@ -18,7 +18,7 @@ int nodes, qNodes, r = 0;
 LINE prinVarLine, oldPrinVarLine;
 double totalTimeW = 0, totalTimeB = 0;
 SDL_Event e; //Event handler
-int killers[20][2];
+int killers[30][2];
 
 int think(Board& b, int depth) {
 	using std::vector;
@@ -42,21 +42,21 @@ int think(Board& b, int depth) {
 			}
 	}
 	//Clear prinVar, oldPrinVar
-	for (int i = 0; i < prinVarLine.count; i++)
-		prinVarLine.move[i] = 0;
-	for (int i = 0; i < oldPrinVarLine.count; i++)
-		oldPrinVarLine.move[i] = 0;
+	prinVarLine.count = 0;
+	oldPrinVarLine.count = 0;
 
 	b.genOrderedMoveList(b.getSide(), moveList);
 	b.checkCheck(b.getSide(), moveList);
 	
-	for (int i = 1; i <= depth; i += 2) {
+	int i;
+	i = depth%2==1 ? 1 : 2;
+	for (i = i; i <= depth; i += 2) {
 		//Age HH tables
 		for (int f = 0; f < 64; f++)
 			for (int t = 0; t < 64; t++)
 				b.hh[b.getSide()][f][t] /= 2;
 		//Clear killer moves
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 30; i++) {
 			killers[i][0] = 0;
 			killers[i][1] = 0;
 		}
@@ -98,7 +98,8 @@ int think(Board& b, int depth) {
 			std::cout << diff1.count() << '\n';
 			std::cout << "Nodes / sec: ";
 			std::cout << (nodes+qNodes) / diff1.count() << '\n';
-			std::cout << "Best score: " << bestScore << "\n\n";
+			std::cout << "Best score: " << bestScore << "\n";
+			std::cout << "Current score: " << b.eval() << "\n\n";
 		}
 	}
 	for (int i = 0; i < prinVarLine.count; i++) {
@@ -199,7 +200,8 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		//Killer moves
 		int killerMove;
 		for (int i = 1; i >= 0; i--) {
-			killerMove = killers[depthGone][i];
+			if (depthGone == 0) continue;
+			killerMove = killers[depthGone-1][i];
 			if (killerMove == 0) continue;
 			std::vector<int>::iterator kIndex;
 			kIndex = std::find(moveList.begin(), moveList.end(), killerMove);
@@ -211,7 +213,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		//Then put PV first
 		std::vector<int>::iterator pvIndex;
 		int pvmove = oldPrinVarLine.move[depthGone];
-		if (pvmove != 0) {
+		if (pvmove != 0 && depthGone < oldPrinVarLine.count) {
 			pvIndex = std::find(moveList.begin(), moveList.end(), pvmove);
 			if (pvIndex != moveList.end()) {
 				temp = *pvIndex;
