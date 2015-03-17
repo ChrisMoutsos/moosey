@@ -23,12 +23,13 @@ int killers[30][2];
 int think(Board& b, int depth) {
 	using std::vector;
 
+	//Save starting time
 	auto beginTime1 = std::chrono::high_resolution_clock::now();
 	typedef std::chrono::duration<float> fsec;
 
 	int bestMoveSoFar = 0, bestScore = 0;
 	int alpha = -99999, beta = 99999;
-	int asp = 100;
+	int asp = 50;
 	vector<int> moveList;
 
 	//Reset everything if you restart the game
@@ -41,12 +42,14 @@ int think(Board& b, int depth) {
 				b.hh[WHITE][f][t] = 0;
 			}
 	}
-	//Clear prinVar, oldPrinVar
-	for (int i = 0; i < 30; i++) {
-		prinVarLine.move[i] = 0;
-		oldPrinVarLine.move[i] = 0;
-	} 
 
+	//Clear prinVar, oldPrinVar
+	for (int i = 0; i < prinVarLine.count; i++)
+		prinVarLine.move[i] = 0;
+	for (int i = 0; i < oldPrinVarLine.count; i++)
+		oldPrinVarLine.move[i] = 0;
+
+	//Generate legal moveLists
 	b.genOrderedMoveList(b.getSide(), moveList);
 	b.checkCheck(b.getSide(), moveList);
 	
@@ -65,10 +68,12 @@ int think(Board& b, int depth) {
 
 		oldPrinVarLine = prinVarLine;
 
+		//Get start time of this specific search
 		auto beginTime2 = std::chrono::high_resolution_clock::now();
 		nodes = 0;
 		qNodes = 0;
 		
+		//Set aspiration window
 		alpha = bestScore - asp;
 		beta = bestScore + asp;
 		for (;;) {
@@ -134,6 +139,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	using std::vector;
 
 	LINE line;
+
 	bool s = b.getSide();
 
 	//If our king is dead, return bad score
@@ -151,10 +157,10 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		}
 		//Otherwise, do a quiescence search
 		pline->count = 0;
-		return quies(b, alpha, beta, depthGone, pline);
+		return quies(b, alpha, beta, depthGone);
 	}
 
-	
+	//Useful to know this for later	
 	if (b.inCheck(s)) {
 		if (s) b.setSideInCheck(1);
 		else b.setSideInCheck(2);
@@ -174,7 +180,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 				depthLeft -= 4;
 				if (depthLeft <= 0) {
 					pline->count = 0;
-					return quies(b, alpha, beta, depthGone, pline);
+					return quies(b, alpha, beta, depthGone);
 				}
 			}
 		}
@@ -184,9 +190,10 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	int mF, mT;
 	vector<int> moveList;
 
+	//Generate pseudo-legal, ordered moveList
 	b.genOrderedMoveList(s, moveList);
 
-	//If we are in checkmate
+	//If we are in checkmate, return bad score
 	if ((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2)) {
 		b.cleanMoveList(s, moveList);
 		if ((int)moveList.size() == 0) {
@@ -195,12 +202,12 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		}
 	}
 
-	//Frontier nodes, futility pruning
+	//Frontier nodes: futility pruning
 	if (depthLeft == 1 && !(abs(alpha) > 9000 || abs(beta) > 9000)) {
 		if (!((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
 			if (b.eval() + B_VAL < alpha) {
 				pline->count = 0;
-				return quies(b, alpha, beta, depthGone, pline);
+				return quies(b, alpha, beta, depthGone);
 			}
 		}
 	}
@@ -208,7 +215,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	//Put principal variation and killer moves first
 	int temp;
 	if (allowNull) { //Except if we already null-moved, or checking a check
-		//Killer moves
+		//Killer moves in front,
 		int killerMove;
 		for (int i = 1; i >= 0; i--) {
 			if (depthGone == 0) continue;
@@ -221,7 +228,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 				moveList.insert(moveList.begin()+0, killerMove);
 			}
 		}
-		//Then put PV first
+		//then PV in front
 		std::vector<int>::iterator pvIndex;
 		int pvmove = oldPrinVarLine.move[depthGone];
 		if (pvmove != 0 && depthGone < oldPrinVarLine.count) {
@@ -233,6 +240,8 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 			}
 		}
 	}
+	
+	//Loop through psuedo-legal moves
 	for (int i = 0; i < (int)moveList.size(); i++) {
 		vector<int> localPV;
 		nodes++;
@@ -254,7 +263,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		b.unmovePiece();
 		b.changeTurn();
 
-		if (score >= beta) {
+		if (score >= beta) { //Fail-high
 			//If it wasn't a capture, update HH table and killer moves
 			if (b.getBoard120(mT) == empty) {
 				b.hh[s][to64(mF)-1][to64(mT)-1] += depthGone*depthGone;
@@ -263,10 +272,10 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 			}
 			return beta;
 		}
-		if (score > alpha) {
+		if (score > alpha) { //Best so far
 			alpha = score;
 			foundPV = true;
-			//Add it to the principal variation
+			//Add the move to the principal variation
 			pline->move[0] = mF*100 + mT;
 			memcpy(pline->move + 1, line.move, line.count * sizeof(int));
 			pline->count = line.count + 1;
@@ -276,31 +285,39 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	return alpha;
 }
 
-int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline) {
+int quies(Board& b, int alpha, int beta, int depthGone) {
 	using std::vector;
 
-	vector<int> captureList;
 	bool s = b.getSide();
 
+	//If our king is dead, return a bad score
 	if ((s && !b.piece[wK].getAlive()) || (!s && !b.piece[bK].getAlive()))
 		return -9999 + depthGone-1;
 
 	int score = b.eval();
 	int mF, mT;
 	
+	//If standing pat is too good
 	if (score >= beta)
 		return beta;
+	//If standing pat is the best option
 	if (score > alpha)
 		alpha = score;
 
+	vector<int> captureList;
+
+	//Get psuedo-legal captures in captureList
 	b.generatePieceMoveLists(s);
 	b.getCaptures(s, captureList);
 
+	//No captures, so return stand-pat
 	if ((int)captureList.size() == 0)
 		return score;
 	
+	//Order the captures by MVVLVA
 	b.sortCaptures(captureList);
 
+	//Loop through the captures
 	for (int i = 0; i < (int)captureList.size(); i++) {
 		qNodes++;
 
@@ -308,20 +325,20 @@ int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline) {
 		mT = captureList[i]%100;
 		b.setMove(mF, mT);
 		b.movePiece();
+		//If we are in check, keep searching
 		if (b.inCheck(s)) {
 			b.unmovePiece();
 			continue;
 		}
 		b.changeTurn();
-		score = -quies(b, -beta, -alpha, depthGone+1, pline);
+		score = -quies(b, -beta, -alpha, depthGone+1);
 		b.unmovePiece();
 		b.changeTurn();
 		
-		if (score >= beta)
+		if (score >= beta) //Fail-high
 			return beta;
-		if (score > alpha) {
+		if (score > alpha) //Best so far
 			alpha = score;
-		}
 	}
 	
 	return alpha;
