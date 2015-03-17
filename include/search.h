@@ -1,9 +1,10 @@
 /*
 ----------------------------------
 	~Moosey Chess Engine~
-	     	search.h
+	      search.h
 ----------------------------------
 */
+
 #ifndef SEARCH_H
 #define SEARCH_H
 
@@ -18,6 +19,6 @@ struct LINE {
 
 int think(Board& b, int depth);
 int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE* pline, bool allowNull);
-int quies(Board& b, int alpha, int beta, int depthGone, LINE* pline);
+int quies(Board& b, int alpha, int beta, int depthGone);
 
 #endif
