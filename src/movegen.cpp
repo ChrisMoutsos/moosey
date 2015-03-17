@@ -130,23 +130,21 @@ void Board::getCaptures(bool s, std::vector<int>& moveList) {
 	//Put every capture for side s in moveList
 
 	moveList.clear();
-	int startP, endP, mF, mT;
+	int startP, endP, enemyStartP, enemyEndP;
 	startP = s ? wqR : bqR;
 	endP = s ? wPh : bPh;
+	enemyStartP = s ? bqR : wqR;
+	enemyEndP = s ? bPh : wPh;
 
-	int tempSize;
 	for (int i = startP; i <= endP; i++) {
 		if (!piece[i].getAlive()) continue;
-		generatePieceMoveListFor(i);
-		tempSize = piece[i].getMoveListSize();
-		mF = piece[i].getPos();
-		for (int j = 0; j < tempSize; j++) {
-			mT = piece[i].getFromMoveList(j);
-			if (mT == 0) break;
-			if (board120[mT] == empty) continue;
-			moveList.push_back(mF*100+mT);
+		for (int j = enemyStartP; j <= enemyEndP; j++) {
+			if (!piece[j].getAlive()) continue;
+			if (validateMove(piece[i].getPos(), piece[j].getPos(), s)) {
+				moveList.push_back(piece[i].getPos()*100 + piece[j].getPos());
+			}
 		}
-	}
+	}	
 }
 
 void Board::cleanMoveList(bool s) {
