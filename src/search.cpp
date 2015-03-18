@@ -333,8 +333,9 @@ int quies(Board& b, int alpha, int beta, int depthGone) {
 
 		//Futility (AKA delta) pruning
 		if (b.getWhiteMaterial() > ENDGAME_VAL && b.getBlackMaterial() > ENDGAME_VAL)
-			if (b.piece[b.getBoard120(mT)].getValue() + 150 + currEval < alpha)
-				continue;
+			if (b.piece[b.getBoard120(mT)].getValue() + 120 + currEval <= alpha)
+				if (!b.inCheck(s)) 
+					continue;
 
 		b.setMove(mF, mT);
 		b.movePiece();
