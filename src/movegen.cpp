@@ -26,7 +26,6 @@ void Board::genOrderedMoveList(bool s, std::vector<int>& moveList) {
 	moveList.clear();
 	std::vector<int> captures, nonCaptures;
 		
-	generatePieceMoveLists(s);
 	getCaptures(s, captures);
 	getNonCaptures(s, nonCaptures);
 
@@ -116,6 +115,7 @@ void Board::getNonCaptures(bool s, std::vector<int>& moveList) {
 
 	for (int i = startP; i <= endP; i++) {
 		if (!piece[i].getAlive()) continue;
+		generatePieceMoveListFor(i);
 		mF = piece[i].getPos();
 		for (int j = 0; j < piece[i].getMoveListSize(); j++) {
 			mT = piece[i].getFromMoveList(j);
