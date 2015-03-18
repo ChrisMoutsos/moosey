@@ -302,15 +302,15 @@ int quies(Board& b, int alpha, int beta, int depthGone) {
 	if ((s && !b.piece[wK].getAlive()) || (!s && !b.piece[bK].getAlive()))
 		return -9999 + depthGone-1;
 
-	int score = b.eval();
-	int mF, mT;
+	int currEval = b.eval();
+	int score, mF, mT;
 	
 	//If standing pat is too good
-	if (score >= beta)
+	if (currEval >= beta)
 		return beta;
 	//If standing pat is the best option
-	if (score > alpha)
-		alpha = score;
+	if (currEval > alpha)
+		alpha = currEval;
 
 	vector<int> captureList;
 
@@ -319,7 +319,7 @@ int quies(Board& b, int alpha, int beta, int depthGone) {
 
 	//No captures, so return stand-pat
 	if ((int)captureList.size() == 0)
-		return score;
+		return currEval;
 	
 	//Order the captures by MVVLVA
 	b.sortCaptures(captureList);
@@ -330,6 +330,12 @@ int quies(Board& b, int alpha, int beta, int depthGone) {
 
 		mF = captureList[i]/100;
 		mT = captureList[i]%100;
+
+		//Futility (AKA delta) pruning
+		if (b.getWhiteMaterial() > ENDGAME_VAL && b.getBlackMaterial() > ENDGAME_VAL)
+			if (b.piece[b.getBoard120(mT)].getValue() + 150 + currEval < alpha)
+				continue;
+
 		b.setMove(mF, mT);
 		b.movePiece();
 		//If we are in check, keep searching
