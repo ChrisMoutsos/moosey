@@ -20,5 +20,6 @@ The following features have been implemented.
 - Better move ordering
 - Transposition tables
 - Static exchange evaluation (attempted, such a pain I gave up for now)
+- Search extensions
 
 ![Screenshot](https://raw.githubusercontent.com/ChrisMoutsos/moosey/master/res/screenshot.png)
