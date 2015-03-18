@@ -207,7 +207,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	//Frontier nodes: futility pruning
 	if (depthLeft == 1 && !(abs(alpha) > 9000 || abs(beta) > 9000)) {
 		if (!((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
-			if (b.eval() + B_VAL < alpha) {
+			if (b.eval() + B_VAL < alpha && (int)moveList.size() > 0) {
 				pline->count = 0;
 				return quies(b, alpha, beta, depthGone);
 			}
