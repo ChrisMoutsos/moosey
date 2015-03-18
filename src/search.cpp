@@ -315,7 +315,6 @@ int quies(Board& b, int alpha, int beta, int depthGone) {
 	vector<int> captureList;
 
 	//Get psuedo-legal captures in captureList
-	b.generatePieceMoveLists(s);
 	b.getCaptures(s, captureList);
 
 	//No captures, so return stand-pat
