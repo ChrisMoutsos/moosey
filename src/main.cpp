@@ -11,10 +11,11 @@
  * SDL:
  * - Add mute button
  * - Splash screen
- * FEN parsing
+ * Add en passants and promotions to quiescent search
  * Threefold repetition
+ * - FEN parsing
  * Finish null move heuristic edge cases
- * Verify that bot will deliver checkmates
+ * Make sure bot isn't putting illegal moves in the PV
  * Write dupMove code for Queens
  * 
  */
