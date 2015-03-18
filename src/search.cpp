@@ -53,6 +53,7 @@ int think(Board& b, int depth) {
 	b.genOrderedMoveList(b.getSide(), moveList);
 	b.checkCheck(b.getSide(), moveList);
 	
+	//Iterative deepening
 	int i;
 	i = depth%2==1 ? 1 : 2;
 	for (i = i; i <= depth; i += 2) {
@@ -76,6 +77,7 @@ int think(Board& b, int depth) {
 		//Set aspiration window
 		alpha = bestScore - asp;
 		beta = bestScore + asp;
+
 		for (;;) {
 			bestScore = alphaBeta(b, alpha, beta, i, 0, &prinVarLine, 1);
 			if (bestScore <= alpha)  {
@@ -218,8 +220,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		//Killer moves in front,
 		int killerMove;
 		for (int i = 1; i >= 0; i--) {
-			if (depthGone == 0) continue;
-			killerMove = killers[depthGone-1][i];
+			killerMove = killers[depthGone][i];
 			if (killerMove == 0) continue;
 			std::vector<int>::iterator kIndex;
 			kIndex = std::find(moveList.begin(), moveList.end(), killerMove);
@@ -267,8 +268,15 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 			//If it wasn't a capture, update HH table and killer moves
 			if (b.getBoard120(mT) == empty) {
 				b.hh[s][to64(mF)-1][to64(mT)-1] += depthGone*depthGone;
-				killers[depthGone][1] = killers[depthGone][0];
-				killers[depthGone][0] = mF*100+mT;
+				if (depthGone != 0) {
+					if (mF*100+mT == killers[depthGone-1][1]) {
+						killers[depthGone-1][1] = killers[depthGone-1][0];
+						killers[depthGone-1][0] = mF*100+mT;
+					}
+					else if (mF*100+mT != killers[depthGone-1][0]) {
+						killers[depthGone-1][1] = mF*100+mT;
+					}
+				}
 			}
 			return beta;
 		}
