@@ -214,6 +214,15 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		}
 	}
 
+	//Pre-frontier nodes: extended futility pruning
+	if (depthLeft == 2 && !(abs(alpha) > 9000 || abs(beta) > 9000)) {
+		if (!((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
+			if (b.eval() + R_VAL < alpha && (int)moveList.size() > 0) {
+				depthLeft--;
+			}
+		}
+	}
+
 	//Put principal variation and killer moves first
 	int temp;
 	if (allowNull) { //Except if we already null-moved, or checking a check
