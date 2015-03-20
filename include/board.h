@@ -102,7 +102,7 @@ class Board {
 		void sortCaptures(std::vector<int>& moveList);
 		bool MVVLVA(int i, int j);
 		void sortNonCaptures(std::vector<int>& moveList);
-		bool nonCaptureSort(bool s, int i, int j);
+		bool hhSort(bool s, int i, int j);
 		void getNonCaptures(bool s, std::vector<int>& moveList);
 		void removeNonCaptures(bool s, std::vector<int>& moveList);
 		void cleanMoveList(bool s);

@@ -33,7 +33,7 @@ void Board::genOrderedMoveList(bool s, std::vector<int>& moveList) {
 	sortNonCaptures(nonCaptures);
 
 	if ((!whiteCastled && s) || (!blackCastled && s)) {
-		for (int i = 0; i < (int)nonCaptures.size(); i++) {
+		for (size_t i = 0; i < nonCaptures.size(); i++) {
 			if (piece[board120[nonCaptures[i]/100]].getValue() == K_VAL) {
 				if (abs(nonCaptures[i]/100 - nonCaptures[i]%100) == 2) {
 					int move = nonCaptures[i];
@@ -47,83 +47,6 @@ void Board::genOrderedMoveList(bool s, std::vector<int>& moveList) {
 	moveList.reserve(captures.size() + nonCaptures.size());
 	moveList.insert(moveList.begin(), captures.begin(), captures.end());
 	moveList.insert(moveList.end(), nonCaptures.begin(), nonCaptures.end());
-}
-
-void Board::sortCaptures(std::vector<int>& moveList) {
-	bool sorted = false;
-	int temp;
-	while (!sorted) {
-		sorted = true;
-		for (int i = 0; i < (int)moveList.size() - 1; i++) {
-			if (!MVVLVA(moveList[i], moveList[i+1])) {
-				temp = moveList[i];
-				moveList[i] = moveList[i+1];
-				moveList[i+1] = temp;
-				sorted = false;
-			}
-		}
-	}
-}
-
-bool Board::MVVLVA(int i, int j) {
-	return (piece[board120[i%100]].getValue() - piece[board120[i/100]].getValue()/10
-		 >= piece[board120[j%100]].getValue() - piece[board120[j/100]].getValue()/10);
-}
-
-void Board::sortNonCaptures(std::vector<int>& moveList) {
-	bool sorted = false, s;
-	int temp;
-	while (!sorted) {
-		sorted = true;
-		if (moveList.size() > 0)
-			s = piece[board120[moveList[0]/100]].getColor();
-		for (int i = 0; i < (int)moveList.size() - 1; i++) {
-			if (!nonCaptureSort(s, moveList[i], moveList[i+1])) {
-				temp = moveList[i];
-				moveList[i] = moveList[i+1];
-				moveList[i+1] = temp;
-				sorted = false;
-			}
-		}
-	}
-}
-
-bool Board::nonCaptureSort(bool s, int i, int j) {
-	return (hh[s][to64(i/100)-1][to64(i%100)-1] >= hh[s][to64(j/100)-1][to64(j%100)-1]);
-}
-
-void Board::removeNonCaptures(bool s, std::vector<int>& moveList) {
-	//Remove any move in moveList that is a noncapture
-	int mT, move;
-	for (int i = 0; i < (int)moveList.size(); i++) {
-		move = moveList[i];
-		mT = move%100;
-		if (board120[mT] == empty) {
-			moveList.erase(moveList.begin()+i);
-			i--;
-		}
-	}
-}
-
-void Board::getNonCaptures(bool s, std::vector<int>& moveList) {
-	//Put every noncapture for side s in moveList
-
-	moveList.clear();
-	int startP, endP, mF, mT;
-	startP = s ? wqR : bqR;
-	endP = s ? wPh : bPh;
-
-	for (int i = startP; i <= endP; i++) {
-		if (!piece[i].getAlive()) continue;
-		generatePieceMoveListFor(i);
-		mF = piece[i].getPos();
-		for (int j = 0; j < piece[i].getMoveListSize(); j++) {
-			mT = piece[i].getFromMoveList(j);
-			if (mT == 0) break;
-			if (board120[mT] != empty) continue;
-			moveList.push_back(mF*100+mT);
-		}
-	}
 }
 
 void Board::getCaptures(bool s, std::vector<int>& moveList) {
@@ -147,6 +70,83 @@ void Board::getCaptures(bool s, std::vector<int>& moveList) {
 	}	
 }
 
+void Board::sortCaptures(std::vector<int>& moveList) {
+	bool sorted = false;
+	int temp;
+	while (!sorted) {
+		sorted = true;
+		for (int i = 0; i < (int)moveList.size() - 1; i++) {
+			if (!MVVLVA(moveList[i], moveList[i+1])) {
+				temp = moveList[i];
+				moveList[i] = moveList[i+1];
+				moveList[i+1] = temp;
+				sorted = false;
+			}
+		}
+	}
+}
+
+bool Board::MVVLVA(int i, int j) {
+	return (piece[board120[i%100]].getValue() - piece[board120[i/100]].getValue()/10
+		 >= piece[board120[j%100]].getValue() - piece[board120[j/100]].getValue()/10);
+}
+
+void Board::getNonCaptures(bool s, std::vector<int>& moveList) {
+	//Put every noncapture for side s in moveList
+
+	moveList.clear();
+	int startP, endP, mF, mT;
+	startP = s ? wqR : bqR;
+	endP = s ? wPh : bPh;
+
+	for (int i = startP; i <= endP; i++) {
+		if (!piece[i].getAlive()) continue;
+		generatePieceMoveListFor(i);
+		mF = piece[i].getPos();
+		for (int j = 0; j < piece[i].getMoveListSize(); j++) {
+			mT = piece[i].getFromMoveList(j);
+			if (mT == 0) break;
+			if (board120[mT] != empty) continue;
+			moveList.push_back(mF*100+mT);
+		}
+	}
+}
+
+void Board::sortNonCaptures(std::vector<int>& moveList) {
+	bool sorted = false, s;
+	int temp;
+	while (!sorted) {
+		sorted = true;
+		if (moveList.size() > 0)
+			s = piece[board120[moveList[0]/100]].getColor();
+		for (int i = 0; i < (int)moveList.size() - 1; i++) {
+			if (!hhSort(s, moveList[i], moveList[i+1])) {
+				temp = moveList[i];
+				moveList[i] = moveList[i+1];
+				moveList[i+1] = temp;
+				sorted = false;
+			}
+		}
+	}
+}
+
+bool Board::hhSort(bool s, int i, int j) {
+	return (hh[s][to64(i/100)-1][to64(i%100)-1] >= hh[s][to64(j/100)-1][to64(j%100)-1]);
+}
+
+void Board::removeNonCaptures(bool s, std::vector<int>& moveList) {
+	//Remove any move in moveList that is a noncapture
+	int mT, move;
+	for (size_t i = 0; i < moveList.size(); i++) {
+		move = moveList[i];
+		mT = move%100;
+		if (board120[mT] == empty) {
+			moveList.erase(moveList.begin()+i);
+			i--;
+		}
+	}
+}
+
 void Board::cleanMoveList(bool s) {
 	if (s)
 		cleanMoveList(s, whiteMoveList);
@@ -158,9 +158,6 @@ void Board::cleanMoveList(bool s, std::vector<int>& moveList) {
 	//Erases any illegal moves (for side s) in moveList
 
 	int mF, mT, size;
-	bool realSide = side;
-	int realMoveFrom = moveFrom;
-	int realMoveTo = moveTo;
 
 	size = moveList.size();
 	for (int i = 0; i < size; i++) {
@@ -172,9 +169,6 @@ void Board::cleanMoveList(bool s, std::vector<int>& moveList) {
 			i--;
 		} 
 	}
-	side = realSide;	
-	moveFrom = realMoveFrom;
-	moveTo = realMoveTo;
 }
 
 void Board::generatePieceMoveLists(bool s) {
