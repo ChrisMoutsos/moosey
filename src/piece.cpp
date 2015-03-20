@@ -5,6 +5,7 @@
 ----------------------------------
 */
 
+#include "common.h"
 #include "piece.h"
 
 Piece::Piece() {
@@ -21,12 +22,12 @@ Piece::~Piece() {
 
 //ACCESSORS
 int Piece::getFromMoveList(int i) const {
-	if (!(i > -1 && i < moveListSize)) return -1;
+	assert (i > -1 && i < moveListSize);
 	return moveList[i];
 }
 
 //MUTATORS
 void Piece::setInMoveList(int i, int v) {
-	if (i > -1 && i < moveListSize)
-		moveList[i] = v;
+	assert (i > -1 && i < moveListSize);
+	moveList[i] = v;
 }

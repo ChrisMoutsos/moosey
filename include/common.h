@@ -2,6 +2,7 @@
 #define COMMON_H
 
 #include <assert.h>
+#include <string>
 
 #define ENDGAME_VAL 11309 
 

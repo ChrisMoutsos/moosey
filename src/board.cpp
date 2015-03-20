@@ -96,41 +96,41 @@ void Board::initializePieces() {
 	//Set names, abbreviations, and values
 	for (int i = 0; i <= 16; i += 16) {
 		piece[wqR+i].setName("Rook");
-		piece[wqR+i].setAbbr(char(int('R') + 2*i));
+		piece[wqR+i].setAbbr('R' + 2*i);
 		piece[wqR+i].setValue(R_VAL);
 
 		piece[wqN+i].setName("Knight");
-		piece[wqN+i].setAbbr(char(int('N') + 2*i));
+		piece[wqN+i].setAbbr('N' + 2*i);
 		piece[wqN+i].setValue(N_VAL);
 
 		piece[wqB+i].setName("Bishop");
-		piece[wqB+i].setAbbr(char(int('B') + 2*i));
+		piece[wqB+i].setAbbr('B' + 2*i);
 		piece[wqB+i].setValue(B_VAL);
 
 		piece[wQ+i].setName("Queen");
-		piece[wQ+i].setAbbr(char(int('Q') + 2*i));
+		piece[wQ+i].setAbbr('Q' + 2*i);
 		piece[wQ+i].setValue(Q_VAL);
 
 		piece[wK+i].setName("King");
-		piece[wK+i].setAbbr(char(int('K') + 2*i));
+		piece[wK+i].setAbbr('K' + 2*i);
 		piece[wK+i].setValue(K_VAL);
 
 		piece[wkB+i].setName("Bishop");
-		piece[wkB+i].setAbbr(char(int('B') + 2*i));
+		piece[wkB+i].setAbbr('B' + 2*i);
 		piece[wkB+i].setValue(B_VAL);
 
 		piece[wkN+i].setName("Knight");
-		piece[wkN+i].setAbbr(char(int('N') + 2*i));
+		piece[wkN+i].setAbbr('N' + 2*i);
 		piece[wkN+i].setValue(N_VAL);
 
 		piece[wkR+i].setName("Rook");
-		piece[wkR+i].setAbbr(char(int('R') + 2*i));
+		piece[wkR+i].setAbbr('R' + 2*i);
 		piece[wkR+i].setValue(R_VAL);
 	}
 	for (int s = 0; s <= 16; s += 16) 
 		for (int i = 0; i < 8; i++) { 
 			piece[wPa+i+s].setName("Pawn");
-			piece[wPa+i+s].setAbbr(char(int('P') + 2*s));
+			piece[wPa+i+s].setAbbr('P' + 2*s);
 			piece[wPa+i+s].setValue(P_VAL);
 		}
 
@@ -191,7 +191,7 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 void Board::botMove() {
 	std::cout << "Thinking for ";
 	side ? std::cout << "White..." : std::cout << "Black...";
-	std::cout << " (ply " << ply << ")\n";
+	std::cout << " (ply " << ply+1 << ")\n";
 	displayBotText(*this);
 	int move = 0;
 	move = think(*this, 7);
@@ -200,17 +200,19 @@ void Board::botMove() {
 	changeTurn();
 	genOrderedMoveList();
 	checkCheck(side);
-	std::cout << "WHITEMAT: " << whiteMaterial << " BLACKMAT: " << blackMaterial << '\n';
+	std::cout << "White Material: " << whiteMaterial << " Black Material: " << blackMaterial << '\n';
 }
 
 //ACCESSORS
 int Board::getFromMoveList(bool s, int i) const {
-	if (s && i > -1 && i < (int)whiteMoveList.size()) 
+	if (s) {
+		assert (i > -1 && i < (int)whiteMoveList.size());
 		return whiteMoveList[i];
-	else if (!s && i > -1 && i < (int)blackMoveList.size())
+	}
+	else {
+		assert (i > -1 && i < (int)blackMoveList.size());
 		return blackMoveList[i];
-	else
-		return -1;
+	}
 }
 
 int Board::getMoveListSize(bool s) const {

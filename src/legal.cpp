@@ -21,23 +21,16 @@ bool Board::legalMove(int mF, int mT, bool s, bool v) {
 		return false;
 	}
 	
-	movePiece(mF, mT);	//Move the piece,
-	isInCheck = inCheck(s);	//see if we put our king in check
-	unmovePiece(mF, mT);	//unmove the piece
+	//Move the piece and see if we put our king in check
+	movePiece(mF, mT);
+	isInCheck = inCheck(s);	
+	unmovePiece(mF, mT);
 	
 	if (isInCheck) { 
 		if (v) std::cout << "Illegal move.\n";
 		return false;
 	}
 	return true;
-}
-
-bool Board::checkStalemate() const {
-	if ((int)whiteMoveList.size() == 0 && (int)blackMoveList.size() == 0) {
-		std::cout << "Stalemate!\n";
-		return true;
-	}	
-	return false;
 }
 
 bool Board::checkCheck(bool s) {
@@ -58,7 +51,7 @@ bool Board::checkCheck(bool s, std::vector<int>& moveList) {
 	if (inCheck(s)) {
 		sideInCheck = s ? 1 : 2;
 		cleanMoveList(s, moveList);
-		if ((int)moveList.size() == 0) { //Checkmate
+		if (moveList.size() == 0) { //Checkmate
 			sideInCheckmate = s ? 1 : 2;
 			return true;
 		}
@@ -136,7 +129,7 @@ bool Board::validateMove(int mF, int mT, bool s) {
 	if (onMF == -1 || mT == 0 || board120[mT] == invalid) 
 		return false;
 	//Trying to capture your own piece
-	if (onMT != empty && piece[onMF].getColor() == piece[onMT].getColor() && !castling) 
+	if (onMT != empty && piece[onMF].getColor() == piece[onMT].getColor()) 
 		return false;
 	//Trying to move enemy piece
 	if (piece[onMF].getColor() != s) 

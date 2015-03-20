@@ -215,7 +215,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	//If we are in checkmate, return bad score
 	if ((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2)) {
 		b.cleanMoveList(s, moveList);
-		if ((int)moveList.size() == 0) {
+		if (moveList.size() == 0) {
 			pline->count = 0;
 			return -9999 + depthGone-1;
 		}
@@ -224,7 +224,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	//Frontier nodes: futility pruning
 	if (depthLeft == 1 && !(abs(alpha) > 9000 || abs(beta) > 9000)) {
 		if (!((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
-			if (b.eval() + B_VAL < alpha && (int)moveList.size() > 0) {
+			if (b.eval() + B_VAL < alpha && moveList.size() > 0) {
 				pline->count = 0;
 				return quies(b, alpha, beta, depthGone);
 			}
@@ -234,7 +234,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	//Pre-frontier nodes: extended futility pruning
 	if (depthLeft == 2 && !(abs(alpha) > 9000 || abs(beta) > 9000)) {
 		if (!((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
-			if (b.eval() + R_VAL < alpha && (int)moveList.size() > 0) {
+			if (b.eval() + R_VAL < alpha && moveList.size() > 0) {
 				depthLeft--;
 			}
 		}
@@ -243,7 +243,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	//Pre-pre-frontier nodes: razoring
 	if (depthLeft == 3 && !(abs(alpha) > 9000 || abs(beta) > 9000)) {
 		if (!((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
-			if (b.eval() + Q_VAL < alpha && (int)moveList.size() > 0) {
+			if (b.eval() + Q_VAL < alpha && moveList.size() > 0) {
 				depthLeft--;
 			}
 		}
@@ -278,7 +278,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	}
 	
 	//Loop through psuedo-legal moves
-	for (int i = 0; i < (int)moveList.size(); i++) {
+	for (size_t i = 0; i < moveList.size(); i++) {
 		vector<int> localPV;
 		nodes++;
 
@@ -353,14 +353,14 @@ int quies(Board& b, int alpha, int beta, int depthGone) {
 	b.getCaptures(s, captureList);
 
 	//No captures, so return stand-pat
-	if ((int)captureList.size() == 0)
+	if (captureList.size() == 0)
 		return currEval;
 	
 	//Order the captures by MVVLVA
 	b.sortCaptures(captureList);
 
 	//Loop through the captures
-	for (int i = 0; i < (int)captureList.size(); i++) {
+	for (size_t i = 0; i < captureList.size(); i++) {
 		qNodes++;
 
 		mF = captureList[i]/100;

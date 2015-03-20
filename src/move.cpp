@@ -52,14 +52,14 @@ void Board::movePiece(int mF, int mT) {
 			piece[board120[mF]].setPromoted(true);
 
 
-			int * temp = new int[27]; 		//Make bigger movelist
-			for (int i = 0; i < 4; i++)	 	//Copy any old values over
+			int * temp = new int[27]; 		 //Make bigger movelist
+			for (int i = 0; i < 4; i++)	 	 //Copy any old values over
 				temp[i] = piece[board120[mF]].getFromMoveList(i);
-			piece[board120[mF]].freeMoveList();	//Free old moveList
-			piece[board120[mF]].setMoveList(temp);	//Point at new array
-			for (int i = 4; i < 27; i++ )		//Fill rest of array with zeroes
-				piece[board120[mF]].setInMoveList(i, 0);
+			piece[board120[mF]].freeMoveList();	 //Free old moveList
+			piece[board120[mF]].setMoveList(temp);	 //Point at new array
 			piece[board120[mF]].setMoveListSize(27); //Update moveListSize
+			for (int i = 4; i < 27; i++ )		 //Fill rest of array with zeroes
+				piece[board120[mF]].setInMoveList(i, 0);
 		}
 
 		//If move is a capture

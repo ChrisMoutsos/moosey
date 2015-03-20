@@ -10,7 +10,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
-#include <string>
 #include <vector>
 #include "square.h"
 #include "piece.h"
@@ -91,12 +90,10 @@ class Board {
 		bool validateDiagMove(int mF, int mT) const;
 		bool validateKnightMove(int mF, int mT) const;
 		bool validateKingMove(int mF, int mT, bool s);
-		bool canCastle(int dir, bool s);
-		bool checkStalemate() const;
-		void setCheck(bool s);
 		bool checkCheck(bool s);
 		bool checkCheck(bool s, std::vector<int>& moveList);
 		bool inCheck(bool s) const;
+		bool canCastle(int dir, bool s);
 	
 		//MOVEGEN.CPP
 		void genOrderedMoveList();

@@ -75,7 +75,7 @@ void Board::sortNonCaptures(std::vector<int>& moveList) {
 	int temp;
 	while (!sorted) {
 		sorted = true;
-		if ((int)moveList.size() > 0)
+		if (moveList.size() > 0)
 			s = piece[board120[moveList[0]/100]].getColor();
 		for (int i = 0; i < (int)moveList.size() - 1; i++) {
 			if (!nonCaptureSort(s, moveList[i], moveList[i+1])) {
@@ -275,6 +275,9 @@ void Board::generateKingMoves(int p, int& counter) {
                         counter++;
                 }
         }
+	
+	if ((s && whiteCastled) || (!s && blackCastled)) return;
+
 	if (canCastle(KINGSIDE, s)) { 
 		if (s)
 			piece[p].setInMoveList(counter, _G1);
