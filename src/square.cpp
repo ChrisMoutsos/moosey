@@ -8,7 +8,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
-#include <iostream>
 #include "square.h"
 #include "ltexture.h"
 #include "display.h"
