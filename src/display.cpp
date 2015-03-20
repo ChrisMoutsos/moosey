@@ -47,10 +47,10 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 	drawMoveTable(b);	//Draw movetable (with text)
 
 	//Draw rank numbers
-	for (int i = int('8'); i >= int('1'); i--) {
-		rankStr = char(i);
+	for (int i = '8'; i >= '1'; i--) {
+		rankStr = i;
 		rankText.loadFromRenderedText(rankStr, textColor, Cicero26);
-		rankText.render(BXSTART-35, BYSTART+30+75*(int('8')-i));
+		rankText.render(BXSTART-35, BYSTART+30+75*('8'-i));
 	}
 	if (!flag) {	//Only load file text once
 		fileText.loadFromRenderedText(fileStr, textColor, Cicero26); //Load file text
@@ -307,19 +307,19 @@ void drawMoveTable(const Board& b) {
 		}
 		if (dupMove) { //If the move was ambiguous, de-ambiguate
 			if (mF2%10 != b.piece[otherPiece].getPos()%10) //Not same file
-				plyStr += char(mF2%10+int('a')-1); //so, file is sufficient
+				plyStr += mF2%10+'a'-1; //so, file is sufficient
 			else 					   //Same file
-				plyStr += char(mF2/10+int('1')-2); //so, rank is sufficient
+				plyStr += mF2/10+'1'-2; //so, rank is sufficient
 		}
 		if (b.getPrevOnMoveTo(b.getPly()-1) != empty) { //If move was a capture
 			//Special case for pawns, display the file of departure
 			if (b.piece[p].getValue() == P_VAL || b.getPmSq(b.getPly()-1) == mT2)
-				plyStr += char(mF2%10+int('a')-1);
+				plyStr += mF2%10+'a'-1;
 			plyStr += "x";
 		}
 		else if (b.piece[p].getValue() == P_VAL)
 			if (abs(mF2 - mT2) == 9 || abs(mF2 - mT2) == 11) { //En passant
-				plyStr += char(mF2%10+int('a')-1);
+				plyStr += mF2%10+'a'-1;
 				plyStr += 'x';
 			}
 
@@ -334,9 +334,9 @@ void drawMoveTable(const Board& b) {
 
 		plyStrings.push_back(plyStr);	    //Add it to the list of ply-moves
 	}
-	for (int i = 0; i < (int)plyStrings.size(); i+=2) { //Loop through moves
+	for (size_t i = 0; i < plyStrings.size(); i+=2) { //Loop through moves
 		plyStr = plyStrings[i];	   		    //Load white move
-		if (i+1 < (int)plyStrings.size())	    //If black has moved,
+		if (i+1 < plyStrings.size())		    //If black has moved,
 			plyStr += " " + plyStrings[i+1];    //load their move, too
 		moveText.loadFromRenderedText(plyStr, textColor, Cicero22);
 		moveText.render(BXSTART+(i/42*180)+B_SIZE+40, 
