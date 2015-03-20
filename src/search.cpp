@@ -96,13 +96,30 @@ int think(Board& b, int depth) {
 		if (i < depth) {
 			std::cout << "Search to ply " << i << "... move: ";
 			std::cout << intToSquare(bestMoveSoFar/100) << " to " << intToSquare(bestMoveSoFar%100) << '\n';
+			auto endTime4 = std::chrono::high_resolution_clock::now();
+			fsec diff4 = endTime4 - beginTime1;
+			if (diff4.count() > 1) {
+				std::cout << "BREAKING\n";
+				i = depth;
+				continue;
+			}
 		}
 		if (i == depth) {
+			auto endTime3 = std::chrono::high_resolution_clock::now();
+			fsec diff3 = endTime3 - beginTime1;
+			if (diff3.count() < 3) {
+				std::cout << "Search to ply " << i << "... move: ";
+				std::cout << intToSquare(bestMoveSoFar/100) << " to " << intToSquare(bestMoveSoFar%100) << '\n';
+				std::cout << "EXTENDING SEARCH BY ONE PLY\n";
+				depth++;
+				i = depth-2;
+				continue;
+			}
 			std::cout << "Search to ply " << i << "...\n";
 			std::cout << "Main nodes searched: " << nodes << '\n';
 			std::cout << "Quies nodes searched: " << qNodes << '\n';
 			std::cout << "Time elapsed: ";
-			auto endTime1= std::chrono::high_resolution_clock::now();
+			auto endTime1 = std::chrono::high_resolution_clock::now();
 			fsec diff1 = endTime1 - beginTime2;
 			std::cout << diff1.count() << '\n';
 			std::cout << "Nodes / sec: ";
@@ -218,6 +235,15 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	if (depthLeft == 2 && !(abs(alpha) > 9000 || abs(beta) > 9000)) {
 		if (!((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
 			if (b.eval() + R_VAL < alpha && (int)moveList.size() > 0) {
+				depthLeft--;
+			}
+		}
+	}
+
+	//Pre-pre-frontier nodes: razoring
+	if (depthLeft == 3 && !(abs(alpha) > 9000 || abs(beta) > 9000)) {
+		if (!((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
+			if (b.eval() + Q_VAL < alpha && (int)moveList.size() > 0) {
 				depthLeft--;
 			}
 		}
