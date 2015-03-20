@@ -55,8 +55,10 @@ int think(Board& b, int depth) {
 	
 	//Iterative deepening
 	int i;
-	i = depth%2==1 ? 1 : 2;
-	for (i = i; i <= depth; i += 2) {
+	//i = depth%2==1 ? 1 : 2;
+	for (i = depth; i <= depth; i += 2) {
+		std::cout << "Search to ply " << i << "...\n";
+
 		//Age HH tables
 		for (int f = 0; f < 64; f++)
 			for (int t = 0; t < 64; t++)
@@ -93,45 +95,30 @@ int think(Board& b, int depth) {
 
 		bestMoveSoFar = prinVarLine.move[0];
 
-		if (i < depth) {
-			std::cout << "Search to ply " << i << "... move: ";
-			std::cout << intToSquare(bestMoveSoFar/100) << " to " << intToSquare(bestMoveSoFar%100) << '\n';
-			auto endTime4 = std::chrono::high_resolution_clock::now();
-			fsec diff4 = endTime4 - beginTime1;
-			if (diff4.count() > 1) {
-				std::cout << "BREAKING\n";
-				i = depth;
-				continue;
-			}
-		}
 		if (i == depth) {
+			std::cout << "Main nodes: " << nodes << ", q-nodes: " << qNodes << ", total: " << nodes+qNodes << '\n';
+			std::cout << "Took: ";
+			auto endTime1 = std::chrono::high_resolution_clock::now();
+			fsec diff1 = endTime1 - beginTime2;
+			std::cout << diff1.count() << "s, ";
+			std::cout << "nodes / sec: ";
+			std::cout << (nodes+qNodes) / diff1.count() << '\n';
+			std::cout << "Current score: " << b.eval() << ", best score: " << bestScore << "\n\n";
+
 			auto endTime3 = std::chrono::high_resolution_clock::now();
 			fsec diff3 = endTime3 - beginTime1;
-			if (diff3.count() < 3) {
-				std::cout << "Search to ply " << i << "... move: ";
-				std::cout << intToSquare(bestMoveSoFar/100) << " to " << intToSquare(bestMoveSoFar%100) << '\n';
-				std::cout << "EXTENDING SEARCH BY ONE PLY\n";
+			if (diff3.count() < 5) {
 				depth++;
 				i = depth-2;
 				continue;
 			}
-			std::cout << "Search to ply " << i << "...\n";
-			std::cout << "Main nodes searched: " << nodes << '\n';
-			std::cout << "Quies nodes searched: " << qNodes << '\n';
-			std::cout << "Time elapsed: ";
-			auto endTime1 = std::chrono::high_resolution_clock::now();
-			fsec diff1 = endTime1 - beginTime2;
-			std::cout << diff1.count() << '\n';
-			std::cout << "Nodes / sec: ";
-			std::cout << (nodes+qNodes) / diff1.count() << '\n';
-			std::cout << "Best score: " << bestScore << "\n";
-			std::cout << "Current score: " << b.eval() << "\n\n";
 		}
 	}
 	for (int i = 0; i < prinVarLine.count; i++) {
 		std::cout << intToSquare(prinVarLine.move[i]/100) << " to ";
-		std::cout << intToSquare(prinVarLine.move[i]%100) << "\n";
+		std::cout << intToSquare(prinVarLine.move[i]%100) << ", ";
 	}
+	std::cout << '\n';
 	
 	auto endTime2 = std::chrono::high_resolution_clock::now();
 	fsec diff2 = endTime2 - beginTime1;
@@ -141,11 +128,8 @@ int think(Board& b, int depth) {
 	else
 		totalTimeB += diff2.count();
 
-	std::cout << "Total time taken so far by ";
-	if (b.getSide()) std::cout << " White: " << totalTimeW << '\n';
-	else std::cout << "Black: " << totalTimeB << '\n';
+	std::cout << "Total time for White: " << totalTimeW << "s, Black: " << totalTimeB << "s\n\n";
 
-	std::cout << "Best move: " << prinVarLine.move[0] << "\n\n";
 	return prinVarLine.move[0];
 }
 

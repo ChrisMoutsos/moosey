@@ -194,7 +194,7 @@ void Board::botMove() {
 	std::cout << " (ply " << ply+1 << ")\n";
 	displayBotText(*this);
 	int move = 0;
-	move = think(*this, 7);
+	move = think(*this, 1);
 	setMove(move/100, move%100);
 	movePiece();
 	changeTurn();
