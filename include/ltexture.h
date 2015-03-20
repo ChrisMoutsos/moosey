@@ -6,6 +6,7 @@
 */
 
 #include <SDL2/SDL_ttf.h>
+#include <string>
 
 #ifndef LTEXTURE_H
 #define LTEXTURE_H
