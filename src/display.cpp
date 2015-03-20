@@ -179,7 +179,7 @@ void drawPieces(const Board& b, const int& mF, const int& mT) {
 		    	else if (p == wK)
 				clipSq = spriteClips[wKing];		
 		    	else if (p >= wPa && p <= wPh) {
-				if (b.piece[b.getBoard120(from64(sq+1))].getValue() == P_VAL)
+				if (b.piece[b[from64(sq+1)]].getValue() == P_VAL)
 					clipSq = spriteClips[wPawn];
 				else
 					clipSq = spriteClips[wQueen];
@@ -195,7 +195,7 @@ void drawPieces(const Board& b, const int& mF, const int& mT) {
 		    	else if (p == bK)
 				clipSq = spriteClips[bKing];		
 		    	else if (p >= bPa && p <= bPh) {
-				if (b.piece[b.getBoard120(from64(sq+1))].getValue() == P_VAL)
+				if (b.piece[b[from64(sq+1)]].getValue() == P_VAL)
 					clipSq = spriteClips[bPawn];
 				else
 					clipSq = spriteClips[bQueen];

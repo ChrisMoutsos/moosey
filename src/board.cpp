@@ -204,10 +204,6 @@ void Board::botMove() {
 }
 
 //ACCESSORS
-int Board::getBoard120(int sq) const {
-	return (sq > -1 && sq < 99) ? board120[sq] : invalid;
-}
-
 int Board::getFromMoveList(bool s, int i) const {
 	if (s && i > -1 && i < (int)whiteMoveList.size()) 
 		return whiteMoveList[i];
@@ -222,30 +218,32 @@ int Board::getMoveListSize(bool s) const {
 }
 
 int Board::getEpSq(int i) const {
-	return (i > -1 && i < (int)moveInfo.size()) ? moveInfo[i].epSq : -1;
+	assert(i > -1 && i < (int)moveInfo.size());
+	return moveInfo[i].epSq;
 }
 
 int Board::getPmSq(int i) const {
-	return (i > -1 && i < (int)moveInfo.size()) ? moveInfo[i].pmSq : -1;
-}
-
-int Board::getMoveMade(int i) const {
-	return (i > -1 && i < (int)movesMade.size()) ? movesMade[i] : -1;
+	assert(i > -1 && i < (int)moveInfo.size());
+	return moveInfo[i].pmSq;
 }
 
 int Board::getPrevOnMoveTo(int i) const {
-	return (i > -1 && i < (int)moveInfo.size()) ? moveInfo[i].prevOnMoveTo : invalid;
+	assert(i > -1 && i < (int)moveInfo.size());
+	return moveInfo[i].prevOnMoveTo;
 }
 
 int Board::getPieceMoved(int i) const {
-	return (i > -1 && i < (int)moveInfo.size()) ? moveInfo[i].pieceMoved : -1;
+	assert(i > -1 && i < (int)moveInfo.size());
+	return moveInfo[i].pieceMoved;
 }
+
+int Board::getMoveMade(int i) const {
+	assert(i > -1 && i < (int)movesMade.size());
+	return movesMade[i];
+}
+
 
 //MUTATORS
-void Board::setBoard120(int i, int v) {
-	if (i > -1 && i < 120) board120[i] = v;
-}
-
 void Board::addToMovelist(bool s, int v) {
 	if (s) whiteMoveList.push_back(v);
 	else blackMoveList.push_back(v);
@@ -254,4 +252,15 @@ void Board::addToMovelist(bool s, int v) {
 void Board::clearMoveList(bool s) {
 	if (s) whiteMoveList.clear();
 	else blackMoveList.clear();
+}
+
+//OPERATOR OVERLOADS
+const int& Board::operator [](const int index) const {
+	assert(index > -1 && index < 120);
+	return board120[index];
+}
+
+int& Board::operator [](const int index) {
+	assert(index > -1 && index < 120);
+	return board120[index];
 }

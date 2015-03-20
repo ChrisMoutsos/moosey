@@ -1,6 +1,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <assert.h>
+
 #define ENDGAME_VAL 11309 
 
 //GAME CONTROL

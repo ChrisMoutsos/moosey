@@ -53,7 +53,6 @@ class Board {
 		int getCastling() const { return castling; };
 		int getWhiteMaterial() const { return whiteMaterial; };
 		int getBlackMaterial() const { return blackMaterial; };
-		int getBoard120(int sq) const;
 		int getFromMoveList(bool s, int i) const;
 		int getMoveListSize(bool s) const;
 		int getEpSq(int i) const;
@@ -68,9 +67,11 @@ class Board {
 		void setCastling(int c) { castling = c; };
 		void setSideInCheck(int i) { sideInCheck = i; };
 		void setSideInCheckmate(int i) { sideInCheckmate = i; };
-		void setBoard120(int i, int v);
 		void addToMovelist(bool s, int v);
 		void clearMoveList(bool s);
+		//OPERATOR OVERLOADS
+		int& operator [](const int index);	       //For accessing board120
+		const int& operator [](const int index) const; //For accessing board120
 	
 		//MOVE.CPP 
 		void movePiece();
@@ -119,11 +120,12 @@ class Board {
 		//EVAL.CPP
 		int eval();
 	
+		//DATA
 		Square squares[64];	//For the display
 
 		Piece piece[32];	//The pieces
 
-		int hh[2][64][64];		//History heuristic
+		int hh[2][64][64];	//History heuristic tables
 	private:
 		int board120[120], moveFrom, moveTo, ply;
 		int whiteMaterial, blackMaterial;

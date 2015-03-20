@@ -301,7 +301,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 
 		if (score >= beta) { //Fail-high
 			//If it wasn't a capture, update HH table and killer moves
-			if (b.getBoard120(mT) == empty) {
+			if (b[mT] == empty) {
 				b.hh[s][to64(mF)-1][to64(mT)-1] += depthGone*depthGone;
 				if (depthGone != 0) {
 					if (mF*100+mT == killers[depthGone-1][1]) {
@@ -368,7 +368,7 @@ int quies(Board& b, int alpha, int beta, int depthGone) {
 
 		//Futility (AKA delta) pruning
 		if (b.getWhiteMaterial() > ENDGAME_VAL && b.getBlackMaterial() > ENDGAME_VAL)
-			if (b.piece[b.getBoard120(mT)].getValue() + 120 + currEval <= alpha)
+			if (b.piece[b[mT]].getValue() + 120 + currEval <= alpha)
 				if (!b.inCheck(s)) 
 					continue;
 
