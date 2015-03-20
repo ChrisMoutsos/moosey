@@ -134,18 +134,22 @@ void drawBorder() {
 }
 
 void drawSquares(const Board& b, const int& mF, const int& mT) {
-	int sq;
+	int sq, ply = b.getPly();
 	SDL_Rect sqPos;
 	for (int r = 1; r <= 8; r++) {
 		for (int f = 1; f <= 8; f++) {
 			sq = FR2SQ64(f, r)-1;
-			if (mF == sq+1 || to64(b.getMoveMade(b.getPly()-1)/100) == sq+1) //moveFrom square
+			//If this square is clicked, or has had a move made on it (moveFrom)
+			if (mF == sq+1 || (ply > 0 && to64(b.getMoveMade(ply-1)/100) == sq+1))
 				SDL_SetRenderDrawColor(renderer, 248, 195, 248, 255);
-			else if (mT == sq+1 || to64(b.getMoveMade(b.getPly()-1)%100) == sq+1) //moveTo square
+			//If this square is clicked, or has had a move made on it (moveTo)
+			else if (mT == sq+1 || (ply > 0 && to64(b.getMoveMade(ply-1)%100) == sq+1))
 				SDL_SetRenderDrawColor(renderer, 238, 157, 242, 255);
-			else if ((r+f)%2 == 1)				//Light squares
+			//Otherwise, color light
+			else if ((r+f)%2 == 1)			
 				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-			else 						//Dark squares
+			//or color dark
+			else 						
 				SDL_SetRenderDrawColor(renderer, 0, 153, 153, 255);
 			sqPos = {b.squares[sq].getX(),	//X start
 				 b.squares[sq].getY(),	//Y start

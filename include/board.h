@@ -18,6 +18,7 @@
 
 void showMoveLists(Board& b);
 
+//For moveInfo vector
 struct info {
 	int pmSq;
 	int epSq;
