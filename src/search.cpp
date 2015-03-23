@@ -54,9 +54,7 @@ int think(Board& b, int depth) {
 	b.checkCheck(b.getSide(), moveList);
 	
 	//Iterative deepening
-	int i;
-	//i = depth%2==1 ? 1 : 2;
-	for (i = depth; i <= depth; i += 2) {
+	for (int i = 1; i <= depth; i++) {
 		std::cout << "Search to ply " << i << "...\n";
 
 		//Age HH tables
@@ -75,7 +73,7 @@ int think(Board& b, int depth) {
 		auto beginTime2 = std::chrono::high_resolution_clock::now();
 		nodes = 0;
 		qNodes = 0;
-		
+
 		//Set aspiration window
 		alpha = bestScore - asp;
 		beta = bestScore + asp;
@@ -95,21 +93,23 @@ int think(Board& b, int depth) {
 
 		bestMoveSoFar = prinVarLine.move[0];
 
-		if (i == depth) {
-			std::cout << "Main nodes: " << nodes << ", q-nodes: " << qNodes << ", total: " << nodes+qNodes << '\n';
-			std::cout << "Took: ";
-			auto endTime1 = std::chrono::high_resolution_clock::now();
-			fsec diff1 = endTime1 - beginTime2;
-			std::cout << diff1.count() << "s, ";
-			std::cout << "nodes / sec: ";
-			std::cout << (nodes+qNodes) / diff1.count() << '\n';
-			std::cout << "Current score: " << b.eval() << ", best score: " << bestScore << "\n\n";
+		auto endTime3 = std::chrono::high_resolution_clock::now();
+		fsec diff3 = endTime3 - beginTime1;
 
-			auto endTime3 = std::chrono::high_resolution_clock::now();
-			fsec diff3 = endTime3 - beginTime1;
-			if (diff3.count() < 5) {
+		std::cout << "Main nodes: " << nodes << ", q-nodes: " << qNodes << ", total: " << nodes+qNodes << '\n';
+		std::cout << "Took: ";
+		auto endTime1 = std::chrono::high_resolution_clock::now();
+		fsec diff1 = endTime1 - beginTime2;
+		std::cout << diff1.count() << "s, ";
+		std::cout << "nodes / sec: ";
+		std::cout << (nodes+qNodes) / diff1.count() << '\n';
+		std::cout << "Current score: " << b.eval() << ", best score: " << bestScore << ", move: " << bestMoveSoFar << '\n';;
+		std::cout << "Total time taken: " << diff3.count() << "\n\n";
+
+		if (i == depth) {
+			if (diff3.count() < 4) {
 				depth++;
-				i = depth-2;
+				i = depth - 1;
 				continue;
 			}
 		}
@@ -154,10 +154,12 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	//Horizon nodes, quiescence search
 	if (depthLeft <= 0) {
 		//If we're in check, search a little further
+
 		if (allowNull) { //If allowNull is false, we already checked if we were in check
 			if (b.inCheck(s))
 				return alphaBeta(b, alpha, beta, 1, depthGone, pline, 0); 
 		}
+
 		//Otherwise, do a quiescence search
 		pline->count = 0;
 		return quies(b, alpha, beta, depthGone);
@@ -248,7 +250,9 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 				moveList.insert(moveList.begin()+0, killerMove);
 			}
 		}
+
 		//then PV in front
+
 		std::vector<int>::iterator pvIndex;
 		int pvmove = oldPrinVarLine.move[depthGone];
 		if (pvmove != 0 && depthGone < oldPrinVarLine.count) {
@@ -259,6 +263,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 				moveList.insert(moveList.begin()+0, temp);
 			}
 		}
+
 	}
 	
 	//Loop through psuedo-legal moves
