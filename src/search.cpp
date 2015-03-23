@@ -252,7 +252,6 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		}
 
 		//then PV in front
-
 		std::vector<int>::iterator pvIndex;
 		int pvmove = oldPrinVarLine.move[depthGone];
 		if (pvmove != 0 && depthGone < oldPrinVarLine.count) {
@@ -341,10 +340,6 @@ int quies(Board& b, int alpha, int beta, int depthGone) {
 	//Get psuedo-legal captures in captureList
 	b.getCaptures(s, captureList);
 
-	//No captures, so return stand-pat
-	if (captureList.size() == 0)
-		return currEval;
-	
 	//Order the captures by MVVLVA
 	b.sortCaptures(captureList);
 
