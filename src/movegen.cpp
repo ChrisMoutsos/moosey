@@ -13,7 +13,7 @@
 #include "board.h"
 
 void Board::genOrderedMoveList() {
-	if (side)
+	if (side == WHITE)
 		genOrderedMoveList(side, whiteMoveList);
 	else
 		genOrderedMoveList(side, blackMoveList);
