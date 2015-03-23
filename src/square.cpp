@@ -8,6 +8,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
+#include "common.h"
 #include "square.h"
 #include "ltexture.h"
 #include "display.h"
@@ -45,7 +46,8 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 						if ((s && piece <= 15) || (!s && piece >= 16)) {
 							mF = square; 
 							dragging = true;
-							Mix_PlayChannel(-1, mFSound, 0);
+							if (!muted)
+								Mix_PlayChannel(-1, mFSound, 0);
 						}
 				}
 				else if (mF != -1) {
@@ -53,12 +55,14 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 						if (piece != noPiece) {
 							mF = square;
 							dragging = true;
-							Mix_PlayChannel(-1, mFSound, 0);
+							if (!muted)
+								Mix_PlayChannel(-1, mFSound, 0);
 						}	
 					}
 					else if (square != mF) {
 						mT = square;
-						Mix_PlayChannel(-1, mTSound, 0);
+						if (!muted)
+							Mix_PlayChannel(-1, mTSound, 0);
 					}
 					else
 						mT = -1;
@@ -69,7 +73,8 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 				if (mF != -1 && mT == -1) {
 					if (square != mF) {
 						mT = square;
-						Mix_PlayChannel(-1, mTSound, 0);
+						if (!muted)
+							Mix_PlayChannel(-1, mTSound, 0);
 					}
 					else if (!dragging) {
 						mF = -1;

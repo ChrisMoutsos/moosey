@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include <SDL2/SDL_mixer.h>
 #include "common.h"
 #include "board.h"
 #include "display.h"
@@ -194,9 +195,11 @@ void Board::botMove() {
 	std::cout << " (ply " << ply+1 << ")\n";
 	displayBotText(*this);
 	int move = 0;
-	move = think(*this, 1);
+	move = think(*this, 7);
 	setMove(move/100, move%100);
 	movePiece();
+	if (!muted)
+		Mix_PlayChannel(-1, mFSound, 0);
 	changeTurn();
 	genOrderedMoveList();
 	checkCheck(side);

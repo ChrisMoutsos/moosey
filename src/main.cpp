@@ -9,13 +9,11 @@
 /* 
  * ##To-Do List##
  * SDL:
- * - Add mute button
  * - Splash screen
  * Add en passants and promotions to quiescent search
  * Threefold repetition
  * - FEN parsing
  * Finish null move heuristic edge cases
- * Make sure bot isn't putting illegal moves in the PV
  * Write dupMove code for Queens
  * 
  */
@@ -28,7 +26,7 @@
 #include "board.h"
 #include "display.h"
 
-bool quit = false;
+bool quit = false, muted = false;;
 
 void showMoveLists(Board& board);
 
@@ -60,6 +58,9 @@ int main(int argc, char* args[]) {
 						displayBoard(board, mF, mT);
 						if (!board.getSideInCheckmate())
 							board.botMove();
+					break;
+					case SDLK_m:
+						muted = muted ? 0 : 1;
 					break;
 					case SDLK_LEFT:
 						board.undoMove();
