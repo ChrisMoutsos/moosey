@@ -76,4 +76,6 @@ enum pieceValue_t { P_VAL = 100, N_VAL = 300, B_VAL = 310,
 enum castleside_t { QUEENSIDE = 2, KINGSIDE = 1
 };
 
+extern bool muted;
+
 #endif
