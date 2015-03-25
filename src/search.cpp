@@ -106,8 +106,8 @@ int think(Board& b, int depth) {
 		std::cout << "Current score: " << b.eval() << ", best score: " << bestScore << ", move: " << bestMoveSoFar << '\n';;
 		std::cout << "Total time taken: " << diff3.count() << "\n\n";
 
-		if (i == depth) {
-			if (diff3.count() < 4) {
+		if (i == depth && bestScore < 9000 && bestScore > -9000) {
+			if (diff3.count() < 2) {
 				depth++;
 				i = depth - 1;
 				continue;
