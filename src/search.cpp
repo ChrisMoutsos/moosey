@@ -173,7 +173,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	else b.setSideInCheck(0);
 
 	int score;
-
+	
 	//Null move reduction
 	if (allowNull && !((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
 		if ((s && b.getWhiteMaterial() > ENDGAME_VAL) || (!s && b.getBlackMaterial() > ENDGAME_VAL)) {
@@ -197,14 +197,14 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 
 	//Generate pseudo-legal, ordered moveList
 	b.genOrderedMoveList(s, moveList);
+	//If we're in check, clean the movelist
+	if ((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))
+		b.cleanMoveList(s, moveList);
 
 	//If we are in checkmate, return bad score
-	if ((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2)) {
-		b.cleanMoveList(s, moveList);
-		if (moveList.size() == 0) {
-			pline->count = 0;
-			return -9999 + depthGone-1;
-		}
+	if (moveList.size() == 0) {
+		pline->count = 0;
+		return -9999 + depthGone-1;
 	}
 
 	//Frontier nodes: futility pruning
