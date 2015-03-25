@@ -15,6 +15,7 @@
  * - FEN parsing
  * Finish null move heuristic edge cases
  * Write dupMove code for Queens
+ * Make sure illegal moves aren't put in PV
  * 
  */
 
@@ -49,6 +50,14 @@ int main(int argc, char* args[]) {
 
 	while (!quit) {
 		while (SDL_PollEvent(&e)) {
+		/*	if (board.getSide()) {
+				mF = mT = -1;
+				displayBoard(board, mF, mT);
+				if (!board.getSideInCheckmate())
+					board.botMove();
+
+			}
+*/
 			if (e.type == SDL_QUIT)
 				quit = true;
 			else if (e.type == SDL_KEYDOWN) {
@@ -64,9 +73,11 @@ int main(int argc, char* args[]) {
 					break;
 					case SDLK_LEFT:
 						board.undoMove();
+						displayBoard(board, mF, mT);
 					break;
 					case SDLK_BACKSPACE:
 						board.restart();
+						displayBoard(board, mF, mT);
 					break;
 				}
 			}
