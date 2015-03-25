@@ -217,8 +217,8 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		extension += 25;
 
 	//Frontier nodes: futility pruning
-	if (depthLeft == 1 && !(abs(alpha) > 9000 || abs(beta) > 9000)) {
-		if (!((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
+	if (depthLeft == 1) {
+		if (!inCheck && !(abs(alpha) > 9000 || abs(beta) > 9000) {
 			if (b.eval() + B_VAL < alpha && moveList.size() > 0) {
 				pline->count = 0;
 				return quies(b, alpha, beta, depthGone);
@@ -227,8 +227,8 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	}
 
 	//Pre-frontier nodes: extended futility pruning
-	if (depthLeft == 2 && !(abs(alpha) > 9000 || abs(beta) > 9000)) {
-		if (!((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
+	else if (depthLeft == 2) {
+		if (!inCheck && !(abs(alpha) > 9000 || abs(beta) > 9000) {
 			if (b.eval() + R_VAL < alpha && moveList.size() > 0) {
 				depthLeft--;
 			}
@@ -236,8 +236,8 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	}
 
 	//Pre-pre-frontier nodes: razoring
-	if (depthLeft == 3 && !(abs(alpha) > 9000 || abs(beta) > 9000)) {
-		if (!((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
+	else if (depthLeft == 3) {
+		if (!inCheck && !(abs(alpha) > 9000 || abs(beta) > 9000) {
 			if (b.eval() + Q_VAL < alpha && moveList.size() > 0) {
 				depthLeft--;
 			}
