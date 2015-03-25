@@ -154,11 +154,8 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	//Horizon nodes, quiescence search
 	if (depthLeft <= 0) {
 		//If we're in check, search a little further
-
-		if (allowNull) { //If allowNull is false, we already checked if we were in check
-			if (b.inCheck(s))
-				return alphaBeta(b, alpha, beta, 1, depthGone, pline, 0); 
-		}
+		if (allowNull && b.inCheck(s))
+			return alphaBeta(b, alpha, beta, 1, depthGone, pline, 0); 
 
 		//Otherwise, do a quiescence search
 		pline->count = 0;
@@ -166,16 +163,12 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	}
 
 	//Useful to know this for later	
-	if (b.inCheck(s)) {
-		if (s) b.setSideInCheck(1);
-		else b.setSideInCheck(2);
-	}
-	else b.setSideInCheck(0);
+	bool inCheck = b.inCheck(s);
 
-	int score;
+	int score, extension = 0;
 	
 	//Null move reduction
-	if (allowNull && !((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))) {
+	if (allowNull && !inCheck) {
 		if ((s && b.getWhiteMaterial() > ENDGAME_VAL) || (!s && b.getBlackMaterial() > ENDGAME_VAL)) {
 			r = depthLeft > 6 ? 4 : 3;
 			b.changeTurn();
@@ -198,14 +191,30 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	//Generate pseudo-legal, ordered moveList
 	b.genOrderedMoveList(s, moveList);
 	//If we're in check, clean the movelist
-	if ((s && b.getSideInCheck() == 1) || (!s && b.getSideInCheck() == 2))
+	if (inCheck) {
 		b.cleanMoveList(s, moveList);
+		//Extend on evading check
+		extension += 100;
+	}
 
 	//If we are in checkmate, return bad score
 	if (moveList.size() == 0) {
 		pline->count = 0;
 		return -9999 + depthGone-1;
 	}
+	//Singular reply
+	else if (moveList.size() == 1) {
+		//On a root node, go straight to quies
+		if (depthGone == 0) {
+			pline->count = 0;
+			return quies(b, alpha, beta, depthGone);
+		}	
+		//Otherwise, extend
+		extension += 75;
+	}
+	//Only two replies
+	else if (moveList.size() == 2)
+		extension += 25;
 
 	//Frontier nodes: futility pruning
 	if (depthLeft == 1 && !(abs(alpha) > 9000 || abs(beta) > 9000)) {
@@ -265,7 +274,9 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 
 	}
 	
-	//Loop through psuedo-legal moves
+	//depthLeft += extension/100;
+	
+	//Loop through moves
 	for (size_t i = 0; i < moveList.size(); i++) {
 		vector<int> localPV;
 		nodes++;
