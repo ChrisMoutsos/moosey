@@ -47,6 +47,7 @@ int main(int argc, char* args[]) {
 	SDL_Event e; //Event handler
 
 	Board board;
+	std::cout << "Current FEN: " << board.getFEN() << '\n';
 
 	while (!quit) {
 		while (SDL_PollEvent(&e)) {
