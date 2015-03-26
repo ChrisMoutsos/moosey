@@ -2,7 +2,7 @@
  ---------------------------------
 	~Moosey Chess Engine~
 	   By Chris Moutsos
-	      main.cpp
+	       main.cpp
  ---------------------------------
 */
 
@@ -13,9 +13,9 @@
  * Add en passants and promotions to quiescent search
  * Threefold repetition
  * - FEN parsing
- * Finish null move heuristic edge cases
+ * Finish null move heuristic edge cases (?)
  * Write dupMove code for Queens
- * Make sure illegal moves aren't put in PV
+ * Handle stalemates
  * 
  */
 
