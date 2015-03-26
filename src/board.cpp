@@ -184,6 +184,7 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 			genOrderedMoveList();
 			checkCheck(getSide());
 			std::cout << "Current FEN: " << getFEN() << '\n';
+			std::cout << "Drawn: " << draw() << '\n';
 		}
 		mF = -1;
 		mT = -1;

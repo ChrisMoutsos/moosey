@@ -123,6 +123,7 @@ void Board::movePiece(int mF, int mT) {
 	//Update move info, increase ply
 	moveInfo.push_back({localPmSq, localEpSq, board120[mT],
 			    localPrevOnMoveTo, localHalfMoveClock});
+	moveInfo[ply].FEN = getFEN();
 	ply++;
 }
 
