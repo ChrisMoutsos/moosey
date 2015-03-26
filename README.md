@@ -17,7 +17,7 @@ The following features have been implemented.
 - Futility pruning
 - Extended futility pruning
 - Razoring
-- Search extensions (evading check, singular reply, two replies)
+- Search extensions: (evading check, singular reply, two replies, threat)
 
 ####In the Future
 - Better move ordering
