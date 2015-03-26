@@ -14,10 +14,10 @@ The following features have been implemented.
 - Null move reductions
 - History heuristic
 - Killer heuristic (saving 2 moves/ply)
-- Futility pruning
+- Futility pruning ("Delta" pruning in quiescent search)
 - Extended futility pruning
 - Razoring
-- Search extensions: (evading check, singular reply, two replies, threat)
+- Search extensions (evading check, singular reply, two replies, threat)
 
 ####In the Future
 - Better move ordering
