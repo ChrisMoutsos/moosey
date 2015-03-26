@@ -184,6 +184,10 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 					return quies(b, alpha, beta, depthGone);
 				}
 			}
+			//Extend on nearby checkmates
+			else if (score < -8500) {
+				ext += 200;
+			}
 		}
 	}
 
@@ -389,6 +393,7 @@ int quies(Board& b, int alpha, int beta, int depthGone) {
 			b.unmovePiece();
 			continue;
 		}
+
 		b.changeTurn();
 		score = -quies(b, -beta, -alpha, depthGone+1);
 		b.unmovePiece();
