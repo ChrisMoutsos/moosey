@@ -28,7 +28,7 @@ struct info {
 class Board {
 	
 	friend int search(Board& b);
-	friend int alphaBeta(Board& b, int alpha, int beta, int depthLeft);
+	friend int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int ext);
 	
 	public:
 		//BOARD.CPP
