@@ -236,6 +236,16 @@ void Board::changeTurn() {
 void Board::undoMove() {
 	if (ply == 0) return;
 	
+	//Stalemate
+	if (movesMade.back() == 0) {
+		movesMade.pop_back();
+		moveInfo.pop_back();
+		ply--;
+		changeTurn();
+		checkCheck(side);
+		return;
+	}
+	
 	changeTurn();
 	unmovePiece();
 	genOrderedMoveList();

@@ -130,6 +130,9 @@ int think(Board& b, int depth) {
 
 	std::cout << "Total time for White: " << totalTimeW << "s, Black: " << totalTimeB << "s\n\n";
 
+	if (prinVarLine.move[0] == 0)
+		std::cout << "Stalemate!\n";
+
 	return prinVarLine.move[0];
 }
 
@@ -206,10 +209,16 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	if (inCheck)
 		ext += 100;
 
-	//If we are in checkmate, return bad score
 	if (moveList.size() == 0) {
 		pline->count = 0;
-		return -9999 + depthGone-1;
+		//If we are in checkmate, return bad score
+		if (inCheck)
+			return -9999 + depthGone-1;
+		//Only favor stalemate if we're losing
+		else {
+			if (alpha > 0) return -8000;
+			else return 8000;
+		}
 	}
 	//Singular reply
 	else if (moveList.size() == 1) {
