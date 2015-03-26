@@ -150,7 +150,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	}
 
 	//Don't give a draw if winning
-	if (alpha > 0) {
+	if (depthGone == 0 && alpha > 0) {
 		if (b.draw())
 			return -8000;
 	}
