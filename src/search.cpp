@@ -134,7 +134,6 @@ int think(Board& b, int depth) {
 }
 
 int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE* pline, bool allowNull, int ext) {
-	//std::cout << "START.. a: " << alpha << " b: " << beta << " dL: " << depthLeft << " dG: " << depthGone << '\n';
 	while (SDL_PollEvent(&e)) {
 		if (e.type == SDL_QUIT)
 			exit(0);
@@ -146,7 +145,6 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 
 	//If our king is dead, return bad score
 	if ((s && !b.piece[wK].getAlive()) || (!s && !b.piece[bK].getAlive())) {
-		//std::cout << "OUR KING IS DEAD\n";
 		pline->count = 0;
 		return -9999 + depthGone-1;
 	}
@@ -185,9 +183,8 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 				}
 			}
 			//Extend on nearby checkmates
-			else if (score < -8500) {
+			else if (score < -8500)
 				ext += 200;
-			}
 		}
 	}
 
@@ -200,10 +197,8 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	b.cleanMoveList(s, moveList);
 
 	//Evading check extension
-	if (inCheck) {
+	if (inCheck)
 		ext += 100;
-	//	std::cout << "inCheck extension\n";
-	}
 
 	//If we are in checkmate, return bad score
 	if (moveList.size() == 0) {
@@ -212,9 +207,8 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	}
 	//Singular reply
 	else if (moveList.size() == 1) {
-		//On a root node with only one move
+		//On a root node, quit early
 		if (depthGone == 0) {
-			//Add the move to the principal variation
 			pline->move[0] = moveList[0];
 			pline->count = 1;
 			return -8000;
@@ -222,24 +216,16 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 
 		//Otherwise, extend
 		ext += 75;
-	//	std::cout << "singular reply extension\n";
 	}
 	//Only two replies
-	else if (moveList.size() == 2) {
+	else if (moveList.size() == 2)
 		ext += 25;
-	//	std::cout << "only two replies extension\n";
-	}
 
-	//std::cout << "Increasing depthLeft: " << depthLeft << " by " << extension/100 << "...";
-	//std::cout << " depthLeft: " << depthLeft << '\n';
-	
-	//std::cout << "futility\n";
 	//Frontier nodes: futility pruning
 	if (depthLeft == 1) {
 		if (!inCheck && !(abs(alpha) > 9000 || abs(beta) > 9000)) {
 			if (b.eval() + B_VAL < alpha && moveList.size() > 0) {
 				pline->count = 0;
-				//std::cout << "CUT\n";
 				return quies(b, alpha, beta, depthGone);
 			}
 		}
@@ -263,7 +249,6 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		}
 	}
 
-	//std::cout << "sorting moves\n";
 	//Put principal variation and killer moves first
 	int temp;
 	if (allowNull) { //Except if we already null-moved, or checking a check
@@ -294,7 +279,6 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 
 	}
 	
-	//std::cout << "starting search\n";
 	//Loop through moves
 	for (size_t i = 0; i < moveList.size(); i++) {
 		vector<int> localPV;
@@ -305,6 +289,15 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		b.setMove(mF, mT);
 		b.movePiece();
 		b.changeTurn();
+
+		//Pawn push extensions
+		if (b.piece[b[mF]].getValue() == P_VAL) {
+			if (s && (mT/10 == 80 || mT/10 == 90))
+				ext += 100;
+			else if (!s && (mT/10 == 30 || mT/10 == 20))
+				ext += 100;
+		}
+
 		//If we had an alpha cutoff, do a zero-window search (guessing we were right)
 		if (foundPV) {
 			score = -alphaBeta(b, -alpha-1, -alpha, depthLeft-1, depthGone+1, &line, 1, ext%100);
