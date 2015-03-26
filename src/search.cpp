@@ -184,7 +184,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 			}
 			//Extend on nearby checkmates
 			else if (score < -8500)
-				ext += 200;
+				ext += 100;
 		}
 	}
 
