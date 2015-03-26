@@ -23,6 +23,7 @@ struct info {
 	int epSq;
 	int pieceMoved;
 	int prevOnMoveTo;
+	int halfMoveClock;
 };
 
 class Board {
@@ -60,6 +61,7 @@ class Board {
 		int getMoveMade(int i) const;
 		int getPrevOnMoveTo(int i) const;
 		int getPieceMoved(int i) const;
+		std::string getFEN();
 		//MUTATORSS
 		void setMove(int mF, int mT) { moveFrom = mF; moveTo = mT; };
 		void setPly(int newPly) { ply = newPly; };
@@ -125,7 +127,7 @@ class Board {
 
 		int hh[2][64][64];	//History heuristic tables
 	private:
-		int board120[120], moveFrom, moveTo, ply;
+		int board120[120], moveFrom, moveTo, ply, halfMoveClock;
 		int whiteMaterial, blackMaterial;
 		//For the line below.. 0: none, 1: white, 2: black 
 		int sideInCheck, sideInCheckmate;

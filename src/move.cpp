@@ -17,7 +17,10 @@ void Board::movePiece() {
 void Board::movePiece(int mF, int mT) {
 	bool s = piece[board120[mF]].getColor();
 	int  mFVal = piece[board120[mF]].getValue(), epExtra = 0;
-	int localEpSq = null, localPmSq = null, localPrevOnMoveTo = board120[mT];
+	int localEpSq = null, localPmSq = null;
+	int localPrevOnMoveTo = board120[mT], localHalfMoveClock;
+	
+	localHalfMoveClock = ply == 0 ? 0 : moveInfo.back().halfMoveClock;
 
 	//Add the move to movesMade
 	movesMade.push_back(mF*100+mT);
@@ -27,14 +30,15 @@ void Board::movePiece(int mF, int mT) {
 		castling = mF < mT ? KINGSIDE : QUEENSIDE;
 	
 	if (!castling) {	
-		//If the move is an en passant
-		if (mFVal == P_VAL && ply > 0 && mT == moveInfo.back().epSq) {
-			epExtra = s ? -10 : 10; //The offset to the killed pawn from mT
+		if (mFVal == P_VAL ) {
+			//If the move is an en passant
+			if (ply > 0 && mT == moveInfo.back().epSq)
+				epExtra = s ? -10 : 10; //The offset to the killed pawn from mT
+			//Set potential en passant target square if appropriate
+			if (abs(mF-mT) == 20)
+				localEpSq = s ? mF+10 : mF-10;  //The square the pawn skipped
+			localHalfMoveClock = 0;
 		}
-
-		//Set potential en passant square if appropriate
-		if (mFVal == P_VAL && abs(mF-mT) == 20)
-			localEpSq = s ? mF+10 : mF-10;  //The square the pawn skipped
 
 		//If the move is a promotion
 		if (mFVal == P_VAL && ((s && mT/10 == 9) || (!s && mT/10 == 2))) {
@@ -74,6 +78,8 @@ void Board::movePiece(int mF, int mT) {
 			piece[board120[mT+epExtra]].setPos(null);
 			if (epExtra != 0)
 				board120[mT+epExtra] = empty;
+	
+			localHalfMoveClock++;
 		}
 	
 		//Move the piece
@@ -111,10 +117,12 @@ void Board::movePiece(int mF, int mT) {
 		board120[mF+cExtras[1]] = empty;		    //Empty old rook sq
 
 		castling = 0;
+		localHalfMoveClock++;
 	}
 
 	//Update move info, increase ply
-	moveInfo.push_back({localPmSq, localEpSq, board120[mT], localPrevOnMoveTo});
+	moveInfo.push_back({localPmSq, localEpSq, board120[mT],
+			    localPrevOnMoveTo, localHalfMoveClock});
 	ply++;
 }
 

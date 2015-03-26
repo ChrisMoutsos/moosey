@@ -51,7 +51,7 @@ void Board::setPiecesOnSquares() {
 }
 
 void Board::initializeVars() {
-	moveFrom = moveTo = ply =  null;
+	moveFrom = moveTo = ply = halfMoveClock = 0;
 	side = WHITE;
 	whiteCastled = blackCastled = false;
 	castling = sideInCheck = sideInCheckmate = 0;
@@ -183,6 +183,7 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 			changeTurn();
 			genOrderedMoveList();
 			checkCheck(getSide());
+			std::cout << "Current FEN: " << getFEN() << '\n';
 		}
 		mF = -1;
 		mT = -1;
@@ -204,9 +205,72 @@ void Board::botMove() {
 	genOrderedMoveList();
 	checkCheck(side);
 	std::cout << "White Material: " << whiteMaterial << " Black Material: " << blackMaterial << '\n';
+	std::cout << "Current FEN: " << getFEN() << '\n';
 }
 
 //ACCESSORS
+std::string Board::getFEN() {
+	using namespace std;
+
+	string FEN;
+	int emptyCount = 0;
+
+	//Piece positions
+	for (int j = 0; j < 8; j++) {
+		emptyCount = 0;
+		for (int i = _A8 - j*10; i <= _H8 - j*10; i++) {
+			if (board120[i] == empty)
+				emptyCount++;
+			else {
+				if (emptyCount > 0) {
+					FEN += to_string(emptyCount);
+					emptyCount = 0;
+				}
+				FEN += piece[board120[i]].getAbbr();
+			}
+		}	
+		if (emptyCount > 0) {
+			FEN += to_string(emptyCount);
+			emptyCount = 0;
+		}
+		if (j != 7)
+			FEN += '/';
+	}
+
+	//Side to move
+	FEN += side ? " w " : " b ";
+
+	//Castling availability
+	if (piece[wK].getMoved() == 0) {
+		if (piece[wkR].getMoved() == 0)
+			FEN += 'K';
+		if (piece[wqR].getMoved() == 0)
+			FEN += 'Q';
+	}
+	if (piece[bK].getMoved() == 0) {
+		if (piece[bkR].getMoved() == 0)
+			FEN += 'k';
+		if (piece[bqR].getMoved() == 0)
+			FEN += 'q';
+	}
+	if (FEN.back() == ' ')
+		FEN += '-';
+
+	//En passant target square
+	if (ply != 0 && moveInfo.back().epSq != 0)
+		FEN += " " + intToSquare(moveInfo.back().epSq) + " ";
+	else 
+		FEN += " - ";
+	
+	//Halfmove clock
+	FEN += ply == 0 ? "0" : to_string(moveInfo.back().halfMoveClock);
+	
+	//Full move clock
+	FEN += " " + to_string(ply/2 + 1);
+
+	return FEN;
+}
+
 int Board::getFromMoveList(bool s, int i) const {
 	if (s) {
 		assert (i > -1 && i < (int)whiteMoveList.size());
