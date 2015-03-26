@@ -15,11 +15,15 @@ The following features have been implemented.
 - History heuristic
 - Killer heuristic (saving 2 moves/ply)
 - Futility pruning
+- Extended futility pruning
+- Razoring
+- Search extensions (evading check, singular reply, two replies)
 
 ####In the Future
 - Better move ordering
 - Transposition tables
 - Static exchange evaluation (attempted, such a pain I gave up for now)
-- Search extensions
+- More search extensions
+- Late move reductions
 
 ![Screenshot](https://raw.githubusercontent.com/ChrisMoutsos/moosey/master/res/screenshot.png)
