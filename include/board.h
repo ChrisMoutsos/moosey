@@ -98,6 +98,7 @@ class Board {
 		bool inCheck(bool s) const;
 		bool canCastle(int dir, bool s);
 		bool drawCheck();
+		bool botDrawCheck();
 	
 		//MOVEGEN.CPP
 		void genOrderedMoveList();

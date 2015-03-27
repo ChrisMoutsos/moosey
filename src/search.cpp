@@ -131,7 +131,7 @@ int think(Board& b, int depth) {
 	std::cout << "Total time for White: " << totalTimeW << "s, Black: " << totalTimeB << "s\n\n";
 
 	if (prinVarLine.move[0] == 0)
-		std::cout << "Stalemate!\n";
+		std::cout << "Draw!\n";
 
 	return prinVarLine.move[0];
 }
@@ -153,17 +153,23 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	}
 
 	//Don't give a draw if winning
-	if (depthGone == 1) {
-		if ((s && b.getWhiteMaterial() > b.getBlackMaterial()) ||
-	            (!s && b.getBlackMaterial() > b.getWhiteMaterial())) {
-			//std::cout << "CHECKING FOR two repeats!!!!.... ";
-			if (b.drawCheck()) {
-				std::cout << "yep!\n";
-			//	return -8000;
+	//if (depthGone == 1) {
+		if (b.botDrawCheck()) {
+			std::cout << "yep DRAW LOL! move: " << b.getMoveFrom() << " to " << b.getMoveTo() << '\n';
+			if ((s && b.getWhiteMaterial() > b.getBlackMaterial()) ||
+			    (!s && b.getBlackMaterial() > b.getWhiteMaterial())) {
+				std::cout << "Returning bad score because " << s << " is winning\n";
+				pline->count = 0;
+				return -8000;
+				//std::cout << "nope!\n";
 			}
-			//std::cout << "nope!\n";
+			else {
+				std::cout << "Returning good score because " << s << " is winning\n";
+				pline->count = 0;
+				return 8000;
+			}
 		}
-	}
+	//}
 
 	//Horizon nodes, quiescence search
 	if (depthLeft <= 0) {
