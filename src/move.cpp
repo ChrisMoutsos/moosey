@@ -20,7 +20,7 @@ void Board::movePiece(int mF, int mT) {
 	int localEpSq = null, localPmSq = null;
 	int localPrevOnMoveTo = board120[mT], localHalfMoveClock;
 	
-	localHalfMoveClock = ply == 0 ? 0 : moveInfo.back().halfMoveClock;
+	localHalfMoveClock = ply == 0 ? 0 : moveInfo.back().halfMoveClock+1;
 
 	//Add the move to movesMade
 	movesMade.push_back(mF*100+mT);
@@ -79,7 +79,7 @@ void Board::movePiece(int mF, int mT) {
 			if (epExtra != 0)
 				board120[mT+epExtra] = empty;
 	
-			localHalfMoveClock++;
+			localHalfMoveClock = 0;
 		}
 	
 		//Move the piece
@@ -117,13 +117,12 @@ void Board::movePiece(int mF, int mT) {
 		board120[mF+cExtras[1]] = empty;		    //Empty old rook sq
 
 		castling = 0;
-		localHalfMoveClock++;
+		localHalfMoveClock = 0;
 	}
 
 	//Update move info, increase ply
 	moveInfo.push_back({localPmSq, localEpSq, board120[mT],
 			    localPrevOnMoveTo, localHalfMoveClock});
-	moveInfo[ply].FEN = getFEN();
 	ply++;
 }
 

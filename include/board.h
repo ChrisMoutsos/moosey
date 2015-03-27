@@ -97,7 +97,7 @@ class Board {
 		bool checkCheck(bool s, std::vector<int>& moveList);
 		bool inCheck(bool s) const;
 		bool canCastle(int dir, bool s);
-		bool draw();
+		bool drawCheck();
 	
 		//MOVEGEN.CPP
 		void genOrderedMoveList();
@@ -129,7 +129,7 @@ class Board {
 
 		int hh[2][64][64];	//History heuristic tables
 	private:
-		int board120[120], moveFrom, moveTo, ply, halfMoveClock;
+		int board120[120], moveFrom, moveTo, ply;
 		int whiteMaterial, blackMaterial;
 		//For the line below.. 0: none, 1: white, 2: black 
 		int sideInCheck, sideInCheckmate;

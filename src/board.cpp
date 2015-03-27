@@ -51,7 +51,7 @@ void Board::setPiecesOnSquares() {
 }
 
 void Board::initializeVars() {
-	moveFrom = moveTo = ply = halfMoveClock = 0;
+	moveFrom = moveTo = ply = 0;
 	side = WHITE;
 	whiteCastled = blackCastled = false;
 	castling = sideInCheck = sideInCheckmate = 0;
@@ -181,10 +181,11 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 			setMove(mF, mT);
 			movePiece();
 			changeTurn();
+			moveInfo.back().FEN = getFEN();
 			genOrderedMoveList();
 			checkCheck(getSide());
 			std::cout << "Current FEN: " << getFEN() << '\n';
-			std::cout << "Drawn: " << draw() << '\n';
+			std::cout << "drawCheck?: " << drawCheck() << '\n';
 		}
 		mF = -1;
 		mT = -1;
@@ -197,15 +198,17 @@ void Board::botMove() {
 	std::cout << " (ply " << ply+1 << ")\n";
 	displayBotText(*this);
 	int move = 0;
-	move = think(*this, 7);
+	move = think(*this, 2);
 	setMove(move/100, move%100);
 	movePiece();
 	if (!muted)
 		Mix_PlayChannel(-1, mFSound, 0);
 	changeTurn();
+	moveInfo.back().FEN = getFEN();
 	genOrderedMoveList();
 	checkCheck(side);
 	std::cout << "White Material: " << whiteMaterial << " Black Material: " << blackMaterial << '\n';
+	std::cout << "drawCheck?: " << drawCheck() << '\n';
 	std::cout << "Current FEN: " << getFEN() << '\n';
 }
 

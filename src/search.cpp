@@ -107,7 +107,7 @@ int think(Board& b, int depth) {
 		std::cout << "Total time taken: " << diff3.count() << "\n\n";
 
 		if (i == depth && bestScore < 9000 && bestScore > -9000) {
-			if (diff3.count() < 3 && prinVarLine.count > 1) {
+			if (diff3.count() < 0 && prinVarLine.count > 1) {
 				depth++;
 				i = depth - 1;
 				continue;
@@ -153,9 +153,16 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	}
 
 	//Don't give a draw if winning
-	if (depthGone == 0 && alpha > 0) {
-		if (b.draw())
-			return -8000;
+	if (depthGone == 1) {
+		if ((s && b.getWhiteMaterial() > b.getBlackMaterial()) ||
+	            (!s && b.getBlackMaterial() > b.getWhiteMaterial())) {
+			//std::cout << "CHECKING FOR two repeats!!!!.... ";
+			if (b.drawCheck()) {
+				std::cout << "yep!\n";
+			//	return -8000;
+			}
+			//std::cout << "nope!\n";
+		}
 	}
 
 	//Horizon nodes, quiescence search

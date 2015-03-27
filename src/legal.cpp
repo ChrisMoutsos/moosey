@@ -264,32 +264,34 @@ bool Board::canCastle(int dir, bool s) {
 	return true;
 }
 
-bool Board::draw() {
-	if (ply < 6) return false;
+bool Board::drawCheck() {
+	//std::cout << "hmc: " << moveInfo.back().halfMoveClock << '\n';
+	//std::cout << "ply: " << ply << '\n';
+	if (ply - moveInfo.back().halfMoveClock < 4)
+		return false;
 
-	struct pos {
-		std::string FEN;
-		int count;
-	};
+	int count = 0, cut1 = 4, cut2;
+	if (moveInfo.back().halfMoveClock > 9) 
+		cut1++;
+	if (ply/2 + 1 > 9)
+		cut1++;
 
-	std::vector<pos> positions;
-
-	bool found = false;
-
-	for (int i = 0; i < ply; i++) {
-		found = false;
-
-		for (size_t j = 0; j < positions.size(); j++) {
-			if (moveInfo[i].FEN.substr(0, moveInfo[i].FEN.length() - 4) == positions[j].FEN) {
-				positions[j].count++;
-				if (positions[j].count == 3)
-					return true;
-				found = true;
-			}
+	//std::cout << "check base: " << moveInfo[ply-1].FEN.substr(0, moveInfo[ply-1].FEN.length() - cut1) << '\n';
+	for (int j = ply - 3; j >= ply - moveInfo.back().halfMoveClock; j -= 2) {
+		cut2 = 5;
+		if (moveInfo[j].halfMoveClock > 9)
+			cut2++;
+		if (ply/2 + 1 - (j/2 + 1) > 9)
+			cut2++;
+		//std::cout << "checking j: " << j << ": " << moveInfo[j].FEN.substr(0, moveInfo[j].FEN.length() - cut2) << '\n';
+		if (moveInfo[ply-1].FEN.substr(0, moveInfo[ply-1].FEN.length() - cut1) ==
+		    moveInfo[j].FEN.substr(0, moveInfo[j].FEN.length() - cut2)) {
+			//std::cout << "Match! " << ply-1 << " and " << j << '\n';
+			count++;
+			if (count == 2)
+				return true;
 		}
-		if (!found)
-			positions.push_back({moveInfo[i].FEN.substr(0, moveInfo[i].FEN.length() - 4), 0});
 	}
-	
+
 	return false;
 }
