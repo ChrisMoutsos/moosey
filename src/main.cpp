@@ -10,12 +10,10 @@
  * ##To-Do List##
  * SDL:
  * - Splash screen
- * Add en passants and promotions to quiescent search
- * Threefold repetition
- * - FEN parsing
+ * Add en passants to quiescent search maybe
+ * Make sure threefold repetition detection works
  * Finish null move heuristic edge cases (?)
  * Write dupMove code for Queens
- * Handle stalemates
  * 
  */
 
