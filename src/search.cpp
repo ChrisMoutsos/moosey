@@ -106,8 +106,8 @@ int think(Board& b, int depth) {
 		std::cout << "Current score: " << b.eval() << ", best score: " << bestScore << ", move: " << bestMoveSoFar << '\n';;
 		std::cout << "Total time taken: " << diff3.count() << "\n\n";
 
-		//Play a checkmate or the draw
-		if (bestScore >= 8000)
+		//Don't search further if you can see checkmate
+		if (bestScore >= 9000)
 			break;
 
 		if (i == depth && bestScore < 8000 && bestScore > -8000) {
@@ -134,8 +134,8 @@ int think(Board& b, int depth) {
 
 	std::cout << "Total time for White: " << totalTimeW << "s, Black: " << totalTimeB << "s\n\n";
 
-	if (prinVarLine.move[0] == 0 || b.drawCheck())
-		std::cout << "Draw!\n";
+	if (prinVarLine.move[0] == 0)
+		std::cout << "Stalemate!\n";
 
 	return prinVarLine.move[0];
 }
@@ -156,7 +156,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		return -9999 + depthGone-1;
 	}
 
-	//Don't give a draw if winning
+	//Reptition detection
 	if (depthGone == 1)
 		if (b.drawCheck(1)) {
 			pline->count = 0;
@@ -209,7 +209,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	int mF, mT;
 	vector<int> moveList;
 
-	//Generate legal ordered moveList
+	//Generate ordered legal moveList
 	b.genOrderedMoveList(s, moveList);
 	b.cleanMoveList(s, moveList);
 
@@ -217,16 +217,18 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	if (inCheck)
 		ext += 75;
 
+	//No legal moves
 	if (moveList.size() == 0) {
 		pline->count = 0;
 		//If we are in checkmate, return bad score
 		if (inCheck)
 			return -9999 + depthGone-1;
 		//Only favor stalemate if we're losing
-		else {
-			if (alpha > 0) return -8000;
-			else return 8000;
-		}
+		else
+			if (s)
+				return b.getWhiteMaterial() > b.getBlackMaterial() ? -8000 : 8000;
+			else 
+				return b.getBlackMaterial() > b.getWhiteMaterial() ? -8000 : 8000;
 	}
 	//Singular reply
 	else if (moveList.size() == 1) {
@@ -253,7 +255,6 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 			}
 		}
 	}
-
 	//Pre-frontier nodes: extended futility pruning
 	else if (depthLeft == 2) {
 		if (!inCheck && !(abs(alpha) > 9000 || abs(beta) > 9000)) {
@@ -262,7 +263,6 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 			}
 		}
 	}
-
 	//Pre-pre-frontier nodes: razoring
 	else if (depthLeft == 3) {
 		if (!inCheck && !(abs(alpha) > 9000 || abs(beta) > 9000)) {
@@ -383,7 +383,7 @@ int quies(Board& b, int alpha, int beta, int depthGone) {
 
 	vector<int> nonQuiesList;
 
-	//Get psuedo-legal captures in captureList
+	//Get psuedo-legal captures
 	b.getCaptures(s, nonQuiesList);
 
 	//Order the captures by MVVLVA
@@ -395,8 +395,6 @@ int quies(Board& b, int alpha, int beta, int depthGone) {
 
 	//Loop through the captures/promotions
 	for (size_t i = 0; i < nonQuiesList.size(); i++) {
-		qNodes++;
-
 		mF = nonQuiesList[i]/100;
 		mT = nonQuiesList[i]%100;
 
@@ -405,6 +403,8 @@ int quies(Board& b, int alpha, int beta, int depthGone) {
 			if (b.piece[b[mT]].getValue() + 120 + currEval <= alpha)
 				if (!b.inCheck(s)) 
 					continue;
+
+		qNodes++;
 
 		b.setMove(mF, mT);
 		b.movePiece();
