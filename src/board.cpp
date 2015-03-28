@@ -195,10 +195,13 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 void Board::botMove() {
 	std::cout << "Thinking for ";
 	side ? std::cout << "White..." : std::cout << "Black...";
-	std::cout << " (ply " << ply+1 << ")\n";
+	std::cout << " (ply " << ply+1 << ", move " << ply/2 + 1 << ")\n";
 	displayBotText(*this);
 	int move = 0;
-	move = think(*this, 3);
+	if (side)
+		move = think(*this, 7);
+	else
+		move = think(*this, 7);
 	setMove(move/100, move%100);
 	movePiece();
 	if (!muted)
@@ -207,8 +210,9 @@ void Board::botMove() {
 	moveInfo.back().FEN = getFEN();
 	genOrderedMoveList();
 	checkCheck(side);
-	std::cout << "White Material: " << whiteMaterial << " Black Material: " << blackMaterial << '\n';
-	std::cout << "drawCheck?: " << drawCheck() << '\n';
+	std::cout << "White material: " << whiteMaterial << " Black material: " << blackMaterial << '\n';
+	if (drawCheck())
+		std::cout << "Draw!\n";
 	std::cout << "Current FEN: " << getFEN() << '\n';
 }
 
