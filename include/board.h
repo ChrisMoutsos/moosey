@@ -105,6 +105,7 @@ class Board {
 		void getCaptures(bool s, std::vector<int>& moveList);
 		void sortCaptures(std::vector<int>& moveList);
 		bool MVVLVA(int i, int j);
+		void addPromotions(bool s, std::vector<int>& moveList);
 		void sortNonCaptures(std::vector<int>& moveList);
 		bool hhSort(bool s, int i, int j);
 		void getNonCaptures(bool s, std::vector<int>& moveList);

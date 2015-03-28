@@ -91,6 +91,23 @@ bool Board::MVVLVA(int i, int j) {
 		 >= piece[board120[j%100]].getValue() - piece[board120[j/100]].getValue()/10);
 }
 
+void Board::addPromotions(bool s, std::vector<int>& moveList) {
+	int startP, endP, extra;
+	startP = s ? wqR : bqR;
+	endP = s ? wPh : bPh;
+	extra = s ? 10 : -10;
+	
+	for (int i = startP; i <= endP; i++) {
+		if (!piece[i].getAlive()) continue;
+		if (s && piece[i].getPos() < 80) continue;
+		if (!s && piece[i].getPos() > 38) continue;
+		for (int j = -1; j <= 1; j++)
+			if (validateMove(piece[i].getPos(), piece[i].getPos()+extra+j, s))
+				moveList.insert(moveList.begin()+0,
+						piece[i].getPos()*100+piece[i].getPos()+extra+j);
+	}
+}
+
 void Board::getNonCaptures(bool s, std::vector<int>& moveList) {
 	//Put every noncapture for side s in moveList
 
