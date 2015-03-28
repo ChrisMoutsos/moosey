@@ -274,17 +274,29 @@ bool Board::drawCheck(bool bot) {
 	lastFEN = bot ? getFEN() : moveInfo[ply-1].FEN;
 
 	int count = 0, cut1 = 4, cut2;
-	if (moveInfo.back().halfMoveClock > 9) 
+	if (moveInfo.back().halfMoveClock > 9) { 
 		cut1++;
-	if (ply/2 + 1 > 9)
+		if (moveInfo.back().halfMoveClock > 99) 
+			cut1++;
+	}
+	if (ply/2 + 1 > 9) {
 		cut1++;
+		if (ply/2 + 1 > 99)
+			cut1++;
+	}
 
 	for (int j = ply - 3; j >= ply - moveInfo.back().halfMoveClock; j -= 2) {
 		cut2 = 5;
-		if (moveInfo[j].halfMoveClock > 9)
+		if (moveInfo[j].halfMoveClock > 9) {
 			cut2++;
-		if (ply/2 + 1 - (j/2 + 1) > 9)
+			if (moveInfo[j].halfMoveClock > 99)
+				cut2++;
+		}
+		if (ply/2 + 1 - (j/2 + 1) > 9) {
 			cut2++;
+			if (ply/2 + 1 - (j/2 + 1) > 99) 
+				cut2++;
+		}
 		if (lastFEN.substr(0, lastFEN.length() - cut1) ==
 		    moveInfo[j].FEN.substr(0, moveInfo[j].FEN.length() - cut2)) {
 			count++;
