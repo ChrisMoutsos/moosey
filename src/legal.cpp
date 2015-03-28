@@ -264,11 +264,14 @@ bool Board::canCastle(int dir, bool s) {
 	return true;
 }
 
-bool Board::drawCheck() {
-	//std::cout << "hmc: " << moveInfo.back().halfMoveClock << '\n';
-	//std::cout << "ply: " << ply << '\n';
+bool Board::drawCheck(bool bot) {
 	if (ply == 0 || ply - moveInfo.back().halfMoveClock < 4)
 		return false;
+
+	std::string lastFEN;
+	//If a bot is calling this, we have to get the current FEN
+	//because the FEN is added to moveInfo after an official move is made
+	lastFEN = bot ? getFEN() : moveInfo[ply-1].FEN;
 
 	int count = 0, cut1 = 4, cut2;
 	if (moveInfo.back().halfMoveClock > 9) 
@@ -276,54 +279,20 @@ bool Board::drawCheck() {
 	if (ply/2 + 1 > 9)
 		cut1++;
 
-	//std::cout << "check base: " << moveInfo[ply-1].FEN.substr(0, moveInfo[ply-1].FEN.length() - cut1) << '\n';
 	for (int j = ply - 3; j >= ply - moveInfo.back().halfMoveClock; j -= 2) {
 		cut2 = 5;
 		if (moveInfo[j].halfMoveClock > 9)
 			cut2++;
 		if (ply/2 + 1 - (j/2 + 1) > 9)
 			cut2++;
-		//std::cout << "checking j: " << j << ": " << moveInfo[j].FEN.substr(0, moveInfo[j].FEN.length() - cut2) << '\n';
-		if (moveInfo[ply-1].FEN.substr(0, moveInfo[ply-1].FEN.length() - cut1) ==
+		if (lastFEN.substr(0, lastFEN.length() - cut1) ==
 		    moveInfo[j].FEN.substr(0, moveInfo[j].FEN.length() - cut2)) {
-			//std::cout << "Match! " << ply-1 << " and " << j << '\n';
 			count++;
-			if (count == 2)
+			if (count == 1)
 				return true;
 		}
 	}
 
 	return false;
-}
 
-bool Board::botDrawCheck() {
-	//std::cout << "hmc: " << moveInfo.back().halfMoveClock << '\n';
-	//std::cout << "ply: " << ply << '\n';
-	if (ply == 0 || ply - moveInfo.back().halfMoveClock < 4)
-		return false;
-
-	int count = 0, cut1 = 4, cut2;
-	if (moveInfo.back().halfMoveClock > 9) 
-		cut1++;
-	if (ply/2 + 1 > 9)
-		cut1++;
-
-	//std::cout << "check base: " << moveInfo[ply-1].FEN.substr(0, moveInfo[ply-1].FEN.length() - cut1) << '\n';
-	for (int j = ply - 3; j >= ply - moveInfo.back().halfMoveClock; j -= 2) {
-		cut2 = 5;
-		if (moveInfo[j].halfMoveClock > 9)
-			cut2++;
-		if (ply/2 + 1 - (j/2 + 1) > 9)
-			cut2++;
-		//std::cout << "checking j: " << j << ": " << moveInfo[j].FEN.substr(0, moveInfo[j].FEN.length() - cut2) << '\n';
-		if (getFEN().substr(0, getFEN().length() - cut1) ==
-		    moveInfo[j].FEN.substr(0, moveInfo[j].FEN.length() - cut2)) {
-			//std::cout << "Match! " << ply-1 << " and " << j << '\n';
-			count++;
-			if (count == 2)
-				return true;
-		}
-	}
-
-	return false;
 }

@@ -158,7 +158,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 
 	//Don't give a draw if winning
 	if (depthGone == 1) {
-		if (b.botDrawCheck()) {
+		if (b.drawCheck(1)) {
 //			std::cout << "yep DRAW! on " << s << "'s turn, " << !s << " moved: " << b.getMoveFrom() << " to " << b.getMoveTo() << '\n';
 			pline->count = 0;
 			if (s) {

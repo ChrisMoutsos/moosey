@@ -198,7 +198,7 @@ void Board::botMove() {
 	std::cout << " (ply " << ply+1 << ")\n";
 	displayBotText(*this);
 	int move = 0;
-	move = think(*this, 2);
+	move = think(*this, 3);
 	setMove(move/100, move%100);
 	movePiece();
 	if (!muted)

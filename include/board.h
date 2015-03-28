@@ -97,8 +97,7 @@ class Board {
 		bool checkCheck(bool s, std::vector<int>& moveList);
 		bool inCheck(bool s) const;
 		bool canCastle(int dir, bool s);
-		bool drawCheck();
-		bool botDrawCheck();
+		bool drawCheck(bool bot = false);
 	
 		//MOVEGEN.CPP
 		void genOrderedMoveList();
