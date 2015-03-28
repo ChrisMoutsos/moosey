@@ -157,34 +157,14 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	}
 
 	//Don't give a draw if winning
-	if (depthGone == 1) {
+	if (depthGone == 1)
 		if (b.drawCheck(1)) {
-//			std::cout << "yep DRAW! on " << s << "'s turn, " << !s << " moved: " << b.getMoveFrom() << " to " << b.getMoveTo() << '\n';
 			pline->count = 0;
-			if (s) {
-//				std::cout << "White's turn, ";
-				if (b.getWhiteMaterial() > b.getBlackMaterial()) {
-//					std::cout << "White > black NO THANKS\n";
-					return -8000;
-				}
-				else {
-//					std::cout << "Black >= white SURE\n";
-					return 8000;
-				}
-			}
-			else {
-//				std::cout << "Black's turn, ";
-				if (b.getBlackMaterial() > b.getWhiteMaterial()) {
-//					std::cout << "Black > white NO THANKS\n";
-					return -8000;
-				}
-				else {
-//					std::cout << "White >= black SURE\n";
-					return 8000;
-				}
-			}
+			if (s)
+				return b.getWhiteMaterial() > b.getBlackMaterial() ? -8000 : 8000;
+			else 
+				return b.getBlackMaterial() > b.getWhiteMaterial() ? -8000 : 8000;
 		}
-	}
 
 	//Horizon nodes, quiescence search
 	if (depthLeft <= 0) {
@@ -401,20 +381,24 @@ int quies(Board& b, int alpha, int beta, int depthGone) {
 	if (currEval > alpha)
 		alpha = currEval;
 
-	vector<int> captureList;
+	vector<int> nonQuiesList;
 
 	//Get psuedo-legal captures in captureList
-	b.getCaptures(s, captureList);
+	b.getCaptures(s, nonQuiesList);
 
 	//Order the captures by MVVLVA
-	b.sortCaptures(captureList);
+	b.sortCaptures(nonQuiesList);
 
-	//Loop through the captures
-	for (size_t i = 0; i < captureList.size(); i++) {
+	//Add promotions to start
+	b.addPromotions(s, nonQuiesList);
+	
+
+	//Loop through the captures/promotions
+	for (size_t i = 0; i < nonQuiesList.size(); i++) {
 		qNodes++;
 
-		mF = captureList[i]/100;
-		mT = captureList[i]%100;
+		mF = nonQuiesList[i]/100;
+		mT = nonQuiesList[i]%100;
 
 		//Futility (AKA delta) pruning
 		if (b.getWhiteMaterial() > ENDGAME_VAL && b.getBlackMaterial() > ENDGAME_VAL)
