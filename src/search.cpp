@@ -106,7 +106,11 @@ int think(Board& b, int depth) {
 		std::cout << "Current score: " << b.eval() << ", best score: " << bestScore << ", move: " << bestMoveSoFar << '\n';;
 		std::cout << "Total time taken: " << diff3.count() << "\n\n";
 
-		if (i == depth && bestScore < 9000 && bestScore > -9000) {
+		//Play a checkmate or the draw
+		if (bestScore >= 8000)
+			break;
+
+		if (i == depth && bestScore < 8000 && bestScore > -8000) {
 			if (diff3.count() < 0 && prinVarLine.count > 1) {
 				depth++;
 				i = depth - 1;
@@ -130,7 +134,7 @@ int think(Board& b, int depth) {
 
 	std::cout << "Total time for White: " << totalTimeW << "s, Black: " << totalTimeB << "s\n\n";
 
-	if (prinVarLine.move[0] == 0)
+	if (prinVarLine.move[0] == 0 || b.drawCheck())
 		std::cout << "Draw!\n";
 
 	return prinVarLine.move[0];
@@ -153,23 +157,34 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	}
 
 	//Don't give a draw if winning
-	//if (depthGone == 1) {
+	if (depthGone == 1) {
 		if (b.botDrawCheck()) {
-			std::cout << "yep DRAW LOL! move: " << b.getMoveFrom() << " to " << b.getMoveTo() << '\n';
-			if ((s && b.getWhiteMaterial() > b.getBlackMaterial()) ||
-			    (!s && b.getBlackMaterial() > b.getWhiteMaterial())) {
-				std::cout << "Returning bad score because " << s << " is winning\n";
-				pline->count = 0;
-				return -8000;
-				//std::cout << "nope!\n";
+//			std::cout << "yep DRAW! on " << s << "'s turn, " << !s << " moved: " << b.getMoveFrom() << " to " << b.getMoveTo() << '\n';
+			pline->count = 0;
+			if (s) {
+//				std::cout << "White's turn, ";
+				if (b.getWhiteMaterial() > b.getBlackMaterial()) {
+//					std::cout << "White > black NO THANKS\n";
+					return -8000;
+				}
+				else {
+//					std::cout << "Black >= white SURE\n";
+					return 8000;
+				}
 			}
 			else {
-				std::cout << "Returning good score because " << s << " is winning\n";
-				pline->count = 0;
-				return 8000;
+//				std::cout << "Black's turn, ";
+				if (b.getBlackMaterial() > b.getWhiteMaterial()) {
+//					std::cout << "Black > white NO THANKS\n";
+					return -8000;
+				}
+				else {
+//					std::cout << "White >= black SURE\n";
+					return 8000;
+				}
 			}
 		}
-	//}
+	}
 
 	//Horizon nodes, quiescence search
 	if (depthLeft <= 0) {
@@ -220,7 +235,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 
 	//Evading check extension
 	if (inCheck)
-		ext += 100;
+		ext += 75;
 
 	if (moveList.size() == 0) {
 		pline->count = 0;
@@ -243,7 +258,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		}	
 
 		//Otherwise, extend
-		ext += 75;
+		ext += 50;
 	}
 	//Only two replies
 	else if (moveList.size() == 2)
