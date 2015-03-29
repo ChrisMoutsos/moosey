@@ -33,11 +33,13 @@ void Bot::reset() {
 	for (int f = 0; f < 64; f++)
 			for (int t = 0; t < 64; t++)
 				hh[f][t] = 0;
+/*
 	//Clear killer moves
 	for (int i = 0; i < 30; i++) {
 		killers[i][0] = 0;
 		killers[i][1] = 0;
 	}
+*/
 }
 
 int Bot::think(Board& b, int depth) {
@@ -68,11 +70,13 @@ int Bot::think(Board& b, int depth) {
 		for (int f = 0; f < 64; f++)
 			for (int t = 0; t < 64; t++)
 				hh[f][t] /= 2;
+/*
 		//Clear killer moves
 		for (int i = 0; i < 30; i++) {
 			killers[i][0] = 0;
 			killers[i][1] = 0;
 		}
+*/
 
 		oldPrinVarLine = prinVarLine;
 
@@ -278,6 +282,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 	int temp;
 	if (allowNull) { //Except if we already null-moved, or checking a check
 		//Killer moves in front,
+/*
 		int killerMove;
 		for (int i = 1; i >= 0; i--) {
 			killerMove = killers[depthGone][i];
@@ -289,7 +294,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 				moveList.insert(moveList.begin()+0, killerMove);
 			}
 		}
-
+*/
 		//then PV in front
 		std::vector<int>::iterator pvIndex;
 		if (depthGone < oldPrinVarLine.count) {
@@ -341,10 +346,12 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 			//If it wasn't a capture, update HH table and killer moves
 			if (b[mT] == empty) {
 				hh[to64(mF)-1][to64(mT)-1] += depthGone*depthGone;
+/*
 				if (killers[depthGone][0] != mF*100+mT) {
 					killers[depthGone][1] = killers[depthGone][0];
 					killers[depthGone][0] = mF*100+mT;
 				}
+*/
 			}
 			return beta;
 		}
