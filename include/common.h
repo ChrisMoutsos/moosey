@@ -5,6 +5,7 @@
 #include <string>
 
 #define ENDGAME_VAL 11309 
+#define defaultFEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 //GAME CONTROL
 extern bool quit;
