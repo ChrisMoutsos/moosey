@@ -158,21 +158,26 @@ bool Board::validatePawnMove(int mF, int mT, bool s) const {
 
 	if (board120[mT] == invalid) return false;
 
-	if ((s && mF > mT) || (!s && mF < mT))  //Ensures correct direction
+	//Ensure correct direction
+	if ((s && mF > mT) || (!s && mF < mT))
 		return false;
 
-	if (diff == 10 && onMT == empty)	//Moving forward one square
+	//Moving forward one square
+	if (diff == 10 && onMT == empty)
 		return true;
-	if (diff == 20 && onMT == empty) {	//Moving forward two squares
+	//Moving forward two squares
+	if (diff == 20 && onMT == empty) {
 		if (board120[mF+extra] == empty && piece[onMF].getMoved() == 0) 
 			return true;
 		else return false;
 	}
-	if (diff == 9 || diff == 11) {		//Attacking
+	//Attacking
+	if (diff == 9 || diff == 11) {	
+		//En passant
 		if (onMT == empty) { 	
-			if (ply > 0 && mT == moveInfo[ply-1].epSq) 	//En passanting
-				if ((s && moveInfo[ply-1].epSq > _H5) 
-				   || (!s && moveInfo[ply-1].epSq < _A4))
+			if (moveInfo.size() > 1 && mT == moveInfo.back().epSq)
+				if ((s && moveInfo.back().epSq > _H5) 
+				   || (!s && moveInfo.back().epSq < _A4))
 					return true;
 			return false;	
 		}
@@ -265,13 +270,15 @@ bool Board::canCastle(int dir, bool s) {
 }
 
 bool Board::drawCheck(bool bot) {
-	if (ply == 0 || ply - moveInfo.back().halfMoveClock < 4)
+	int lastPly = movesMade.size();
+
+	if (lastPly < 2|| lastPly - moveInfo.back().halfMoveClock < 4)
 		return false;
 
 	std::string lastFEN;
 	//If a bot is calling this, we have to get the current FEN
 	//because the FEN is added to moveInfo after an official move is made
-	lastFEN = bot ? getFEN() : moveInfo[ply-1].FEN;
+	lastFEN = bot ? getFEN() : moveInfo[lastPly-1].FEN;
 
 	int count = 0, cut1 = 4, cut2;
 	if (moveInfo.back().halfMoveClock > 9) { 
@@ -279,22 +286,22 @@ bool Board::drawCheck(bool bot) {
 		if (moveInfo.back().halfMoveClock > 99) 
 			cut1++;
 	}
-	if (ply/2 + 1 > 9) {
+	if (lastPly/2 + 1 > 9) {
 		cut1++;
-		if (ply/2 + 1 > 99)
+		if (lastPly/2 + 1 > 99)
 			cut1++;
 	}
 
-	for (int j = ply - 3; j >= ply - moveInfo.back().halfMoveClock; j -= 2) {
+	for (int j = lastPly - 3; j >= lastPly - moveInfo.back().halfMoveClock; j -= 2) {
 		cut2 = 5;
 		if (moveInfo[j].halfMoveClock > 9) {
 			cut2++;
 			if (moveInfo[j].halfMoveClock > 99)
 				cut2++;
 		}
-		if (ply/2 + 1 - (j/2 + 1) > 9) {
+		if (lastPly/2 + 1 - (j/2 + 1) > 9) {
 			cut2++;
-			if (ply/2 + 1 - (j/2 + 1) > 99) 
+			if (lastPly/2 + 1 - (j/2 + 1) > 99) 
 				cut2++;
 		}
 		if (lastFEN.substr(0, lastFEN.length() - cut1) ==

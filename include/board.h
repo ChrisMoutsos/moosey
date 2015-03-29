@@ -39,12 +39,16 @@ class Board {
 		void initializeVars();
 		void emptyBoard();
 		void botMove();
-		void placePiece(int p, int sq);
+		void placePiece(unsigned int p, unsigned int sq);
 		void placePiecesDefault();	
+		void placePieces(std::string FEN);	
 		void initializePieces();
 		void handleInput(int& mF, int& mT, SDL_Event* e);
 		void setSquarePositions();
 		void setPiecesOnSquares();
+		void changeTurn();
+		void undoMove();
+		void restart();
 		//ACCESSORS
 		int getMoveFrom() const { return moveFrom; };
 		int getMoveTo() const { return moveTo; };
@@ -60,6 +64,8 @@ class Board {
 		int getEpSq(int i) const;
 		int getPmSq(int i) const;
 		int getMoveMade(int i) const;
+		int getLastMove() const;
+		int getNumMovesMade() const;
 		int getPrevOnMoveTo(int i) const;
 		int getPieceMoved(int i) const;
 		std::string getFEN();
@@ -81,9 +87,6 @@ class Board {
 		void movePiece(int mF, int mT);
 		void unmovePiece();
 		void unmovePiece(int mF, int mT);
-		void undoMove();
-		void restart();
-		void changeTurn();
 	
 		//LEGAL.CPP
 		bool legalMove(int mF, int mT, bool s, bool v = false);

@@ -21,18 +21,126 @@ Board::Board() {
 	setSquarePositions();
 	setButtonPositions();
 	setSpriteClips();	
-	genOrderedMoveList();
 }
 
 Board::Board(std::string FEN) {
+	std::cout << "Loading FEN: " << FEN << '\n';
 	initializeVars();
 	emptyBoard();
 	initializePieces();
 	setSquarePositions();
 	setButtonPositions();
 	setSpriteClips();	
-	genOrderedMoveList();
-	//FEN stuff
+	placePieces(FEN);
+}
+
+void Board::placePieces(std::string FEN) {
+	unsigned int index = 0, sqCounter = _A8, p;
+	int wPIndex = wPa, bPIndex = bPa;
+
+	//Place the pieces
+	while (FEN[index] != ' ') {
+		if (FEN[index] == '/')
+			sqCounter -= 18;
+		else if (isalpha(FEN[index])) {
+			if (FEN[index] == 'Q')
+				p = wQ;
+			else if (FEN[index] == 'K')
+				p = wK;
+			else if (FEN[index] == 'R')
+				p = piece[wqR].getPos() ? wkR : wqR;
+			else if (FEN[index] == 'N')
+				p = piece[wqN].getPos() ? wkN : wqN;
+			else if (FEN[index] == 'B')
+				p = piece[wqB].getPos() ? wkB : wqB;
+			else if (FEN[index] == 'P') {
+				p = wPIndex;
+				wPIndex++;
+			}
+			else if (FEN[index] == 'q')
+				p = bQ;
+			else if (FEN[index] == 'k')
+				p = bK;
+			else if (FEN[index] == 'r')
+				p = piece[bqR].getPos() ? bkR : bqR;
+			else if (FEN[index] == 'n')
+				p = piece[bqN].getPos() ? bkN : bqN;
+			else if (FEN[index] == 'b')
+				p = piece[bqB].getPos() ? bkB : bqB;
+			else if (FEN[index] == 'p') {
+				p = bPIndex;
+				bPIndex++;
+			}
+
+			placePiece(p, sqCounter);	
+			sqCounter++;
+		}
+		else
+			sqCounter += FEN[index] - '0';
+
+		index++;
+	}
+
+	//Set the side to move
+	index++;
+	side = (FEN[index] == 'w') ? 1 : 0;
+
+	//Set castling permissions
+	index += 2;
+	piece[wqR].incrMoved();
+	piece[wkR].incrMoved();
+	piece[bqR].incrMoved();
+	piece[bkR].incrMoved();
+	while (FEN[index] != ' ') {
+		if (FEN[index] == 'K')
+			piece[wkR].decrMoved();
+		else if (FEN[index] == 'Q')
+			piece[wqR].decrMoved();
+		else if (FEN[index] == 'k')
+			piece[bkR].decrMoved();
+		else if (FEN[index] == 'q')
+			piece[bqR].decrMoved();
+		index++;
+	}
+
+	//Set en passant square
+	int epSq = 0;
+	index++;
+	if (FEN[index] != '-') {
+		int row, file;
+		file = FEN[index] - 'a' + 1;
+		index++; 
+		row = FEN[index] - '0' + 1;
+		epSq = row*10 + file;
+	}
+	index++;	
+
+	//Set half move clock
+	index++;
+	int halfMoveClock = FEN[index] - '0';
+	index++;
+	while (FEN[index] != ' ') {
+		halfMoveClock *= 10;
+		index++;
+		halfMoveClock += FEN[index] - '0';
+		index++;
+	}
+
+	//Set ply
+	index++;
+	int moves;
+	moves = FEN[index] - '0';
+	while (index+1 != FEN.size() && FEN[index+1] != ' ') {
+		moves *= 10;
+		index++;
+		moves += FEN[index] - '0';
+	}
+	ply = (moves-1)*2;
+	if (!side) ply++;
+
+	//Update moveInfo
+	moveInfo.push_back({0, epSq, -1, -1, halfMoveClock, getFEN()});
+	
 }
 
 void Board::setSquarePositions() {
@@ -75,7 +183,7 @@ void Board::emptyBoard() {
 	}
 }
 
-void Board::placePiece(int p, int sq) {
+void Board::placePiece(unsigned int p, unsigned int sq) {
 	piece[p].setPos(sq);
 	board120[sq] = p;
 }
@@ -93,6 +201,11 @@ void Board::placePiecesDefault() {
 
 void Board::initializePieces() {
 	int v;
+	
+	//Default all pieces to square 0
+	//This makes it easier for the FEN constructor
+	for (int i = wqR; i <= bPh; i++)
+		piece[i].setPos(0);
 
 	//Set names, abbreviations, and values
 	for (int i = 0; i <= 16; i += 16) {
@@ -144,6 +257,8 @@ void Board::initializePieces() {
 
 	//Create moveLists
 	for (int i = wqR; i <= bPh; i++) {
+		piece[i].freeMoveList();
+	
 		v = piece[i].getValue();
 		if (v == K_VAL)
 			piece[i].setMoveListSize(10);
@@ -216,6 +331,53 @@ void Board::botMove() {
 	std::cout << "Current FEN: " << getFEN() << '\n';
 }
 
+void Board::changeTurn() {
+	side = side ? BLACK : WHITE;
+}
+
+void Board::undoMove() {
+	if (movesMade.size() == 0) return;
+	
+	//Stalemate
+	if (movesMade.back() == 0) {
+		movesMade.pop_back();
+		moveInfo.pop_back();
+		ply--;
+		changeTurn();
+		checkCheck(side);
+		return;
+	}
+	
+	changeTurn();
+	unmovePiece();
+	genOrderedMoveList();
+	checkCheck(side);
+	
+	moveFrom = movesMade.back()/100;     
+	moveTo = movesMade.back()%100;	   
+}
+
+void Board::restart() {
+	//Restart to default position
+	if (movesMade.size() == 0) {
+		if (getFEN() != defaultFEN) {
+			initializeVars();
+			emptyBoard();
+			initializePieces();
+			placePiecesDefault();
+		}
+	}
+	//Restart to loaded FEN
+	else {
+		while (movesMade.size())
+			undoMove();	
+		moveTo = null;
+		moveFrom = null;
+	}
+
+	std::cout << "\nRestarted game\n";
+}
+
 //ACCESSORS
 std::string Board::getFEN() {
 	using namespace std;
@@ -265,13 +427,13 @@ std::string Board::getFEN() {
 		FEN += '-';
 
 	//En passant target square
-	if (ply != 0 && moveInfo.back().epSq != 0)
+	if (moveInfo.size() && moveInfo.back().epSq != 0)
 		FEN += " " + intToSquare(moveInfo.back().epSq) + " ";
 	else 
 		FEN += " - ";
 	
 	//Halfmove clock
-	FEN += ply == 0 ? "0" : to_string(moveInfo.back().halfMoveClock);
+	FEN += (moveInfo.size() == 0) ? "0" : to_string(moveInfo.back().halfMoveClock);
 	
 	//Full move clock
 	FEN += " " + to_string(ply/2 + 1);
@@ -317,6 +479,16 @@ int Board::getPieceMoved(int i) const {
 int Board::getMoveMade(int i) const {
 	assert(i > -1 && i < (int)movesMade.size());
 	return movesMade[i];
+}
+
+int Board::getNumMovesMade() const {
+	return movesMade.size();
+}
+
+int Board::getLastMove() const {
+	if (movesMade.size())
+		return movesMade.back();
+	return 0;
 }
 
 

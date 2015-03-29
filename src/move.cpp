@@ -20,7 +20,7 @@ void Board::movePiece(int mF, int mT) {
 	int localEpSq = null, localPmSq = null;
 	int localPrevOnMoveTo = board120[mT], localHalfMoveClock;
 	
-	localHalfMoveClock = ply == 0 ? 0 : moveInfo.back().halfMoveClock+1;
+	localHalfMoveClock = moveInfo.size() == 0 ? 0 : moveInfo.back().halfMoveClock+1;
 
 	//Add the move to movesMade
 	movesMade.push_back(mF*100+mT);
@@ -32,7 +32,7 @@ void Board::movePiece(int mF, int mT) {
 	if (!castling) {	
 		if (mFVal == P_VAL ) {
 			//If the move is an en passant
-			if (ply > 0 && mT == moveInfo.back().epSq)
+			if (moveInfo.size() && mT == moveInfo.back().epSq)
 				epExtra = s ? -10 : 10; //The offset to the killed pawn from mT
 			//Set potential en passant target square if appropriate
 			if (abs(mF-mT) == 20)
@@ -54,7 +54,6 @@ void Board::movePiece(int mF, int mT) {
 				blackMaterial += Q_VAL - P_VAL;
 			}
 			piece[board120[mF]].setPromoted(true);
-
 
 			int * temp = new int[27]; 		 //Make bigger movelist
 			for (int i = 0; i < 4; i++)	 	 //Copy any old values over
@@ -226,38 +225,4 @@ void Board::unmovePiece(int mF, int mT) {
 	movesMade.pop_back();
 	moveInfo.pop_back();
 	ply--;
-}
-
-void Board::changeTurn() {
-	side = side ? BLACK : WHITE;
-}
-
-void Board::undoMove() {
-	if (ply == 0) return;
-	
-	//Stalemate
-	if (movesMade.back() == 0) {
-		movesMade.pop_back();
-		moveInfo.pop_back();
-		ply--;
-		changeTurn();
-		checkCheck(side);
-		return;
-	}
-	
-	changeTurn();
-	unmovePiece();
-	genOrderedMoveList();
-	checkCheck(side);
-	
-	moveFrom = movesMade.back()/100;     
-	moveTo = movesMade.back()%100;	   
-}
-
-void Board::restart() {
-	while (ply > 0)
-		undoMove();	
-	moveTo = null;
-	moveFrom = null;
-	std::cout << "\nRestarted game\n";
 }

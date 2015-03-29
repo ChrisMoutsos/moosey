@@ -98,7 +98,7 @@ void displayBotText(const Board& b) {
 
 void updateText(const Board& b, bool& sidey) {
 	std::string checkStr = " ";
-	if (sidey != b.getSide() || b.getPly() == 0) {
+	if (sidey != b.getSide() || b.getNumMovesMade() == 0) {
 		sidey = b.getSide();
 		if (b.getSideInCheck()) { //Load check text
 			if (b.getSideInCheckmate() == 1)
@@ -134,16 +134,16 @@ void drawBorder() {
 }
 
 void drawSquares(const Board& b, const int& mF, const int& mT) {
-	int sq, ply = b.getPly();
+	int sq;
 	SDL_Rect sqPos;
 	for (int r = 1; r <= 8; r++) {
 		for (int f = 1; f <= 8; f++) {
 			sq = FR2SQ64(f, r)-1;
 			//If this square is clicked, or has had a move made on it (moveFrom)
-			if (mF == sq+1 || (ply > 0 && to64(b.getMoveMade(ply-1)/100) == sq+1))
+			if (mF == sq+1 || to64(b.getLastMove()/100) == sq+1)
 				SDL_SetRenderDrawColor(renderer, 248, 195, 248, 255);
 			//If this square is clicked, or has had a move made on it (moveTo)
-			else if (mT == sq+1 || (ply > 0 && to64(b.getMoveMade(ply-1)%100) == sq+1))
+			else if (mT == sq+1 || to64(b.getLastMove()%100) == sq+1)
 				SDL_SetRenderDrawColor(renderer, 238, 157, 242, 255);
 			//Otherwise, color light
 			else if ((r+f)%2 == 1)			
@@ -247,16 +247,31 @@ void drawMoveTable(const Board& b) {
 	borderRect = {BXSTART+B_SIZE+24, BYSTART-1, 500, 650};
 	SDL_RenderDrawRect(renderer, &borderRect);
 
-	while ((int)plyStrings.size() > b.getPly()) 
+	static int extra = 0;
+	//Add "#. ... " if loaded from a FEN and black to move
+	if (b.getNumMovesMade() == 0) {
+		if (b.getSide() == BLACK) {
+			plyStr = std::to_string((b.getPly()-1)/2+1) + ". ";
+			plyStr += " ... ";
+			plyStrings.push_back(plyStr);
+			extra = 1;
+		}
+		else extra = 0;
+	}
+
+	while ((int)plyStrings.size() > b.getNumMovesMade() + extra) 
 		plyStrings.pop_back();
 
-	if ((int)plyStrings.size() < b.getPly()) { //If a new move has been made
-		mF2 = b.getMoveMade(b.getPly()-1)/100;
-		mT2 = b.getMoveMade(b.getPly()-1)%100;	
+	int lastMove = b.getNumMovesMade()-1+extra;
+
+	//If a new move has been made
+	if ((int)plyStrings.size() < b.getNumMovesMade() + extra) {
+		mF2 = b.getLastMove()/100;
+		mT2 = b.getLastMove()%100;
 		if ((b.getPly()-1)%2 == 0)	//Add number in front for white's moves
 			plyStr = std::to_string((b.getPly()-1)/2+1) + ". ";
-		p = b.getPieceMoved(b.getPly()-1);
-		if (b.piece[p].getValue() == Q_VAL && b.getPmSq(b.getPly()-1) != mT2)
+		p = b.getPieceMoved(lastMove);
+		if (b.piece[p].getValue() == Q_VAL && b.getPmSq(lastMove) != mT2)
 			plyStr += "Q";
 		else if (b.piece[p].getValue() == K_VAL) {
 			if (mF2 == _E1 && (mT2 == _B1 || mT2 == _G1)) { //White castled
@@ -311,9 +326,10 @@ void drawMoveTable(const Board& b) {
 			else 					   //Same file
 				plyStr += mF2/10+'1'-2; //so, rank is sufficient
 		}
-		if (b.getPrevOnMoveTo(b.getPly()-1) != empty) { //If move was a capture
+		if (b.getPrevOnMoveTo(lastMove) != empty) { //If move was a capture
 			//Special case for pawns, display the file of departure
-			if (b.piece[p].getValue() == P_VAL || b.getPmSq(b.getPly()-1) == mT2)
+			if (b.piece[p].getValue() == P_VAL || 
+			    b.getPmSq(b.getNumMovesMade()-1+extra) == mT2)
 				plyStr += mF2%10+'a'-1;
 			plyStr += "x";
 		}
@@ -326,7 +342,7 @@ void drawMoveTable(const Board& b) {
 		if (!castling)	//Add moveTo 
 			plyStr += intToSquare(mT2);
 
-		if (b.getPmSq(b.getPly()-1) == mT2) //If it was a promotion
+		if (b.getPmSq(lastMove) == mT2) //If it was a promotion
 			plyStr += "=Q";
 
 		if (b.getSideInCheck())
