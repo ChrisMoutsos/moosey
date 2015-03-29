@@ -292,13 +292,15 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 
 		//then PV in front
 		std::vector<int>::iterator pvIndex;
-		int pvmove = oldPrinVarLine.move[depthGone];
-		if (pvmove != 0 && depthGone < oldPrinVarLine.count) {
-			pvIndex = std::find(moveList.begin(), moveList.end(), pvmove);
-			if (pvIndex != moveList.end()) {
-				temp = *pvIndex;
-				moveList.erase(pvIndex);
-				moveList.insert(moveList.begin()+0, temp);
+		if (depthGone < oldPrinVarLine.count) {
+			int pvmove = oldPrinVarLine.move[depthGone];
+			if (pvmove != 0 && depthGone < oldPrinVarLine.count) {
+				pvIndex = std::find(moveList.begin(), moveList.end(), pvmove);
+				if (pvIndex != moveList.end()) {
+					temp = *pvIndex;
+					moveList.erase(pvIndex);
+					moveList.insert(moveList.begin()+0, temp);
+				}
 			}
 		}
 
