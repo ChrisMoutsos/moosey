@@ -13,7 +13,7 @@
 #include <vector>
 #include "square.h"
 #include "piece.h"
-#include "search.h"
+#include "bot.h"
 
 void showMoveLists(Board& b);
 

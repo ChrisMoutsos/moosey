@@ -44,8 +44,8 @@ int main(int argc, char* args[]) {
 	int mF = -1, mT = -1;
 	SDL_Event e; //Event handler
 
-	Board board("r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R b KQkq - 1 4");
-//	Board board;
+//	Board board("r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R b KQkq - 1 4");
+	Board board;
 	std::cout << "Current FEN: " << board.getFEN() << '\n';
 
 	while (!quit) {
