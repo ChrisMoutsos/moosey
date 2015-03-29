@@ -9,12 +9,10 @@
 #define BUTTON_H
 
 #include <SDL2/SDL.h>
-//#include <SDL2/SDL_image.h>
 
 enum ButtonSprite { noButton = -1, undo = 0, restart = 0
 };
 
-//class LTexture;
 class Board;
 
 class Button {
@@ -35,10 +33,5 @@ class Button {
 		bool inside, clicking;
 		SDL_Point pos;
 };
-
-/*
-extern SDL_Rect buttonClips[6];
-extern LTexture buttonTexture;
-*/
 
 #endif
