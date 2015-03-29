@@ -79,8 +79,8 @@ class Board {
 		void addToMovelist(bool s, int v);
 		void clearMoveList(bool s);
 		//OPERATOR OVERLOADS
-		int& operator [](const int index);	       //For accessing board120
-		const int& operator [](const int index) const; //For accessing board120
+		int& operator [](const int index);
+		const int& operator [](const int index) const;
 	
 		//MOVE.CPP 
 		void movePiece();
@@ -131,8 +131,8 @@ class Board {
 
 		Piece piece[32];	//The pieces
 
-		int hh[2][64][64];	//History heuristic tables
 	private:
+		Bot whiteBot, blackBot;
 		int board120[120], moveFrom, moveTo, ply;
 		int whiteMaterial, blackMaterial;
 		//For the line below.. 0: none, 1: white, 2: black 

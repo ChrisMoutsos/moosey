@@ -14,13 +14,27 @@
 #include "board.h"
 #include "display.h"
 
-int nodes, qNodes, r = 0;
-LINE prinVarLine, oldPrinVarLine;
-double totalTimeW = 0, totalTimeB = 0;
-SDL_Event e; //Event handler
-int killers[30][2];
+Bot::Bot() {
+	reset();
+}
 
-int think(Board& b, int depth) {
+Bot::~Bot() {
+	
+}
+
+void Bot::reset() {
+	for (int i = 0; i < prinVarLine.count; i++)
+		prinVarLine.move[i] = 0;
+	for (int i = 0; i < oldPrinVarLine.count; i++)
+		oldPrinVarLine.move[i] = 0;
+	nodes = qNodes = r = 0;
+	totalTime = 0;
+	for (int f = 0; f < 64; f++)
+			for (int t = 0; t < 64; t++)
+				hh[f][t] = 0;
+}
+
+int Bot::think(Board& b, int depth) {
 	using std::vector;
 
 	//Save starting time
@@ -33,21 +47,8 @@ int think(Board& b, int depth) {
 	vector<int> moveList;
 
 	//Reset everything if you restart the game
-	if (b.getPly() == 0) {
-		totalTimeW = 0;
-		totalTimeB = 0;
-		for (int f = 0; f < 64; f++)
-			for (int t = 0; t < 64; t++) {
-				b.hh[BLACK][f][t] = 0;
-				b.hh[WHITE][f][t] = 0;
-			}
-	}
-
-	//Clear prinVar, oldPrinVar
-	for (int i = 0; i < prinVarLine.count; i++)
-		prinVarLine.move[i] = 0;
-	for (int i = 0; i < oldPrinVarLine.count; i++)
-		oldPrinVarLine.move[i] = 0;
+	if (b.getNumMovesMade() == 0)
+		reset();
 
 	//Generate legal moveLists
 	b.genOrderedMoveList(b.getSide(), moveList);
@@ -60,7 +61,7 @@ int think(Board& b, int depth) {
 		//Age HH tables
 		for (int f = 0; f < 64; f++)
 			for (int t = 0; t < 64; t++)
-				b.hh[b.getSide()][f][t] /= 2;
+				hh[f][t] /= 2;
 		//Clear killer moves
 		for (int i = 0; i < 30; i++) {
 			killers[i][0] = 0;
@@ -126,13 +127,8 @@ int think(Board& b, int depth) {
 	
 	auto endTime2 = std::chrono::high_resolution_clock::now();
 	fsec diff2 = endTime2 - beginTime1;
-	std::cout << "Total time elapsed: " << diff2.count() << '\n';
-	if (b.getSide())
-		totalTimeW += diff2.count();
-	else
-		totalTimeB += diff2.count();
-
-	std::cout << "Total time for White: " << totalTimeW << "s, Black: " << totalTimeB << "s\n\n";
+	totalTime += diff2.count();
+	std::cout << "Total time elapsed: " << totalTime << '\n';
 
 	if (prinVarLine.move[0] == 0)
 		std::cout << "Stalemate!\n";
@@ -140,7 +136,7 @@ int think(Board& b, int depth) {
 	return prinVarLine.move[0];
 }
 
-int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE* pline, bool allowNull, int ext) {
+int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE* pline, bool allowNull, int ext) {
 	while (SDL_PollEvent(&e)) {
 		if (e.type == SDL_QUIT)
 			exit(0);
@@ -156,7 +152,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		return -9999 + depthGone-1;
 	}
 
-	//Reptition detection
+	//Repetition detection
 	if (depthGone == 1)
 		if (b.drawCheck(1)) {
 			pline->count = 0;
@@ -336,7 +332,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 		if (score >= beta) { //Fail-high
 			//If it wasn't a capture, update HH table and killer moves
 			if (b[mT] == empty) {
-				b.hh[s][to64(mF)-1][to64(mT)-1] += depthGone*depthGone;
+				hh[to64(mF)-1][to64(mT)-1] += depthGone*depthGone;
 				if (depthGone != 0) {
 					if (mF*100+mT == killers[depthGone-1][1]) {
 						killers[depthGone-1][1] = killers[depthGone-1][0];
@@ -362,7 +358,7 @@ int alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE*
 	return alpha;
 }
 
-int quies(Board& b, int alpha, int beta, int depthGone) {
+int Bot::quies(Board& b, int alpha, int beta, int depthGone) {
 	using std::vector;
 
 	bool s = b.getSide();
@@ -392,7 +388,6 @@ int quies(Board& b, int alpha, int beta, int depthGone) {
 	//Add promotions to start
 	b.addPromotions(s, nonQuiesList);
 	
-
 	//Loop through the captures/promotions
 	for (size_t i = 0; i < nonQuiesList.size(); i++) {
 		mF = nonQuiesList[i]/100;
@@ -426,4 +421,10 @@ int quies(Board& b, int alpha, int beta, int depthGone) {
 	}
 	
 	return alpha;
+}
+
+int Bot::getFromHH(int mF, int mT) {
+	assert(mF > -1 && mF < 65);
+	assert(mT > -1 && mT < 65);
+	return hh[mF][mT];
 }

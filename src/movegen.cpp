@@ -148,7 +148,12 @@ void Board::sortNonCaptures(std::vector<int>& moveList) {
 }
 
 bool Board::hhSort(bool s, int i, int j) {
-	return (hh[s][to64(i/100)-1][to64(i%100)-1] >= hh[s][to64(j/100)-1][to64(j%100)-1]);
+	if (s)
+		return (whiteBot.getFromHH(to64((i/100)-1), to64((i%100)-1)) 
+			>= whiteBot.getFromHH(to64((j/100)-1), to64((j%100)-1)));
+	else
+		return (blackBot.getFromHH(to64((i/100)-1), to64((i%100)-1)) 
+			>= blackBot.getFromHH(to64((j/100)-1), to64((j%100)-1)));
 }
 
 void Board::removeNonCaptures(bool s, std::vector<int>& moveList) {

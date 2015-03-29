@@ -165,11 +165,6 @@ void Board::initializeVars() {
 	castling = sideInCheck = sideInCheckmate = 0;
 	whiteMaterial = 8*P_VAL + 2*(R_VAL+B_VAL+N_VAL) + Q_VAL + K_VAL;
 	blackMaterial = whiteMaterial;
-	//Clear history heuristic tables
-	for (int i = 0; i < 2; i++)
-		for (int f = 0; f < 64; f++)
-			for (int t = 0; t < 64; t++)
-				hh[i][f][t] = 0;
 }
 
 void Board::emptyBoard() {
@@ -314,9 +309,9 @@ void Board::botMove() {
 	displayBotText(*this);
 	int move = 0;
 	if (side)
-		move = think(*this, 7);
+		move = whiteBot.think(*this, 7);
 	else
-		move = think(*this, 7);
+		move = blackBot.think(*this, 7);
 	setMove(move/100, move%100);
 	movePiece();
 	if (!muted)
