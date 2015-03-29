@@ -81,6 +81,26 @@ void Board::placePieces(std::string FEN) {
 		index++;
 	}
 
+	whiteMaterial = blackMaterial = 0;
+	for (int i = wqR; i <= bPh; i++) {
+		//Kill pieces that weren't placed
+		if (piece[i].getPos() == 0)
+			piece[i].kill();
+		if (!piece[i].getAlive()) continue;
+		//Update material
+		if (i <= wPh) 
+			whiteMaterial += piece[i].getValue();
+		else 
+			blackMaterial += piece[i].getValue();
+		//Incr pawn's movecount if they have moved
+		if (piece[i].getValue() == P_VAL) {
+			if (i <= wPh && piece[i].getPos()/10 != 3)
+				piece[i].incrMoved();
+			else if (i <= bPh && piece[i].getPos()/10 != 8)
+				piece[i].incrMoved();
+		}
+	}
+
 	//Set the side to move
 	index++;
 	side = (FEN[index] == 'w') ? 1 : 0;
@@ -197,11 +217,6 @@ void Board::placePiecesDefault() {
 void Board::initializePieces() {
 	int v;
 	
-	//Default all pieces to square 0
-	//This makes it easier for the FEN constructor
-	for (int i = wqR; i <= bPh; i++)
-		piece[i].setPos(0);
-
 	//Set names, abbreviations, and values
 	for (int i = 0; i <= 16; i += 16) {
 		piece[wqR+i].setName("Rook");
@@ -248,7 +263,6 @@ void Board::initializePieces() {
 		piece[i].setColor(WHITE);
 	for (int i = bqR; i <= bPh; i++)
 		piece[i].setColor(BLACK);
-	
 
 	//Create moveLists
 	for (int i = wqR; i <= bPh; i++) {
