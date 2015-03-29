@@ -341,14 +341,9 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 			//If it wasn't a capture, update HH table and killer moves
 			if (b[mT] == empty) {
 				hh[to64(mF)-1][to64(mT)-1] += depthGone*depthGone;
-				if (depthGone != 0) {
-					if (mF*100+mT == killers[depthGone-1][1]) {
-						killers[depthGone-1][1] = killers[depthGone-1][0];
-						killers[depthGone-1][0] = mF*100+mT;
-					}
-					else if (mF*100+mT != killers[depthGone-1][0]) {
-						killers[depthGone-1][1] = mF*100+mT;
-					}
+				if (killers[depthGone][0] != mF*100+mT) {
+					killers[depthGone][1] = killers[depthGone][0];
+					killers[depthGone][0] = mF*100+mT;
 				}
 			}
 			return beta;
