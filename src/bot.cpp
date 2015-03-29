@@ -19,15 +19,25 @@ Bot::Bot() {
 }
 
 void Bot::reset() {
+/*
 	for (int i = 0; i < prinVarLine.count; i++)
 		prinVarLine.move[i] = 0;
 	for (int i = 0; i < oldPrinVarLine.count; i++)
 		oldPrinVarLine.move[i] = 0;
+*/
+	prinVarLine.count = 0;
+	oldPrinVarLine.count = 0;
 	nodes = qNodes = r = 0;
 	totalTime = 0;
+	//Clear HH table
 	for (int f = 0; f < 64; f++)
 			for (int t = 0; t < 64; t++)
 				hh[f][t] = 0;
+	//Clear killer moves
+	for (int i = 0; i < 30; i++) {
+		killers[i][0] = 0;
+		killers[i][1] = 0;
+	}
 }
 
 int Bot::think(Board& b, int depth) {
