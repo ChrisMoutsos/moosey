@@ -13,7 +13,7 @@ The following features have been implemented.
 - Sorting captures by MVVLVA (for now)
 - Null move reductions
 - History heuristic
-- Killer heuristic (saving 2 moves/ply)
+- ~~Killer heuristic (saving 2 moves/ply)~~ (disabled for now)
 - Futility pruning ("Delta" pruning in quiescent search)
 - Extended futility pruning
 - Razoring
@@ -22,7 +22,7 @@ The following features have been implemented.
 ####In the Future
 - Better move ordering
 - Transposition tables
-- Static exchange evaluation (attempted, such a pain I gave up for now)
+- Static exchange evaluation (attempted, gave up for now)
 - More search extensions
 - Late move reductions
 
