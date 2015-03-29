@@ -9,11 +9,12 @@
 #include "piece.h"
 
 Piece::Piece() {
-	moved = 0;
+	pos = moved = value = moveListSize = 0;
 	alive = true;
 	promoted = false;
 	moveList = NULL;
-	moveListSize = 0;
+	name = "";
+	abbr = ' ';
 }
 
 Piece::~Piece() {
