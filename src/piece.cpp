@@ -12,7 +12,7 @@ Piece::Piece() {
 	moved = 0;
 	alive = true;
 	promoted = false;
-	moveList = 0;
+	moveList = NULL;
 	moveListSize = 0;
 }
 
