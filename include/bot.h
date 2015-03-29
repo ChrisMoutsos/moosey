@@ -21,7 +21,6 @@ struct LINE {
 class Bot {
 	public:
 		Bot();
-		~Bot();
 		
 		void reset();
 		int think(Board& b, int depth);

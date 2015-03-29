@@ -18,10 +18,6 @@ Bot::Bot() {
 	reset();
 }
 
-Bot::~Bot() {
-	
-}
-
 void Bot::reset() {
 	for (int i = 0; i < prinVarLine.count; i++)
 		prinVarLine.move[i] = 0;
@@ -47,8 +43,8 @@ int Bot::think(Board& b, int depth) {
 	vector<int> moveList;
 
 	//Reset everything if you restart the game
-	if (b.getNumMovesMade() == 0)
-		reset();
+	if (b.getNumMovesMade() < 2)
+		reset();	
 
 	//Generate legal moveLists
 	b.genOrderedMoveList(b.getSide(), moveList);
