@@ -14,8 +14,7 @@
 #include <string>
 #include <cmath>
 #include "ltexture.h"
-#include "square.h"
-#include "button.h"
+#include "display.h"
 #include "sdl.h"
 
 SDL_Window* window = NULL; //The window we'll be rendering to
@@ -103,6 +102,8 @@ bool loadMedia() {
 	if (!spriteSheetTexture.loadFromFile("../res/spritesheet2.bmp"))
 		success = false;
 	if (!buttonTexture.loadFromFile("../res/buttons.bmp"))
+		success = false;
+	if (!titleTexture.loadFromFile("../res/mooseytitle.bmp"))
 		success = false;
 	
 	SDL_Surface* icon = IMG_Load("../res/icon.png");	

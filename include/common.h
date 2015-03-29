@@ -8,7 +8,7 @@
 #define defaultFEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 //GAME CONTROL
-extern bool quit;
+extern bool quit, muted;
 
 //INLINE FUNCTIONS
 inline int to64(int x) { //returns 1 to 64
@@ -76,7 +76,5 @@ enum pieceValue_t { P_VAL = 100, N_VAL = 300, B_VAL = 310,
 
 enum castleside_t { QUEENSIDE = 2, KINGSIDE = 1
 };
-
-extern bool muted;
 
 #endif

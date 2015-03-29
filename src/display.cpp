@@ -19,7 +19,7 @@
 
 SDL_Rect spriteClips[12], buttonClips[6];
 Button buttons[2];
-LTexture spriteSheetTexture, buttonTexture;
+LTexture spriteSheetTexture, buttonTexture, titleTexture;
 LTexture turnText, checkText, moveText, rankText, fileText;
 SDL_Color textColor;
 
