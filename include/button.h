@@ -10,26 +10,32 @@
 
 #include <SDL2/SDL.h>
 
-enum ButtonSprite { noButton = -1, undo = 0, restart = 0
-};
-
 class Board;
 
 class Button {
 	public:
 		Button();
-		void setPos(int x, int y);
+
 		bool handleEvent(SDL_Event* e, Board& b);
-		void render();
+
+		//ACCESSORS
 		int getX() const { return pos.x; };
 		int getY() const { return pos.y; };
+		int getW() const { return w; };
+		int getH() const { return h; };
 		bool getInside() const { return inside; };
 		bool getClicking() const { return clicking; };
+		//MUTATORS
 		void setInside(bool b) { inside = b; };
 		void setClicking(bool b) { clicking = b; };
 		void setButt(int b) { butt = b; };
+		void setPos(int x, int y);
+		void setW(int x) { w = x > 0 ? x : 0; };
+		void setH(int x) { h = x > 0 ? x : 0; };
+		void setSize(int x, int y);
 	private:
 		int butt;	//Which button it is
+		int w, h;
 		bool inside, clicking;
 		SDL_Point pos;
 };
