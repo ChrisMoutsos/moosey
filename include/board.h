@@ -71,6 +71,7 @@ class Board {
 		std::string getFEN();
 		bool getWhiteIsBot() const { return whiteIsBot; };
 		bool getBlackIsBot() const { return blackIsBot; };
+		bool getFlipped() const { return flipped; };
 		//MUTATORSS
 		void setMove(int mF, int mT) { moveFrom = mF; moveTo = mT; };
 		void setPly(int newPly) { ply = newPly; };
@@ -82,6 +83,7 @@ class Board {
 		void clearMoveList(bool s);
 		void setWhiteIsBot(bool b) { whiteIsBot = b; };
 		void setBlackIsBot(bool b) { blackIsBot = b; };
+		void flipBoard() { flipped = flipped ? 0 : 1; };
 		//OPERATOR OVERLOADS
 		int& operator [](const int index);
 		const int& operator [](const int index) const;
@@ -142,7 +144,7 @@ class Board {
 		//For the line below.. 0: none, 1: white, 2: black 
 		int sideInCheck, sideInCheckmate;
 		bool side, whiteCastled, blackCastled;
-		bool whiteIsBot, blackIsBot;
+		bool whiteIsBot, blackIsBot, flipped;
 		int whiteBotLevel, blackBotLevel;
 		std::vector<int> whiteMoveList, blackMoveList;
 		std::vector<int> movesMade; 
