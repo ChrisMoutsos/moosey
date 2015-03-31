@@ -26,4 +26,6 @@ The following features have been implemented.
 - More search extensions
 - Late move reductions
 
+![Title screenshot](https://raw.githubusercontent.com/ChrisMoutsos/moosey/master/res/titlescreenshot.png)
 ![Screenshot](https://raw.githubusercontent.com/ChrisMoutsos/moosey/master/res/screenshot.png)
+![Checkmate screenshot](https://raw.githubusercontent.com/ChrisMoutsos/moosey/master/res/checkmatescreenshot.png)
