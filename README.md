@@ -1,5 +1,3 @@
-This is a work in progress.
-
 ##Overview
 Moosey is a chess engine designed to run without the help of an external GUI. It uses the SDL2 library. Complete with beautiful hand-drawn pieces!
 
