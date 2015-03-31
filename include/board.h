@@ -69,6 +69,8 @@ class Board {
 		int getPrevOnMoveTo(int i) const;
 		int getPieceMoved(int i) const;
 		std::string getFEN();
+		bool getWhiteIsBot() const { return whiteIsBot; };
+		bool getBlackIsBot() const { return blackIsBot; };
 		//MUTATORSS
 		void setMove(int mF, int mT) { moveFrom = mF; moveTo = mT; };
 		void setPly(int newPly) { ply = newPly; };
@@ -78,6 +80,8 @@ class Board {
 		void setSideInCheckmate(int i) { sideInCheckmate = i; };
 		void addToMovelist(bool s, int v);
 		void clearMoveList(bool s);
+		void setWhiteIsBot(bool b) { whiteIsBot = b; };
+		void setBlackIsBot(bool b) { blackIsBot = b; };
 		//OPERATOR OVERLOADS
 		int& operator [](const int index);
 		const int& operator [](const int index) const;
@@ -131,14 +135,15 @@ class Board {
 
 		Piece piece[32];	//The pieces
 
+		Bot whiteBot, blackBot; //The bots
 	private:
-		Bot whiteBot, blackBot;
 		int board120[120], moveFrom, moveTo, ply;
-		int whiteMaterial, blackMaterial;
+		int whiteMaterial, blackMaterial, castling;
 		//For the line below.. 0: none, 1: white, 2: black 
 		int sideInCheck, sideInCheckmate;
-		int castling;
 		bool side, whiteCastled, blackCastled;
+		bool whiteIsBot, blackIsBot;
+		int whiteBotLevel, blackBotLevel;
 		std::vector<int> whiteMoveList, blackMoveList;
 		std::vector<int> movesMade; 
 		std::vector<info> moveInfo;

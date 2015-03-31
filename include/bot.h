@@ -29,6 +29,9 @@ class Bot {
 		int quies(Board& b, int alpha, int beta, int depthGone);
 		int getFromHH(int mF, int mT);
 
+		int getLevel() const { return level; };
+		void setLevel(int d) { level = d; };
+
 	private:
 		LINE prinVarLine, oldPrinVarLine;
 		double totalTime;
@@ -38,6 +41,7 @@ class Bot {
 		int hh[64][64];
 		//Killer moves
 		int killers[30][2];
+		int level;
 };
 
 #endif

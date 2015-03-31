@@ -16,15 +16,10 @@
 
 Bot::Bot() {
 	reset();
+	level = 7;
 }
 
 void Bot::reset() {
-/*
-	for (int i = 0; i < prinVarLine.count; i++)
-		prinVarLine.move[i] = 0;
-	for (int i = 0; i < oldPrinVarLine.count; i++)
-		oldPrinVarLine.move[i] = 0;
-*/
 	prinVarLine.count = 0;
 	oldPrinVarLine.count = 0;
 	nodes = qNodes = r = 0;
