@@ -86,7 +86,7 @@ void setButtons() {
 		buttons[i].setSize(titleTextClips[i].w, titleTextClips[i].h);
 	}
 	//Flip board
-	buttons[24].setPos(BXSTART+B_SIZE+200, BYSTART+500);
+	buttons[24].setPos(BXSTART+B_SIZE+200, BYSTART+520);
 	buttons[24].setSize(titleTextClips[24].w, titleTextClips[24].h);
 	//Start, and light version
 	buttons[25].setPos(BXSTART+B_SIZE+230, BYSTART+590);
