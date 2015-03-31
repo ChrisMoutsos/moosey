@@ -21,19 +21,22 @@ enum PieceSprite {
 class Square {
 	public:
 		Square();
-		void setPos(int x, int y);
+
 		void handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s);
-		int getPiece() const { return piece; };
-		void setPiece(int p) { piece = p; };
+
+		//ACCESSORS
 		int getX() const { return pos.x; };
 		int getY() const { return pos.y; };
-		void setSq(int i) { square = i; };
 		bool getDragging() const { return dragging; };
+		int getPiece() const { return piece; };
+		//MUTATORS
+		void setPos(int x, int y);
+		void setPiece(int p) { piece = p; };
+		void setSq(int i) { square = i; };
 		void setDragging(bool x) { dragging = x; };
 	private:
 		bool dragging;
-		int square;
-		int piece;
+		int square, piece;
 		SDL_Point pos;
 };
 
