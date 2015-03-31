@@ -44,14 +44,8 @@ class Piece {
 	private:
 		std::string name;
 		char abbr;
-		int value;
-		int pos;
-		int moved;
-		bool alive;
-		bool promoted;
-		bool color;
-		int* moveList;
-		int moveListSize;	
+		int value, pos, moved, moveListSize, * moveList;
+		bool alive, promoted, color;
 };
 
 
