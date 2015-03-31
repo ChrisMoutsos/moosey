@@ -27,9 +27,11 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 	using std::string;
 
 	static bool sidey = !b.getSide(); //Keeps track of if text needs to be updated
-	static bool flag = false; //Used to load fileText only once
-	string rankStr;
-	string fileStr = "a         b        c         d         e         f         g         h";
+	string rankStr, fileStr;
+	if (!b.getFlipped())
+		fileStr = "a         b        c         d         e         f         g         h";
+	else
+		fileStr = "h         g        f         e         d         c         b         a";
 
 	//Clear screen
 	SDL_SetRenderDrawColor(renderer, 209, 224, 255, 255);
@@ -48,15 +50,21 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 		drawTitleScreen(b);	//Draw title screen
 
 	//Draw rank numbers
-	for (int i = '8'; i >= '1'; i--) {
-		rankStr = i;
-		rankText.loadFromRenderedText(rankStr, textColor, Cicero26);
-		rankText.render(BXSTART-35, BYSTART+30+75*('8'-i));
-	}
-	if (!flag) {	//Only load file text once
-		fileText.loadFromRenderedText(fileStr, textColor, Cicero26); //Load file text
-		flag = true;
-	}
+	if (!b.getFlipped())
+		for (char i = '8'; i >= '1'; i--) {
+			rankStr = i;
+			rankText.loadFromRenderedText(rankStr, textColor, Cicero26);
+			rankText.render(BXSTART-35, BYSTART+30+75*('8'-i));
+		}
+	else
+		for (char i = '1'; i <= '8'; i++) {
+			rankStr = i;
+			rankText.loadFromRenderedText(rankStr, textColor, Cicero26);
+			rankText.render(BXSTART-35, BYSTART+30+75*(i-'1'));
+		}
+
+	fileText.loadFromRenderedText(fileStr, textColor, Cicero26); //Load file text
+
 	//Render all the rest of the text
 	checkText.render(BXSTART+B_SIZE-200, BYSTART+B_SIZE+40);
 	fileText.render(BXSTART+33, BYSTART+B_SIZE+10);
@@ -225,15 +233,21 @@ void drawSquares(const Board& b, const int& mF, const int& mT) {
 }
 
 void drawPieces(const Board& b, const int& mF, const int& mT) {
-	int p, sq, x, y, putOnTop = -1;
+	int p, sq, flipSq, x, y, putOnTop = -1;
 	SDL_Rect sqPos;
 	SDL_Rect clipSq, pOTClipSq;
 	for (int r = 1; r <= 8; r++) {
 		for (int f = 1; f <= 8; f++) {
 			sq = FR2SQ64(f, r)-1;
-			sqPos = {b.squares[sq].getX(), 	//X start
-				 b.squares[sq].getY(), 	//Y start
-				 SQ_SIZE, SQ_SIZE};	//Width, height of square
+			flipSq = flip[sq];
+			if (!b.getFlipped()) 
+				sqPos = {b.squares[sq].getX(), 	//X start
+					 b.squares[sq].getY(), 	//Y start
+					 SQ_SIZE, SQ_SIZE};	//Width, height of square
+			else
+				sqPos = {b.squares[flipSq].getX(), //X start
+					 b.squares[flipSq].getY(), //Y start
+					 SQ_SIZE, SQ_SIZE};	   //Width, height of square
 		
 			p = b.squares[sq].getPiece();
 			if (p == wqR || p == wkR)
@@ -272,7 +286,7 @@ void drawPieces(const Board& b, const int& mF, const int& mT) {
 			if (p != empty) { 
 				//Save piece being dragged, to rerender on top
 				if (b.squares[sq].getDragging()) {
-					putOnTop = sq;
+					putOnTop = b.getFlipped() ? flipSq : sq;
 					pOTClipSq = clipSq;
 				}
 				else	//Every other piece
