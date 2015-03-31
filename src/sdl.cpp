@@ -105,6 +105,8 @@ bool loadMedia() {
 		success = false;
 	if (!titleTexture.loadFromFile("../res/mooseytitle.bmp"))
 		success = false;
+	if (!titleTextTexture.loadFromFile("../res/titletext.bmp"))
+		success = false;
 	
 	SDL_Surface* icon = IMG_Load("../res/icon.png");	
 	SDL_SetWindowIcon(window, icon);
@@ -116,6 +118,8 @@ void close_SDL() {
 	//Free loaded images
 	spriteSheetTexture.free();
 	buttonTexture.free();
+	titleTexture.free();
+	titleTextTexture.free();
 
 	//Free sounds
 	Mix_FreeChunk(mFSound);
