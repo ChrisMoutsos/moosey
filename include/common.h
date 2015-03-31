@@ -10,6 +10,8 @@
 //GAME CONTROL
 extern bool quit, muted, start;
 
+extern int flip[64];
+
 //INLINE FUNCTIONS
 inline int to64(int x) { //returns 1 to 64
 	if (x < 99 && x > 20 && !(x%10 == 0 || x%10 == 9))

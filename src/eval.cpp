@@ -9,16 +9,16 @@
 #include "common.h"
 #include "board.h"
 
-int Board::eval() {
-	static int reverse[64] = { 63, 62, 61, 60, 59, 58, 57, 56,
-				   55, 54, 53, 52, 51, 50, 49, 48,
-				   47, 46, 45, 44, 43, 42, 41, 40,
-				   39, 38, 37, 36, 35, 34, 33, 32,
-				   31, 30, 29, 28, 27, 26, 25, 24,
-				   23, 22, 21, 20, 19, 18, 17, 16,
-				   15, 14, 13, 12, 11, 10,  9,  8,
-				    7,  6,  5,  4,  3,  2,  1,  0 };
+int flip[64] = { 63, 62, 61, 60, 59, 58, 57, 56,
+	 	 55, 54, 53, 52, 51, 50, 49, 48,
+	         47, 46, 45, 44, 43, 42, 41, 40,
+	  	 39, 38, 37, 36, 35, 34, 33, 32,
+		 31, 30, 29, 28, 27, 26, 25, 24,
+		 23, 22, 21, 20, 19, 18, 17, 16,
+		 15, 14, 13, 12, 11, 10,  9,  8,
+		  7,  6,  5,  4,  3,  2,  1,  0 };
 
+int Board::eval() {
 	static int pawnTable[64] = { 0,  0,  0,  0,  0,  0,  0,  0,
 				     5,	10, 10,-20,-20, 10, 10,  5,
 				     5, -5,-10,  0,  0,-10, -5,  5,
@@ -118,27 +118,27 @@ int Board::eval() {
 	//---Black pieces
 	for (int i = bqR; i <= bkR; i += bkR-bqR)
 		if (piece[i].getAlive())
-			score -= rookTable[reverse[to64(piece[i].getPos())-1]];
+			score -= rookTable[flip[to64(piece[i].getPos())-1]];
 	for (int i = bqN; i <= bkN; i += bkN-bqN)
 		if (piece[i].getAlive())
-			score -= knightTable[reverse[to64(piece[i].getPos())-1]];
+			score -= knightTable[flip[to64(piece[i].getPos())-1]];
 	for (int i = bqB; i <= bkB; i += bkB-bqB)
 		if (piece[i].getAlive())
-			score -= bishopTable[reverse[to64(piece[i].getPos())-1]];
+			score -= bishopTable[flip[to64(piece[i].getPos())-1]];
 	if (piece[bQ].getAlive())
-		score -= queenTable[reverse[to64(piece[bQ].getPos())-1]];
+		score -= queenTable[flip[to64(piece[bQ].getPos())-1]];
 	if (piece[bK].getAlive()) {
 		if (blackMaterial <= ENDGAME_VAL)
-			score -= kingTable2[reverse[to64(piece[wK].getPos())-1]];
+			score -= kingTable2[flip[to64(piece[wK].getPos())-1]];
 		else
-			score -= kingTable1[reverse[to64(piece[wK].getPos())-1]];
+			score -= kingTable1[flip[to64(piece[wK].getPos())-1]];
 	}
 	for (int i = bPa; i <= bPh; i++) {
 		if (piece[i].getAlive()) {
 			if (piece[i].getValue() == P_VAL)
-				score -= pawnTable[reverse[to64(piece[i].getPos())-1]];
+				score -= pawnTable[flip[to64(piece[i].getPos())-1]];
 			else
-				score -= queenTable[reverse[to64(piece[i].getPos())-1]];
+				score -= queenTable[flip[to64(piece[i].getPos())-1]];
 		}
 	}
 
