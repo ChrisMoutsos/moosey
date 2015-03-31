@@ -83,7 +83,7 @@ bool Button::handleEvent(SDL_Event* e, Board& b) {
 						b.blackBot.setLevel(butt-14);
 					//Flip board
 					else if (butt == 24) 
-						butt = 24;
+						b.flipBoard();
 					//Start
 					else if (butt == 25)
 						start = true;
