@@ -8,11 +8,9 @@
 
 /* 
  * ##To-Do List##
- * SDL:
- * - Splash screen
  * Add en passants to quiescent search maybe
+ * Make sure killer moves are being implemented correctly
  * Make sure threefold repetition detection works
- * Finish null move heuristic edge cases (?)
  * Write dupMove code for Queens
  * 
  */
@@ -25,7 +23,7 @@
 #include "board.h"
 #include "display.h"
 
-bool quit = false, muted = false;;
+bool quit = false, muted = false, start = false;
 
 void showMoveLists(Board& board);
 
@@ -45,28 +43,22 @@ int main(int argc, char* args[]) {
 	SDL_Event e; //Event handler
 
 //	Board board("r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R b KQkq - 1 4");
+//	Board board("8/8/p1p5/1p5p/1P5p/8/PPP2K1p/4R1rk w - - 0 1");
 	Board board;
 	std::cout << "Current FEN: " << board.getFEN() << '\n';
 
 	while (!quit) {
 		while (SDL_PollEvent(&e)) {
-		/*	if (board.getSide()) {
-				mF = mT = -1;
-				displayBoard(board, mF, mT);
-				if (!board.getSideInCheckmate())
-					board.botMove();
-
-			}
-*/
 			if (e.type == SDL_QUIT)
 				quit = true;
 			else if (e.type == SDL_KEYDOWN) {
 				switch (e.key.keysym.sym) {
 					case SDLK_SPACE:
-						mF = mT = -1;
-						displayBoard(board, mF, mT);
-						if (!board.getSideInCheckmate())
+						if (start) {
+							mF = mT = -1;
+							displayBoard(board, mF, mT);
 							board.botMove();
+						}
 					break;
 					case SDLK_m:
 						muted = muted ? 0 : 1;
@@ -84,6 +76,15 @@ int main(int argc, char* args[]) {
 			board.handleInput(mF, mT, &e);
 			displayBoard(board, mF, mT);
 		}
+		if (start) {
+			if ((board.getSide() && board.getWhiteIsBot()) || 
+			    (!board.getSide() && board.getBlackIsBot())) {
+				board.botMove();
+				displayBoard(board, mF, mT);
+			}
+		}
+		else
+			mF = mT = -1;
 	}
 
 	close_SDL();
