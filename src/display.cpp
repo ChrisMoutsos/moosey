@@ -17,9 +17,9 @@
 #include "button.h"
 #include "display.h"
 
-SDL_Rect spriteClips[12], buttonClips[6];
-Button buttons[2];
-LTexture spriteSheetTexture, buttonTexture, titleTexture;
+SDL_Rect spriteClips[12], buttonClips[6], titleTextClips[27];
+Button buttons[26];
+LTexture spriteSheetTexture, buttonTexture, titleTexture, titleTextTexture;
 LTexture turnText, checkText, moveText, rankText, fileText;
 SDL_Color textColor;
 
@@ -44,7 +44,10 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 
 	drawButtons(b);		//Draw buttons (undo, restart)
 	updateText(b, sidey);	//Updates text if someone moved
-	drawMoveTable(b);	//Draw movetable (with text)
+	if (start)
+		drawMoveTable(b);	//Draw movetable (with text)
+	else	
+		drawTitleScreen(b);	//Draw title screen
 
 	//Draw rank numbers
 	for (int i = '8'; i >= '1'; i--) {
@@ -64,11 +67,32 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 	SDL_RenderPresent(renderer);
 }
 
-void setButtonPositions() {
+void setButtons() {
+	for (int i = 0; i < 26; i++)
+		buttons[i].setButt(i);
+	//Restart and undo
 	buttons[0].setPos(1185, 25);
-	buttons[0].setButt(0);
-	buttons[1].setPos(1185, 75);
-	buttons[1].setButt(1);
+	buttons[0].setSize(51, 31);
+	buttons[1].setPos(buttons[0].getX(), buttons[0].getY()+50);
+	buttons[1].setSize(51, 31);
+	//Human, computer (white and black)
+	for (int i = 2; i < 6; i++) {
+		buttons[i].setPos(BXSTART+B_SIZE+125+((i-2)%2)*200,
+			          BYSTART+250+(i/4)*150);
+		buttons[i].setSize(titleTextClips[i].w, titleTextClips[i].h);
+	}
+	//1-9 (white and black)
+	for (int i = 6; i < 24; i++) {
+		buttons[i].setPos(BXSTART+B_SIZE+300+(i-6)%9*20,
+				  BYSTART+300+(i/15)*150);
+		buttons[i].setSize(titleTextClips[i].w, titleTextClips[i].h);
+	}
+	//Flip board
+	buttons[24].setPos(BXSTART+B_SIZE+200, BYSTART+500);
+	buttons[24].setSize(titleTextClips[24].w, titleTextClips[24].h);
+	//Start, and light version
+	buttons[25].setPos(BXSTART+B_SIZE+230, BYSTART+590);
+	buttons[25].setSize(titleTextClips[25].w, titleTextClips[25].h);
 }
 
 void setSpriteClips() {
@@ -79,11 +103,53 @@ void setSpriteClips() {
 		spriteClips[i].h = SQ_SIZE;
 	}
 	for (int i = 0; i < 6; i++) {
-		buttonClips[i].x = i%2*BUT_SIZEX;
-		buttonClips[i].y = i/2*BUT_SIZEY;
-		buttonClips[i].w = BUT_SIZEX;
-		buttonClips[i].h = BUT_SIZEY;
+		buttonClips[i].x = i%2*51;
+		buttonClips[i].y = i/2*31;
+		buttonClips[i].w = 51;
+		buttonClips[i].h = 31;
 	}
+	//"White:", "Black:"
+	for (int i = 0; i < 2; i++) {
+		titleTextClips[i].x = 0+i*100;
+		titleTextClips[i].y = 0;
+		titleTextClips[i].w = 100;
+		titleTextClips[i].h = 40;
+	}
+	//"Human", "Computer", and light versions
+	for (int i = 2; i < 6; i++) {
+		titleTextClips[i].x = 0+(i%2)*100;
+		titleTextClips[i].y = 45+(i/4)*40;
+		titleTextClips[i].w = 100+(i%2)*40;
+		titleTextClips[i].h = 40;
+	}
+	//1-9, and light versions
+	for (int i = 6; i < 24; i++) {
+		titleTextClips[i].x = 0+25*((i-6)%9);
+		titleTextClips[i].y = 130 + 33*(i/15);
+		titleTextClips[i].w = 25;
+		titleTextClips[i].h = 30;
+	}
+	//"Flip board"
+	titleTextClips[24].x = 0;
+	titleTextClips[24].y = 200;
+	titleTextClips[24].w = 150;
+	titleTextClips[24].h = 50;
+	//"Flip board" light
+	titleTextClips[27].x = 0;
+	titleTextClips[27].y = 294;
+	titleTextClips[27].w = 150;
+	titleTextClips[27].h = 50;
+
+	//"Start"
+	titleTextClips[25].x = 10;
+	titleTextClips[25].y = 250;
+	titleTextClips[25].w = 90;
+	titleTextClips[25].h = 40;
+	//"Start" light
+	titleTextClips[26].x = 125;
+	titleTextClips[26].y = 250;
+	titleTextClips[26].w = 90;
+	titleTextClips[26].h = 40;
 }
 
 void displayBotText(const Board& b) {
@@ -360,19 +426,88 @@ void drawMoveTable(const Board& b) {
 	}
 }
 
-void showPieceMoveLists(const Board &b) {
-	int mF, mT;
-	std::cout << "Piece movelists: " << std::endl;
-	for (int i = wqR; i <= bPh; i++) {
-		std::cout << b.piece[i].getName() << " (" << b.piece[i].getMoveListSize() << "): ";
-		for (int j = 0; j < b.piece[i].getMoveListSize(); j++) {
-			mF = b.piece[i].getPos();
-			mT = b.piece[i].getFromMoveList(j);
-			if (mT != 0) {
-				std::cout << mF << " to " << mT << ", ";
-			}
+void drawTitleScreen(const Board& b) {
+	SDL_Rect clipSq;
+
+	//Draw the border and background
+	SDL_Rect borderRect = {BXSTART+B_SIZE+25, BYSTART, 500, 650};
+	SDL_SetRenderDrawColor(renderer, 236, 247, 235, 255);
+	SDL_RenderFillRect(renderer, &borderRect);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderDrawRect(renderer, &borderRect);
+	borderRect = {BXSTART+B_SIZE+24, BYSTART-1, 500, 650};
+	SDL_RenderDrawRect(renderer, &borderRect);
+
+	titleTexture.render(BXSTART+B_SIZE+75, BYSTART);
+
+	//Draw white options
+	//"White:"
+	clipSq = titleTextClips[0];
+	titleTextTexture.render(BXSTART+B_SIZE+230, BYSTART+200, &clipSq);
+	//"Human"
+	if (buttons[2].getInside() || !b.getWhiteIsBot())
+		clipSq = titleTextClips[4];
+	else
+		clipSq = titleTextClips[2];
+	titleTextTexture.render(buttons[2].getX(), buttons[2].getY(), &clipSq);
+	//"Computer"
+	if (buttons[3].getInside() || b.getWhiteIsBot())
+		clipSq = titleTextClips[5];
+	else
+		clipSq = titleTextClips[3];
+	titleTextTexture.render(buttons[3].getX(), buttons[3].getY(), &clipSq);
+	//Numbers 1-9
+	if (b.getWhiteIsBot()) {
+		for (int i = 1; i < 10; i++) {
+			if (buttons[i+5].getInside() || b.whiteBot.getLevel() == i)
+				clipSq = titleTextClips[i+14];
+			else
+				clipSq = titleTextClips[i+5];
+			titleTextTexture.render(buttons[i+5].getX(), 
+						buttons[i+5].getY(), &clipSq);
 		}
-		std::cout << " ... \n";
 	}
-	std::cout << "\n\n";
+
+	//Draw black options
+	//"Black:"
+	clipSq = titleTextClips[1];
+	titleTextTexture.render(BXSTART+B_SIZE+230, BYSTART+350, &clipSq);
+	//"Human"
+	if (buttons[4].getInside() || !b.getBlackIsBot())
+		clipSq = titleTextClips[4];
+	else
+		clipSq = titleTextClips[2];
+	titleTextTexture.render(buttons[4].getX(), buttons[4].getY(), &clipSq);
+	//"Computer"
+	if (buttons[5].getInside() || b.getBlackIsBot())
+		clipSq = titleTextClips[5];
+	else
+		clipSq = titleTextClips[3];
+	titleTextTexture.render(buttons[5].getX(), buttons[5].getY(), &clipSq);
+	//Numbers 1-9
+	if (b.getBlackIsBot()) {
+		for (int i = 1; i < 10; i++) {
+			if (buttons[i+14].getInside() || b.blackBot.getLevel() == i)
+				clipSq = titleTextClips[i+14];
+			else
+				clipSq = titleTextClips[i+5];
+			titleTextTexture.render(buttons[i+14].getX(), 
+						buttons[i+14].getY(), &clipSq);
+		}
+	}
+
+	//"Flip board"
+	if (buttons[24].getInside())
+		clipSq = titleTextClips[27];
+	else
+		clipSq = titleTextClips[24];
+	titleTextTexture.render(buttons[24].getX(), buttons[24].getY(), &clipSq);
+
+	//"Start"
+	if (buttons[25].getInside())
+		clipSq = titleTextClips[26];
+	else
+		clipSq = titleTextClips[25];
+	titleTextTexture.render(buttons[25].getX(), buttons[25].getY(), &clipSq);
+
 }
