@@ -40,6 +40,7 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 			inside = false;
 		switch (e->type) {
 			case SDL_MOUSEBUTTONDOWN:
+				if (!start) break;
 				if (!inside) break;
 				if (mF == -1) {
 					if (piece != noPiece)
@@ -69,6 +70,7 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 				}
 			break;
 			case SDL_MOUSEBUTTONUP:
+			if (!start) break;
 			if (inside)
 				if (mF != -1 && mT == -1) {
 					if (square != mF) {
