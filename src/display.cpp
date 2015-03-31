@@ -23,8 +23,6 @@ LTexture spriteSheetTexture, buttonTexture, titleTexture, titleTextTexture;
 LTexture turnText, checkText, moveText, rankText, fileText;
 SDL_Color textColor;
 
-void showPieceMoveLists(const Board& b);
-
 void displayBoard(Board& b, const int& mF, const int& mT) {
 	using std::string;
 
@@ -83,7 +81,7 @@ void setButtons() {
 	}
 	//1-9 (white and black)
 	for (int i = 6; i < 24; i++) {
-		buttons[i].setPos(BXSTART+B_SIZE+300+(i-6)%9*20,
+		buttons[i].setPos(BXSTART+B_SIZE+280+(i-6)%9*titleTextClips[i].w,
 				  BYSTART+300+(i/15)*150);
 		buttons[i].setSize(titleTextClips[i].w, titleTextClips[i].h);
 	}
