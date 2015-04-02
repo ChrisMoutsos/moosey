@@ -8,10 +8,11 @@
 
 /* 
  * ##To-Do List##
+ * Make Display a class
  * Add en passants to quiescent search maybe
  * Make sure killer moves are being implemented correctly
- * Make sure threefold repetition detection works
  * Write dupMove code for Queens
+ * Make sure threefold repetition detection works
  * 
  */
 
@@ -45,7 +46,10 @@ int main(int argc, char* args[]) {
 //	Board board("r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R b KQkq - 1 4");
 //	Board board("8/8/p1p5/1p5p/1P5p/8/PPP2K1p/4R1rk w - - 0 1");
 	Board board;
+//	Board board("r2b1rk1/pbpq1ppp/2pp1n2/5N2/4P3/2N2Q2/PPP2PPP/R1B1R1K1 w - - 5 13");
+//	Board board("6k1/ppp2ppp/8/r7/8/3KN3/8/8 b - - 0 2");
 	std::cout << "Current FEN: " << board.getFEN() << '\n';
+	std::cout << "Current Zobrist: " << board.getZobrist() << '\n';
 
 	while (!quit) {
 		while (SDL_PollEvent(&e)) {
