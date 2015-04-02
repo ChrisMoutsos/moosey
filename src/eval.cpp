@@ -28,14 +28,23 @@ int Board::eval() {
 			     8,  9, 10, 11, 12, 13, 14, 15,
 			     0,  1,  2,  3,  4,  5,  6,  7 };
 
-	static int pawnTable[64] = { 0,  0,  0,  0,  0,  0,  0,  0,
-				     5,	10, 10,-20,-20, 10, 10,  5,
-				     5, -5,-10,  0,  0,-10, -5,  5,
-				     0,  0,  0, 20, 20,  0,  0,  0,
-				     5,  5, 10, 25, 25, 10,  5,  5,
-				    10, 10, 20, 30, 30, 20, 10, 10,
-				    50, 50, 50, 50, 50, 50, 50, 50,
-				     0,  0,  0,  0,  0,  0,  0,  0 };
+	static int pawnTable1[64] = { 0,  0,  0,  0,  0,  0,  0,  0,
+			 	      5,10, 10,-20,-20, 10, 10,  5,
+				      5, -5,-10,  0,  0,-10, -5,  5,
+				      0,  0,  0, 20, 20,  0,  0,  0,
+				      5,  5, 10, 25, 25, 10,  5,  5,
+				     10, 10, 20, 30, 30, 20, 10, 10,
+				     50, 50, 50, 50, 50, 50, 50, 50,
+				      0,  0,  0,  0,  0,  0,  0,  0 };
+
+	static int pawnTable2[64] = { 0,  0,  0,  0,  0,  0,  0,  0,
+				      5,  5,  5,  5,  5,  5,  5,  5,
+				     20, 20, 20, 20, 20, 20, 20, 20,
+				     30, 30, 30, 30, 30, 30, 30, 30,
+				     40, 40, 40, 40, 40, 40, 40, 40,
+				     60, 60, 60, 60, 60, 60, 60, 60,
+				     80, 80, 80, 80, 80, 80, 80, 80,
+				      0,  0,  0,  0,  0,  0,  0,  0 };
 
 	static int knightTable[64] = { -50,-40,-30,-30,-30,-30,-40,-50,
 				       -40,-20,  0,  5,  5,  0,-20,-40,
@@ -118,8 +127,12 @@ int Board::eval() {
 	}
 	for (int i = wPa; i <= wPh; i++) {
 		if (piece[i].getAlive()) {
-			if (piece[i].getValue() == P_VAL)
-				score += pawnTable[to64(piece[i].getPos())-1];
+			if (piece[i].getValue() == P_VAL) {
+				if (whiteMaterial <= ENDGAME_VAL)
+					score += pawnTable2[to64(piece[i].getPos())-1];
+				else
+					score += pawnTable1[to64(piece[i].getPos())-1];
+			}
 			else
 				score += queenTable[to64(piece[i].getPos())-1];
 		}
@@ -144,8 +157,12 @@ int Board::eval() {
 	}
 	for (int i = bPa; i <= bPh; i++) {
 		if (piece[i].getAlive()) {
-			if (piece[i].getValue() == P_VAL)
-				score -= pawnTable[reverse[to64(piece[i].getPos())-1]];
+			if (piece[i].getValue() == P_VAL) {
+				if (blackMaterial <= ENDGAME_VAL)
+					score -= pawnTable2[reverse[to64(piece[i].getPos())-1]];
+				else
+					score -= pawnTable1[reverse[to64(piece[i].getPos())-1]];
+			}
 			else
 				score -= queenTable[reverse[to64(piece[i].getPos())-1]];
 		}
