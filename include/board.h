@@ -14,8 +14,7 @@
 #include "square.h"
 #include "piece.h"
 #include "bot.h"
-
-void showMoveLists(Board& b);
+#include "zobrist.h"
 
 //For moveInfo vector
 struct info {
@@ -25,6 +24,7 @@ struct info {
 	int prevOnMoveTo;
 	int halfMoveClock;
 	std::string FEN;
+	long zobrist;
 };
 
 class Board {
@@ -43,6 +43,7 @@ class Board {
 		void placePiecesDefault();	
 		void placePieces(std::string FEN);	
 		void initializePieces();
+		void initializeZobrist();
 		void handleInput(int& mF, int& mT, SDL_Event* e);
 		void setSquarePositions();
 		void setPiecesOnSquares();
@@ -72,6 +73,7 @@ class Board {
 		bool getWhiteIsBot() const { return whiteIsBot; };
 		bool getBlackIsBot() const { return blackIsBot; };
 		bool getFlipped() const { return flipped; };
+		unsigned long getZobrist() const { return zobrist.key; };
 		//MUTATORSS
 		void setMove(int mF, int mT) { moveFrom = mF; moveTo = mT; };
 		void setPly(int newPly) { ply = newPly; };
@@ -146,6 +148,10 @@ class Board {
 		bool side, whiteCastled, blackCastled;
 		bool whiteIsBot, blackIsBot, flipped;
 		int whiteBotLevel, blackBotLevel;
+		//Used for Zobrist key
+		bool canCastleZ[2][2];
+		//Zobrist hash key
+		Zobrist zobrist;
 		std::vector<int> whiteMoveList, blackMoveList;
 		std::vector<int> movesMade; 
 		std::vector<info> moveInfo;

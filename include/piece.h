@@ -25,6 +25,7 @@ class Piece {
 		int getValue() const { return value; };
 		int getPos() const { return pos; };
 		bool getColor() const { return color; };
+		int getType() const { return type; };
 		//Mutators
 		void setInMoveList(int i, int v);
 		void kill() { alive = false; };
@@ -38,13 +39,14 @@ class Piece {
 		void setColor(bool newColor) { color = newColor; };
 		void setAbbr(char newAbbr) { abbr = newAbbr; };
 		void setValue(int newValue) { value = newValue; };
+		void setType(int newType) { type = newType; };
 		void setPromoted(bool newPromoted) { promoted = newPromoted; };
 		void freeMoveList() { delete [] moveList; };
 	
 	private:
 		std::string name;
 		char abbr;
-		int value, pos, moved, moveListSize, * moveList;
+		int value, pos, moved, type, moveListSize, * moveList;
 		bool alive, promoted, color;
 };
 

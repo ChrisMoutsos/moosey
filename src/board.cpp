@@ -15,6 +15,7 @@
 
 Board::Board() { 
 	initializeVars();
+	initializeZobrist();
 	emptyBoard();
 	initializePieces();
 	placePiecesDefault();	
@@ -32,6 +33,54 @@ Board::Board(std::string FEN) {
 	setSpriteClips();	
 	setButtons();
 	placePieces(FEN);
+}
+
+void Board::initializeZobrist() {
+	bool color;
+	int pos;
+	//Get initial key
+	zobrist.key = 0;
+	//Piece positions
+	for (int p = 0; p < 32; p++) {
+		if (!piece[p].getAlive()) continue;
+		color = piece[p].getColor();
+		pos = to64(piece[p].getPos());
+		switch (piece[p].getValue()) {
+			case R_VAL:
+				zobrist.key ^= zobrist.piece[0][color][pos];
+			case N_VAL:
+				zobrist.key ^= zobrist.piece[1][color][pos];
+			case B_VAL:
+				zobrist.key ^= zobrist.piece[2][color][pos];
+			case Q_VAL:
+				zobrist.key ^= zobrist.piece[3][color][pos];
+			case K_VAL:
+				zobrist.key ^= zobrist.piece[4][color][pos];
+			case P_VAL:
+				zobrist.key ^= zobrist.piece[5][color][pos];
+		}
+	}
+	//Side
+	if (!side)
+		zobrist.key ^= zobrist.side;
+
+	//Castling availibity
+	if (piece[wK].getMoved() == 0) {
+		if (piece[wkR].getMoved() == 0)
+			zobrist.key ^= zobrist.castling[WHITE][0];
+		if (piece[wqR].getMoved() == 0)
+			zobrist.key ^= zobrist.castling[WHITE][1];
+	}
+	if (piece[bK].getMoved() == 0) {
+		if (piece[bkR].getMoved() == 0)
+			zobrist.key ^= zobrist.castling[BLACK][0];
+		if (piece[bqR].getMoved() == 0)
+			zobrist.key ^= zobrist.castling[BLACK][1];
+	}
+	
+	//En passant square
+	if (moveInfo.size() && moveInfo.back().epSq != 0)
+		zobrist.key ^= zobrist.enPassant[to64(moveInfo.back().epSq)%10-1];
 }
 
 void Board::setSquarePositions() {
@@ -64,6 +113,8 @@ void Board::initializeVars() {
 	whiteIsBot = false;
 	blackIsBot = true;
 	whiteCastled = blackCastled = false;
+	canCastleZ[WHITE][0] = canCastleZ[WHITE][1] = true;
+	canCastleZ[BLACK][0] = canCastleZ[BLACK][1] = true;
 	castling = sideInCheck = sideInCheckmate = 0;
 	whiteMaterial = 8*P_VAL + 2*(R_VAL+B_VAL+N_VAL) + Q_VAL + K_VAL;
 	blackMaterial = whiteMaterial;
@@ -104,40 +155,49 @@ void Board::initializePieces() {
 		piece[wqR+i].setName("Rook");
 		piece[wqR+i].setAbbr('R' + 2*i);
 		piece[wqR+i].setValue(R_VAL);
+		piece[wqR+i].setType(0);
 
 		piece[wqN+i].setName("Knight");
 		piece[wqN+i].setAbbr('N' + 2*i);
 		piece[wqN+i].setValue(N_VAL);
+		piece[wqN+i].setType(1);
 
 		piece[wqB+i].setName("Bishop");
 		piece[wqB+i].setAbbr('B' + 2*i);
 		piece[wqB+i].setValue(B_VAL);
+		piece[wqB+i].setType(2);
 
 		piece[wQ+i].setName("Queen");
 		piece[wQ+i].setAbbr('Q' + 2*i);
 		piece[wQ+i].setValue(Q_VAL);
+		piece[wQ+i].setType(3);
 
 		piece[wK+i].setName("King");
 		piece[wK+i].setAbbr('K' + 2*i);
 		piece[wK+i].setValue(K_VAL);
+		piece[wK+i].setType(4);
 
 		piece[wkB+i].setName("Bishop");
 		piece[wkB+i].setAbbr('B' + 2*i);
 		piece[wkB+i].setValue(B_VAL);
+		piece[wkB+i].setType(2);
 
 		piece[wkN+i].setName("Knight");
 		piece[wkN+i].setAbbr('N' + 2*i);
 		piece[wkN+i].setValue(N_VAL);
+		piece[wkN+i].setType(1);
 
 		piece[wkR+i].setName("Rook");
 		piece[wkR+i].setAbbr('R' + 2*i);
 		piece[wkR+i].setValue(R_VAL);
+		piece[wkR+i].setType(0);
 	}
 	for (int s = 0; s <= 16; s += 16) 
 		for (int i = 0; i < 8; i++) { 
 			piece[wPa+i+s].setName("Pawn");
 			piece[wPa+i+s].setAbbr('P' + 2*s);
 			piece[wPa+i+s].setValue(P_VAL);
+			piece[wPa+i+s].setType(5);
 		}
 
 	//Set colors
@@ -255,6 +315,28 @@ void Board::placePieces(std::string FEN) {
 			piece[bqR].decrMoved();
 		index++;
 	}
+	//Update canCastle vars
+	if (piece[wK].getMoved()) {
+		canCastleZ[WHITE][0] = false;
+		canCastleZ[WHITE][1] = false;
+	}
+	else {
+		if (piece[wqR].getMoved())
+			canCastleZ[WHITE][1] = false;
+		if (piece[wkR].getMoved())
+			canCastleZ[WHITE][0] = false;
+	}
+	if (piece[bK].getMoved()) {
+		canCastleZ[BLACK][0] = false;
+		canCastleZ[BLACK][1] = false;
+	}
+	else {
+		if (piece[bqR].getMoved())
+			canCastleZ[BLACK][1] = false;
+		if (piece[bkR].getMoved())
+			canCastleZ[BLACK][0] = false;
+	}
+	
 
 	//Set en passant square
 	int epSq = 0;
@@ -315,6 +397,7 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 			genOrderedMoveList();
 			checkCheck(getSide());
 			std::cout << "Current FEN: " << getFEN() << '\n';
+			std::cout << "Current Zobrist: " << zobrist.key << '\n';
 			if (drawCheck())
 				std::cout << "Draw\n";
 		}
@@ -344,6 +427,7 @@ void Board::botMove() {
 	checkCheck(side);
 	std::cout << "White material: " << whiteMaterial << " Black material: " << blackMaterial << '\n';
 	std::cout << "Current FEN: " << getFEN() << '\n';
+	std::cout << "Current Zobrist: " << zobrist.key << '\n';
 	if (drawCheck())
 		std::cout << "Draw!\n";
 }
