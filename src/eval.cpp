@@ -19,6 +19,15 @@ int flip[64] = { 63, 62, 61, 60, 59, 58, 57, 56,
 		  7,  6,  5,  4,  3,  2,  1,  0 };
 
 int Board::eval() {
+	int reverse[64] = { 56, 57, 58, 59, 60, 61, 62, 63,
+		 	    48, 49, 50, 51, 52, 53, 54, 55,
+		            40, 41, 42, 43, 44, 45, 46, 47,
+		  	    32, 33, 34, 35, 36, 37, 38, 39,
+			    24, 25, 26, 27, 28, 29, 30, 31,
+			    16, 17, 18, 19, 20, 21, 22, 23,
+			     8,  9, 10, 11, 12, 13, 14, 15,
+			     0,  1,  2,  3,  4,  5,  6,  7 };
+
 	static int pawnTable[64] = { 0,  0,  0,  0,  0,  0,  0,  0,
 				     5,	10, 10,-20,-20, 10, 10,  5,
 				     5, -5,-10,  0,  0,-10, -5,  5,
@@ -118,27 +127,27 @@ int Board::eval() {
 	//---Black pieces
 	for (int i = bqR; i <= bkR; i += bkR-bqR)
 		if (piece[i].getAlive())
-			score -= rookTable[flip[to64(piece[i].getPos())-1]];
+			score -= rookTable[reverse[to64(piece[i].getPos())-1]];
 	for (int i = bqN; i <= bkN; i += bkN-bqN)
 		if (piece[i].getAlive())
-			score -= knightTable[flip[to64(piece[i].getPos())-1]];
+			score -= knightTable[reverse[to64(piece[i].getPos())-1]];
 	for (int i = bqB; i <= bkB; i += bkB-bqB)
 		if (piece[i].getAlive())
-			score -= bishopTable[flip[to64(piece[i].getPos())-1]];
+			score -= bishopTable[reverse[to64(piece[i].getPos())-1]];
 	if (piece[bQ].getAlive())
-		score -= queenTable[flip[to64(piece[bQ].getPos())-1]];
+		score -= queenTable[reverse[to64(piece[bQ].getPos())-1]];
 	if (piece[bK].getAlive()) {
 		if (blackMaterial <= ENDGAME_VAL)
-			score -= kingTable2[flip[to64(piece[wK].getPos())-1]];
+			score -= kingTable2[reverse[to64(piece[wK].getPos())-1]];
 		else
-			score -= kingTable1[flip[to64(piece[wK].getPos())-1]];
+			score -= kingTable1[reverse[to64(piece[wK].getPos())-1]];
 	}
 	for (int i = bPa; i <= bPh; i++) {
 		if (piece[i].getAlive()) {
 			if (piece[i].getValue() == P_VAL)
-				score -= pawnTable[flip[to64(piece[i].getPos())-1]];
+				score -= pawnTable[reverse[to64(piece[i].getPos())-1]];
 			else
-				score -= queenTable[flip[to64(piece[i].getPos())-1]];
+				score -= queenTable[reverse[to64(piece[i].getPos())-1]];
 		}
 	}
 
