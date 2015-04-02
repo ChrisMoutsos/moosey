@@ -269,49 +269,22 @@ bool Board::canCastle(int dir, bool s) {
 	return true;
 }
 
-bool Board::drawCheck(bool bot) {
+int Board::drawCheck() const {
 	int lastPly = movesMade.size();
 
-	if (lastPly < 2|| lastPly - moveInfo.back().halfMoveClock < 4)
+	if (lastPly < 4)
 		return false;
 
-	std::string lastFEN;
-	//If a bot is calling this, we have to get the current FEN
-	//because the FEN is added to moveInfo after an official move is made
-	lastFEN = bot ? getFEN() : moveInfo[lastPly-1].FEN;
+	int count = 0;
 
-	int count = 0, cut1 = 4, cut2;
-	if (moveInfo.back().halfMoveClock > 9) { 
-		cut1++;
-		if (moveInfo.back().halfMoveClock > 99) 
-			cut1++;
-	}
-	if (lastPly/2 + 1 > 9) {
-		cut1++;
-		if (lastPly/2 + 1 > 99)
-			cut1++;
-	}
-
-	for (int j = lastPly - 3; j >= lastPly - moveInfo.back().halfMoveClock; j -= 2) {
-		cut2 = 5;
-		if (moveInfo[j].halfMoveClock > 9) {
-			cut2++;
-			if (moveInfo[j].halfMoveClock > 99)
-				cut2++;
-		}
-		if (lastPly/2 + 1 - (j/2 + 1) > 9) {
-			cut2++;
-			if (lastPly/2 + 1 - (j/2 + 1) > 99) 
-				cut2++;
-		}
-		if (lastFEN.substr(0, lastFEN.length() - cut1) ==
-		    moveInfo[j].FEN.substr(0, moveInfo[j].FEN.length() - cut2)) {
+	for (int j = lastPly - 3; j >= lastPly - moveInfo.back().halfMoveClock - 1; j -= 2) {
+		if (j < 0) break;
+		if (moveInfo[lastPly-1].zobrist == moveInfo[j].zobrist) {
 			count++;
-			if (count == 1)
-				return true;
+			if (count == 2)
+				return 2;
 		}
 	}
-
-	return false;
-
+	
+	return count;
 }

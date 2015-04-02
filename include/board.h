@@ -23,8 +23,7 @@ struct info {
 	int pieceMoved;
 	int prevOnMoveTo;
 	int halfMoveClock;
-	std::string FEN;
-	long zobrist;
+	unsigned long zobrist;
 };
 
 class Board {
@@ -108,7 +107,7 @@ class Board {
 		bool checkCheck(bool s, std::vector<int>& moveList);
 		bool inCheck(bool s) const;
 		bool canCastle(int dir, bool s);
-		bool drawCheck(bool bot = false);
+		int drawCheck() const;
 	
 		//MOVEGEN.CPP
 		void genOrderedMoveList();

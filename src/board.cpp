@@ -15,10 +15,10 @@
 
 Board::Board() { 
 	initializeVars();
-	initializeZobrist();
 	emptyBoard();
 	initializePieces();
 	placePiecesDefault();	
+	initializeZobrist();
 	setSquarePositions();
 	setSpriteClips();	
 	setButtons();
@@ -33,6 +33,8 @@ Board::Board(std::string FEN) {
 	setSpriteClips();	
 	setButtons();
 	placePieces(FEN);
+	initializeZobrist();
+	moveInfo[0].zobrist = zobrist.key;
 }
 
 void Board::initializeZobrist() {
@@ -374,8 +376,7 @@ void Board::placePieces(std::string FEN) {
 	if (!side) ply++;
 
 	//Update moveInfo
-	moveInfo.push_back({0, epSq, -1, -1, halfMoveClock, getFEN()});
-	
+	moveInfo.push_back({0, epSq, -1, -1, halfMoveClock});
 }
 
 void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
@@ -393,7 +394,6 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 			setMove(mF, mT);
 			movePiece();
 			changeTurn();
-			moveInfo.back().FEN = getFEN();
 			genOrderedMoveList();
 			checkCheck(getSide());
 			std::cout << "Current FEN: " << getFEN() << '\n';
@@ -417,12 +417,19 @@ void Board::botMove() {
 		move = whiteBot.think(*this, whiteBot.getLevel());
 	else
 		move = blackBot.think(*this, blackBot.getLevel());
+
+	if (move == -1) {
+		std::cout << "Draw by repetition.\n";
+		sideInCheckmate = 3;
+		return;
+	}
+
 	setMove(move/100, move%100);
+	std::cout << "move: " << move << '\n';
 	movePiece();
 	if (!muted)
 		Mix_PlayChannel(-1, mFSound, 0);
 	changeTurn();
-	moveInfo.back().FEN = getFEN();
 	genOrderedMoveList();
 	checkCheck(side);
 	std::cout << "White material: " << whiteMaterial << " Black material: " << blackMaterial << '\n';

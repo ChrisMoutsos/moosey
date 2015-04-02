@@ -181,7 +181,7 @@ void Board::movePiece(int mF, int mT) {
 	zobrist.key ^= zobrist.side;
 	//Update move info, increase ply
 	moveInfo.push_back({localPmSq, localEpSq, board120[mT],
-			    localPrevOnMoveTo, localHalfMoveClock});
+			    localPrevOnMoveTo, localHalfMoveClock, zobrist.key});
 	ply++;
 }
 
