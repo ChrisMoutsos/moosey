@@ -48,10 +48,12 @@ bool Button::handleEvent(SDL_Event* e, Board& b) {
 					case SDL_MOUSEBUTTONDOWN:
 					clicking = true;
 					if (!muted) {
-						if (butt == 25)
+						if (butt == 25 && !start)
 							Mix_PlayChannel(-1, mTSound, 0);
-						else
-							Mix_PlayChannel(-1, mFSound, 0);
+						else {
+							if ((butt > 1 && !start) || butt < 2)
+								Mix_PlayChannel(-1, mFSound, 0);
+						}
 					}
 					//Restart button
 					if (butt == 0) {
@@ -64,25 +66,25 @@ bool Button::handleEvent(SDL_Event* e, Board& b) {
 						return true;
 					}
 					//White, "Human"
-					else if (butt == 2)
+					else if (butt == 2 && !start)
 						b.setWhiteIsBot(false);
 					//White, "Computer"
-					else if (butt == 3)
+					else if (butt == 3 && !start)
 						b.setWhiteIsBot(true);
 					//Black, "Human"
-					else if (butt == 4)
+					else if (butt == 4 && !start)
 						b.setBlackIsBot(false);
 					//Black, "Computer"
-					else if (butt == 5)
+					else if (butt == 5 && !start)
 						b.setBlackIsBot(true);
 					//White computer levels 1-9
-					else if (butt >= 6 && butt <= 14 && b.getWhiteIsBot())
+					else if (butt >= 6 && butt <= 14 && b.getWhiteIsBot() && !start)
 						b.whiteBot.setLevel(butt-5);
 					//Black computer levels 1-9
-					else if (butt >= 15 && butt <= 23 && b.getBlackIsBot())
+					else if (butt >= 15 && butt <= 23 && b.getBlackIsBot() && !start)
 						b.blackBot.setLevel(butt-14);
 					//Flip board
-					else if (butt == 24) 
+					else if (butt == 24 && !start) 
 						b.flipBoard();
 					//Start
 					else if (butt == 25)
