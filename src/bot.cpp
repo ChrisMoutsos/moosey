@@ -138,6 +138,9 @@ int Bot::think(Board& b, int depth) {
 	if (prinVarLine.move[0] == 0)
 		std::cout << "Stalemate!\n";
 
+	if (bestScore == 0)
+		return -1;
+
 	return prinVarLine.move[0];
 }
 
@@ -158,14 +161,19 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 	}
 
 	//Repetition detection
-	if (depthGone == 1)
-		if (b.drawCheck(1)) {
+/*
+	if (allowNull) {
+		int drawCheck = b.drawCheck();
+		if (drawCheck == 2) {
 			pline->count = 0;
-			if (s)
-				return b.getWhiteMaterial() > b.getBlackMaterial() ? -8000 : 8000;
-			else 
-				return b.getBlackMaterial() > b.getWhiteMaterial() ? -8000 : 8000;
+			return 0;
 		}
+		if (drawCheck == 1) {
+			pline->count = 0;
+			return 0;
+		}
+	}
+*/
 
 	//Horizon nodes, quiescence search
 	if (depthLeft <= 0) {
