@@ -54,7 +54,7 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 				else if (mF != -1) {
 					if ((s && piece <= 15) || (!s && piece >= 16)) {
 						if (piece != noPiece) {
-							mF = square;
+							mF = square; 
 							dragging = true;
 							if (!muted)
 								Mix_PlayChannel(-1, mFSound, 0);

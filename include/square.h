@@ -34,6 +34,7 @@ class Square {
 		void setPiece(int p) { piece = p; };
 		void setSq(int i) { square = i; };
 		void setDragging(bool x) { dragging = x; };
+
 	private:
 		bool dragging;
 		int square, piece;
