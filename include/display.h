@@ -31,7 +31,7 @@ void displayBotText(const Board& b);
 void updateText(const Board& b, bool& sidey);
 void drawButtons(const Board& b);
 void drawSquares(const Board& b, const int& mF = -1, const int& mT = -1);
-void drawPieces(const Board& b, const int& mF = -1, const int& mT = -1);
+void drawPieces(Board& b, const int& mF = -1, const int& mT = -1);
 void drawBorder();
 void drawMoveTable(const Board&);
 void drawTitleScreen(const Board&);

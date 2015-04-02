@@ -232,22 +232,18 @@ void drawSquares(const Board& b, const int& mF, const int& mT) {
 	}
 }
 
-void drawPieces(const Board& b, const int& mF, const int& mT) {
-	int p, sq, flipSq, x, y, putOnTop = -1;
+void drawPieces(Board& b, const int& mF, const int& mT) {
+	b.setSquarePositions();
+
+	int p, sq, x, y, putOnTop = -1;
 	SDL_Rect sqPos;
 	SDL_Rect clipSq, pOTClipSq;
 	for (int r = 1; r <= 8; r++) {
 		for (int f = 1; f <= 8; f++) {
 			sq = FR2SQ64(f, r)-1;
-			flipSq = flip[sq];
-			if (!b.getFlipped()) 
-				sqPos = {b.squares[sq].getX(), 	//X start
-					 b.squares[sq].getY(), 	//Y start
-					 SQ_SIZE, SQ_SIZE};	//Width, height of square
-			else
-				sqPos = {b.squares[flipSq].getX(), //X start
-					 b.squares[flipSq].getY(), //Y start
-					 SQ_SIZE, SQ_SIZE};	   //Width, height of square
+			sqPos = {b.squares[sq].getX(), 	//X start
+				 b.squares[sq].getY(), 	//Y start
+				 SQ_SIZE, SQ_SIZE};	//Width, height of square
 		
 			p = b.squares[sq].getPiece();
 			if (p == wqR || p == wkR)
@@ -286,7 +282,7 @@ void drawPieces(const Board& b, const int& mF, const int& mT) {
 			if (p != empty) { 
 				//Save piece being dragged, to rerender on top
 				if (b.squares[sq].getDragging()) {
-					putOnTop = b.getFlipped() ? flipSq : sq;
+					putOnTop = sq;
 					pOTClipSq = clipSq;
 				}
 				else	//Every other piece

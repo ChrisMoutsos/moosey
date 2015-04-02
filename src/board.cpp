@@ -36,10 +36,19 @@ Board::Board(std::string FEN) {
 
 void Board::setSquarePositions() {
 	//Set positions of the squares in the display
-	for (int i = 0; i < 64; i++) {
-		squares[i].setPos(BXSTART+(SQ_SIZE*(i%8)),
-				  BYSTART+B_SIZE-(SQ_SIZE*(i/8+1)));
-		squares[i].setSq(i+1);
+	if (!flipped) {
+		for (int i = 0; i < 64; i++) {
+			squares[i].setPos(BXSTART+(SQ_SIZE*(i%8)),
+					  BYSTART+B_SIZE-(SQ_SIZE*(i/8+1)));
+			squares[i].setSq(i+1);
+		}
+	}
+	else {
+		for (int i = 0; i < 64; i++) {
+			squares[i].setPos(BXSTART+B_SIZE-(SQ_SIZE*(i%8+1)),
+					  BYSTART+(SQ_SIZE*(i/8)));
+			squares[i].setSq(i+1);
+		}
 	}
 }
 
