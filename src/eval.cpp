@@ -182,6 +182,20 @@ int Board::eval() {
 	if (whiteCastled) score += 50;
 	if (blackCastled) score -= 50;
 
+	//Ability to castle
+	if (!whiteCastled) {
+		if (piece[wK].getMoved())
+			score -= 50;
+		else if (piece[wqR].getMoved() && piece[wkR].getMoved())
+			score -= 50;
+	}
+	if (!blackCastled) {
+		if (piece[bK].getMoved())
+			score += 50;
+		else if (piece[bqR].getMoved() && piece[bkR].getMoved())
+			score += 50;
+	}
+
 	//Passed pawns
 	int blackPawnsOnFile[8] = {0}, whitePawnsOnFile[8] = {0};
 	int file = 0;
