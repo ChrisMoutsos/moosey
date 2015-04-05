@@ -7,9 +7,9 @@
 
 #include <iostream>
 #include <algorithm>
+#include <SDL2/SDL.h>
 #include "common.h"
 #include "display.h"
-#include <SDL2/SDL.h>
 #include "board.h"
 
 void Board::genOrderedMoveList() {
