@@ -10,6 +10,10 @@
 #include "board.h"
 
 int Board::eval() {
+	enum eval_t { BISHOPPAIR = 50, CASTLED = 50, CASTLINGRIGHTS = 50, 
+		      PASSEDPAWN = 50, DOUBLEDPAWN = 50, OPENFILEROOK = 50
+	};
+
 	int reverse[64] = { 56, 57, 58, 59, 60, 61, 62, 63,
 		 	    48, 49, 50, 51, 52, 53, 54, 55,
 		            40, 41, 42, 43, 44, 45, 46, 47,
@@ -165,26 +169,26 @@ int Board::eval() {
 
 	//Bishop pair
 	if (piece[wqB].getAlive() && piece[wkB].getAlive())
-		score += 50;
+		score += BISHOPPAIR;
 	if (piece[bqB].getAlive() && piece[bkB].getAlive())
-		score -= 50;
+		score -= BISHOPPAIR;
 
 	//Castled
-	if (whiteCastled) score += 50;
-	if (blackCastled) score -= 50;
+	if (whiteCastled) score += CASTLED;
+	if (blackCastled) score -= CASTLED;
 
 	//Ability to castle
 	if (!whiteCastled) {
 		if (piece[wK].getMoved())
-			score -= 50;
+			score -= CASTLINGRIGHTS;
 		else if (piece[wqR].getMoved() && piece[wkR].getMoved())
-			score -= 50;
+			score -= CASTLINGRIGHTS;
 	}
 	if (!blackCastled) {
 		if (piece[bK].getMoved())
-			score += 50;
+			score += CASTLINGRIGHTS;
 		else if (piece[bqR].getMoved() && piece[bkR].getMoved())
-			score += 50;
+			score += CASTLINGRIGHTS;
 	}
 
 	//Passed pawns
@@ -204,18 +208,18 @@ int Board::eval() {
 		if (p == wPa) {
 			if (blackPawnsOnFile[file] == 0 &&
 			    blackPawnsOnFile[file-1] == 0)
-				score += 50;
+				score += PASSEDPAWN;
 		}
 		else if (p == wPh) {
 			if (blackPawnsOnFile[file-1] == 0 &&
 			    blackPawnsOnFile[file-2] == 0)
-				score += 50;
+				score += PASSEDPAWN;
 		}
 		else {
 			if (blackPawnsOnFile[file-2] == 0 &&
 			    blackPawnsOnFile[file-1] == 0 &&
 			    blackPawnsOnFile[file] == 0)
-				score += 50;
+				score += PASSEDPAWN;
 		}
 	}
 	for (int p = bPa; p <= bPh; p++) {
@@ -224,18 +228,18 @@ int Board::eval() {
 		if (p == bPa) {
 			if (whitePawnsOnFile[file] == 0 &&
 			    whitePawnsOnFile[file-1] == 0)
-				score -= 50;
+				score -= PASSEDPAWN;
 		}
 		else if (p == bPh) {
 			if (whitePawnsOnFile[file-1] == 0 &&
 			    whitePawnsOnFile[file-2] == 0)
-				score -= 50;
+				score -= PASSEDPAWN;
 		}
 		else {
 			if (whitePawnsOnFile[file-2] == 0 &&
 			    whitePawnsOnFile[file-1] == 0 &&
 			    whitePawnsOnFile[file] == 0)
-				score -= 50;
+				score -= PASSEDPAWN;
 		}
 	}
 
@@ -243,9 +247,9 @@ int Board::eval() {
 	//Doubled pawns
 	for (int f = 0; f < 8; f++) {
 		if (whitePawnsOnFile[f] > 1)
-			score -= (whitePawnsOnFile[f]-1)*50;
+			score -= (whitePawnsOnFile[f]-1)*DOUBLEDPAWN;
 		if (blackPawnsOnFile[f] > 1)
-			score += (blackPawnsOnFile[f]-1)*50;
+			score += (blackPawnsOnFile[f]-1)*DOUBLEDPAWN;
 	}
 
 	//Open filed rooks
@@ -275,7 +279,7 @@ int Board::eval() {
 				}
 			}
 			if (open)
-				score = (j == wqR) ? score+50 : score-50;
+				score = (j == wqR) ? score+OPENFILEROOK : score-OPENFILEROOK;
 		}
 	}
 
