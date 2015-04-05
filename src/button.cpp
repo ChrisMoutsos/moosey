@@ -19,6 +19,7 @@ Button::Button() {
 	w = h = 0;
 	inside = clicking = false;
 	butt = 0;
+	boardPtr = NULL;
 }
 
 void Button::setPos(int x, int y) {
@@ -31,7 +32,7 @@ void Button::setSize(int x, int y) {
 	setH(y);
 }
 
-bool Button::handleEvent(SDL_Event* e, Board& b) {
+bool Button::handleEvent(SDL_Event* e) {
 		int x, y;
 		SDL_GetMouseState(&x, &y);
 		inside = true;
@@ -57,35 +58,37 @@ bool Button::handleEvent(SDL_Event* e, Board& b) {
 					}
 					//Restart button
 					if (butt == 0) {
-						b.restart();
+						boardPtr->restart();
 						return true;
 					}
 					//Undo button
 					else if (butt == 1) {
-						b.undoMove();
+						boardPtr->undoMove();
 						return true;
 					}
 					//White, "Human"
 					else if (butt == 2 && !start)
-						b.setWhiteIsBot(false);
+						boardPtr->setWhiteIsBot(false);
 					//White, "Computer"
 					else if (butt == 3 && !start)
-						b.setWhiteIsBot(true);
+						boardPtr->setWhiteIsBot(true);
 					//Black, "Human"
 					else if (butt == 4 && !start)
-						b.setBlackIsBot(false);
+						boardPtr->setBlackIsBot(false);
 					//Black, "Computer"
 					else if (butt == 5 && !start)
-						b.setBlackIsBot(true);
+						boardPtr->setBlackIsBot(true);
 					//White computer levels 1-9
-					else if (butt >= 6 && butt <= 14 && b.getWhiteIsBot() && !start)
-						b.whiteBot.setLevel(butt-5);
+					else if (butt >= 6 && butt <= 14 &&
+						 boardPtr->getWhiteIsBot() && !start)
+						boardPtr->whiteBot.setLevel(butt-5);
 					//Black computer levels 1-9
-					else if (butt >= 15 && butt <= 23 && b.getBlackIsBot() && !start)
-						b.blackBot.setLevel(butt-14);
+					else if (butt >= 15 && butt <= 23 && 
+						 boardPtr->getBlackIsBot() && !start)
+						boardPtr->blackBot.setLevel(butt-14);
 					//Flip board
 					else if (butt == 24 && !start) 
-						b.flipBoard();
+						boardPtr->flipBoard();
 					//Start
 					else if (butt == 25)
 						start = true;

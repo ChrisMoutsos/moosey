@@ -16,7 +16,7 @@ class Button {
 	public:
 		Button();
 
-		bool handleEvent(SDL_Event* e, Board& b);
+		bool handleEvent(SDL_Event* e);
 
 		//ACCESSORS
 		int getX() const { return pos.x; };
@@ -33,7 +33,9 @@ class Button {
 		void setW(int x) { w = x > 0 ? x : 0; };
 		void setH(int x) { h = x > 0 ? x : 0; };
 		void setSize(int x, int y);
+		void setBoardPtr(Board * b) { boardPtr = b; };
 	private:
+		Board * boardPtr;
 		int butt;	//Which button it is
 		int w, h;
 		bool inside, clicking;

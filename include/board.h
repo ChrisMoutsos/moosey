@@ -15,6 +15,7 @@
 #include "piece.h"
 #include "bot.h"
 #include "zobrist.h"
+#include "display.h"
 
 //For moveInfo vector
 struct info {
@@ -49,6 +50,7 @@ class Board {
 		void changeTurn();
 		void undoMove();
 		void restart();
+		void updateDisplay(const int& mF, const int& mT);
 		//ACCESSORS
 		int getMoveFrom() const { return moveFrom; };
 		int getMoveTo() const { return moveTo; };
@@ -140,6 +142,7 @@ class Board {
 
 		Bot whiteBot, blackBot; //The bots
 	private:
+		Display display;
 		int board120[120], moveFrom, moveTo, ply;
 		int whiteMaterial, blackMaterial, castling;
 		//For the line below.. 0: none, 1: white, 2: black 

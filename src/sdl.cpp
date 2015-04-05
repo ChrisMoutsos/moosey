@@ -87,25 +87,14 @@ bool loadMedia() {
 
 	if (Garamond28 == NULL || Garamond26 == NULL)
 		success = false;
-	else if (Cicero26 == NULL || Cicero22 == NULL)
+	if (Cicero26 == NULL || Cicero22 == NULL)
 		success = false;
-	else 
-		textColor = {0, 0, 0};
 
 	mFSound = Mix_LoadWAV("../res/moveFrom.wav");
 	if (mFSound == NULL)
 		success = false;
 	mTSound = Mix_LoadWAV("../res/moveTo.wav");	
 	if (mTSound == NULL)
-		success = false;
-	
-	if (!spriteSheetTexture.loadFromFile("../res/spritesheet2.bmp"))
-		success = false;
-	if (!buttonTexture.loadFromFile("../res/buttons.bmp"))
-		success = false;
-	if (!titleTexture.loadFromFile("../res/mooseytitle.bmp"))
-		success = false;
-	if (!titleTextTexture.loadFromFile("../res/titletext.bmp"))
 		success = false;
 	
 	SDL_Surface* icon = IMG_Load("../res/icon.png");	
@@ -115,13 +104,6 @@ bool loadMedia() {
 }
 
 void close_SDL() {
-	//Free loaded images
-	spriteSheetTexture.free();
-	buttonTexture.free();
-	titleTexture.free();
-	titleTextTexture.free();
-
-	//Free sounds
 	Mix_FreeChunk(mFSound);
 	Mix_FreeChunk(mTSound);
 	mFSound = NULL;

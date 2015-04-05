@@ -10,31 +10,33 @@
 #include <SDL2/SDL_mixer.h>
 #include "common.h"
 #include "board.h"
-#include "display.h"
-#include "button.h"
 
-Board::Board() { 
+Board::Board() : display(this) { 
 	initializeVars();
 	emptyBoard();
 	initializePieces();
 	placePiecesDefault();	
 	initializeZobrist();
 	setSquarePositions();
-	setSpriteClips();	
-	setButtons();
+	display.setSpriteClips();	
+	display.setButtons();
 }
 
-Board::Board(std::string FEN) {
+Board::Board(std::string FEN) : display(this) {
 	std::cout << "Loading FEN: " << FEN << '\n';
 	initializeVars();
 	emptyBoard();
 	initializePieces();
 	setSquarePositions();
-	setSpriteClips();	
-	setButtons();
+	display.setSpriteClips();	
+	display.setButtons();
 	placePieces(FEN);
 	initializeZobrist();
 	moveInfo[0].zobrist = zobrist.key;
+}
+
+void Board::updateDisplay(const int& mF, const int& mT) {
+	display.displayBoard(mF, mT);
 }
 
 void Board::initializeZobrist() {
@@ -89,15 +91,17 @@ void Board::setSquarePositions() {
 	//Set positions of the squares in the display
 	if (!flipped) {
 		for (int i = 0; i < 64; i++) {
-			squares[i].setPos(BXSTART+(SQ_SIZE*(i%8)),
-					  BYSTART+B_SIZE-(SQ_SIZE*(i/8+1)));
+			squares[i].setPos(display.getBoardXStart()+(display.getSqSize()*(i%8)),
+					  display.getBoardYStart()+display.getBoardSize()-
+					  (display.getSqSize()*(i/8+1)));
 			squares[i].setSq(i+1);
 		}
 	}
 	else {
 		for (int i = 0; i < 64; i++) {
-			squares[i].setPos(BXSTART+B_SIZE-(SQ_SIZE*(i%8+1)),
-					  BYSTART+(SQ_SIZE*(i/8)));
+			squares[i].setPos(display.getBoardXStart()+display.getBoardSize()
+					  -(display.getSqSize()*(i%8+1)),
+					  display.getBoardYStart()+(display.getSqSize()*(i/8)));
 			squares[i].setSq(i+1);
 		}
 	}
@@ -380,9 +384,7 @@ void Board::placePieces(std::string FEN) {
 }
 
 void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
-	for (int i = 0; i < 26; i++) 
-		if (buttons[i].handleEvent(e, *this)) 
-			mF = mT = -1;
+	display.handleButtons(e);
 
 	for (int i = 0; i < 64; i++)
 		squares[i].handleEvent(e, mF, mT, side);
@@ -411,7 +413,7 @@ void Board::botMove() {
 	std::cout << "Thinking for ";
 	side ? std::cout << "White..." : std::cout << "Black...";
 	std::cout << " (ply " << ply+1 << ", move " << ply/2 + 1 << ")\n";
-	displayBotText(*this);
+	display.displayBotText();
 	int move = 0;
 	if (side)
 		move = whiteBot.think(*this, whiteBot.getLevel());

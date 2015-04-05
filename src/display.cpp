@@ -10,25 +10,36 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "board.h"
 #include "common.h"
 #include "sdl.h"
-#include "board.h"
-#include "ltexture.h"
-#include "button.h"
 #include "display.h"
 
-SDL_Rect spriteClips[12], buttonClips[6], titleTextClips[27];
-Button buttons[26];
-LTexture spriteSheetTexture, buttonTexture, titleTexture, titleTextTexture;
-LTexture turnText, checkText, moveText, rankText, fileText;
-SDL_Color textColor;
+Display::Display(Board * b) : boardPtr(b),
+			      B_SIZE(600), SQ_SIZE(75), BXSTART(50), 
+			      BYSTART(25)
+{
+	textColor = { 0, 0, 0 };
+	sideFlag = !boardPtr->getSide();
+	for (int i = 0; i < 26; i++)
+		buttons[i].setBoardPtr(boardPtr);
+	spriteSheetTexture.loadFromFile("../res/spritesheet2.bmp");
+	buttonTexture.loadFromFile("../res/buttons.bmp");
+	titleTexture.loadFromFile("../res/mooseytitle.bmp");
+	titleTextTexture.loadFromFile("../res/titletext.bmp");
+}
 
-void displayBoard(Board& b, const int& mF, const int& mT) {
+Display::~Display() {
+	spriteSheetTexture.free();
+	buttonTexture.free();
+	titleTexture.free();
+	titleTextTexture.free();
+}
+
+void Display::displayBoard(const int& mF, const int& mT) {
 	using std::string;
 
-	static bool sidey = !b.getSide(); //Keeps track of if text needs to be updated
-	string rankStr, fileStr;
-	if (!b.getFlipped())
+	if (!boardPtr->getFlipped())
 		fileStr = "a         b        c         d         e         f         g         h";
 	else
 		fileStr = "h         g        f         e         d         c         b         a";
@@ -37,20 +48,20 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 	SDL_SetRenderDrawColor(renderer, 209, 224, 255, 255);
 	SDL_RenderClear(renderer);
 
-	b.setPiecesOnSquares();	//Update piece positions
-	drawSquares(b, mF, mT);	//Draw the squares
-	drawPieces(b, mF, mT);	//Draw pieces on squares
-	drawBorder();		//Draw border around board
+	boardPtr->setPiecesOnSquares();	//Update piece positions
+	drawSquares(mF, mT);		//Draw the squares
+	drawPieces(mF, mT);		//Draw pieces on squares
+	drawBorder();			//Draw border around board
 
-	drawButtons(b);		//Draw buttons (undo, restart)
-	updateText(b, sidey);	//Updates text if someone moved
+	drawButtons();		//Draw buttons (undo, restart)
+	updateText();		//Updates text if someone moved
 	if (start)
-		drawMoveTable(b);	//Draw movetable (with text)
+		drawMoveTable();	//Draw movetable (with text)
 	else	
-		drawTitleScreen(b);	//Draw title screen
+		drawTitleScreen();	//Draw title screen
 
 	//Draw rank numbers
-	if (!b.getFlipped())
+	if (!boardPtr->getFlipped())
 		for (char i = '8'; i >= '1'; i--) {
 			rankStr = i;
 			rankText.loadFromRenderedText(rankStr, textColor, Cicero26);
@@ -73,7 +84,7 @@ void displayBoard(Board& b, const int& mF, const int& mT) {
 	SDL_RenderPresent(renderer);
 }
 
-void setButtons() {
+void Display::setButtons() {
 	for (int i = 0; i < 26; i++)
 		buttons[i].setButt(i);
 	//Restart and undo
@@ -101,7 +112,7 @@ void setButtons() {
 	buttons[25].setSize(titleTextClips[25].w, titleTextClips[25].h);
 }
 
-void setSpriteClips() {
+void Display::setSpriteClips() {
 	for (int i = 0; i < 12; i++) {
 		spriteClips[i].x = i%6*SQ_SIZE;
 		spriteClips[i].y = i/6*SQ_SIZE;
@@ -158,35 +169,35 @@ void setSpriteClips() {
 	titleTextClips[26].h = 40;
 }
 
-void displayBotText(const Board& b) {
+void Display::displayBotText() {
 	std::string botStr;
 
-	botStr = b.getSide() ? "White" : "Black";
+	botStr = boardPtr->getSide() ? "White" : "Black";
 	botStr += " is thinking..";
 	turnText.loadFromRenderedText(botStr, textColor, Garamond26);
 	turnText.render(BXSTART, BYSTART+B_SIZE+40);
 	SDL_RenderPresent(renderer);
 }
 
-void updateText(const Board& b, bool& sidey) {
+void Display::updateText() {
 	std::string checkStr = " ";
-	if (sidey != b.getSide() || b.getNumMovesMade() == 0) {
-		sidey = b.getSide();
-		if (b.getSideInCheck()) { //Load check text
-			if (b.getSideInCheckmate() == 1)
+	if (sideFlag != boardPtr->getSide() || boardPtr->getNumMovesMade() == 0) {
+		sideFlag = boardPtr->getSide();
+		if (boardPtr->getSideInCheck()) { //Load check text
+			if (boardPtr->getSideInCheckmate() == 1)
 				checkStr = "Black wins!";
-			else if (b.getSideInCheckmate() == 2) 
+			else if (boardPtr->getSideInCheckmate() == 2) 
 				checkStr = "White wins!";
-			else if (b.getSideInCheck() == 1)
+			else if (boardPtr->getSideInCheck() == 1)
 				checkStr = "White is in check";
-			else if (b.getSideInCheck() == 2)
+			else if (boardPtr->getSideInCheck() == 2)
 				checkStr = "Black is in check";
 		}
 		checkText.loadFromRenderedText(checkStr, textColor, Garamond26);
 	}
 }
 
-void drawButtons(const Board& b) {
+void Display::drawButtons() {
 	SDL_Rect clipSq;
 	for (int i = 0; i < 2; i++) {
 		if (buttons[i].getInside())
@@ -197,7 +208,7 @@ void drawButtons(const Board& b) {
 	}
 }
 
-void drawBorder() {
+void Display::drawBorder() {
 	SDL_Rect borderRect = {BXSTART, BYSTART, B_SIZE, B_SIZE};
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderDrawRect(renderer, &borderRect);
@@ -205,17 +216,17 @@ void drawBorder() {
 	SDL_RenderDrawRect(renderer, &borderRect);
 }
 
-void drawSquares(const Board& b, const int& mF, const int& mT) {
+void Display::drawSquares(const int& mF, const int& mT) {
 	int sq;
 	SDL_Rect sqPos;
 	for (int r = 1; r <= 8; r++) {
 		for (int f = 1; f <= 8; f++) {
 			sq = FR2SQ64(f, r)-1;
 			//If this square is clicked, or has had a move made on it (moveFrom)
-			if (mF == sq+1 || to64(b.getLastMove()/100) == sq+1)
+			if (mF == sq+1 || to64(boardPtr->getLastMove()/100) == sq+1)
 				SDL_SetRenderDrawColor(renderer, 248, 195, 248, 255);
 			//If this square is clicked, or has had a move made on it (moveTo)
-			else if (mT == sq+1 || to64(b.getLastMove()%100) == sq+1)
+			else if (mT == sq+1 || to64(boardPtr->getLastMove()%100) == sq+1)
 				SDL_SetRenderDrawColor(renderer, 238, 157, 242, 255);
 			//Otherwise, color light
 			else if ((r+f)%2 == 1)			
@@ -223,8 +234,8 @@ void drawSquares(const Board& b, const int& mF, const int& mT) {
 			//or color dark
 			else 						
 				SDL_SetRenderDrawColor(renderer, 0, 153, 153, 255);
-			sqPos = {b.squares[sq].getX(),	//X start
-				 b.squares[sq].getY(),	//Y start
+			sqPos = {boardPtr->squares[sq].getX(),	//X start
+				 boardPtr->squares[sq].getY(),	//Y start
 				 SQ_SIZE, SQ_SIZE};	//Width, height of square
 			SDL_RenderFillRect(renderer, &sqPos);
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -232,8 +243,8 @@ void drawSquares(const Board& b, const int& mF, const int& mT) {
 	}
 }
 
-void drawPieces(Board& b, const int& mF, const int& mT) {
-	b.setSquarePositions();
+void Display::drawPieces(const int& mF, const int& mT) {
+	boardPtr->setSquarePositions();
 
 	int p, sq, x, y, putOnTop = -1;
 	SDL_Rect sqPos;
@@ -241,11 +252,11 @@ void drawPieces(Board& b, const int& mF, const int& mT) {
 	for (int r = 1; r <= 8; r++) {
 		for (int f = 1; f <= 8; f++) {
 			sq = FR2SQ64(f, r)-1;
-			sqPos = {b.squares[sq].getX(), 	//X start
-				 b.squares[sq].getY(), 	//Y start
+			sqPos = {boardPtr->squares[sq].getX(), 	//X start
+				 boardPtr->squares[sq].getY(), 	//Y start
 				 SQ_SIZE, SQ_SIZE};	//Width, height of square
 		
-			p = b.squares[sq].getPiece();
+			p = boardPtr->squares[sq].getPiece();
 			if (p == wqR || p == wkR)
 				clipSq = spriteClips[wRook];		
 		    	else if (p == wqN || p == wkN)
@@ -257,7 +268,7 @@ void drawPieces(Board& b, const int& mF, const int& mT) {
 		    	else if (p == wK)
 				clipSq = spriteClips[wKing];		
 		    	else if (p >= wPa && p <= wPh) {
-				if (b.piece[b[from64(sq+1)]].getValue() == P_VAL)
+				if (boardPtr->piece[(*boardPtr)[from64(sq+1)]].getValue() == P_VAL)
 					clipSq = spriteClips[wPawn];
 				else
 					clipSq = spriteClips[wQueen];
@@ -273,7 +284,7 @@ void drawPieces(Board& b, const int& mF, const int& mT) {
 		    	else if (p == bK)
 				clipSq = spriteClips[bKing];		
 		    	else if (p >= bPa && p <= bPh) {
-				if (b.piece[b[from64(sq+1)]].getValue() == P_VAL)
+				if (boardPtr->piece[(*boardPtr)[from64(sq+1)]].getValue() == P_VAL)
 					clipSq = spriteClips[bPawn];
 				else
 					clipSq = spriteClips[bQueen];
@@ -281,7 +292,7 @@ void drawPieces(Board& b, const int& mF, const int& mT) {
 
 			if (p != empty) { 
 				//Save piece being dragged, to rerender on top
-				if (b.squares[sq].getDragging()) {
+				if (boardPtr->squares[sq].getDragging()) {
 					putOnTop = sq;
 					pOTClipSq = clipSq;
 				}
@@ -304,7 +315,7 @@ void drawPieces(Board& b, const int& mF, const int& mT) {
 	}
 }
 
-void drawMoveTable(const Board& b) {
+void Display::drawMoveTable() {
 	using std::string;
 	using std::vector;
 	static vector<string> plyStrings;
@@ -323,9 +334,9 @@ void drawMoveTable(const Board& b) {
 
 	static int extra = 0;
 	//Add "#. ... " if loaded from a FEN and black to move
-	if (b.getNumMovesMade() == 0) {
-		if (b.getSide() == BLACK) {
-			plyStr = std::to_string((b.getPly()-1)/2+1) + ". ";
+	if (boardPtr->getNumMovesMade() == 0) {
+		if (boardPtr->getSide() == BLACK) {
+			plyStr = std::to_string((boardPtr->getPly()-1)/2+1) + ". ";
 			plyStr += " ... ";
 			plyStrings.push_back(plyStr);
 			extra = 1;
@@ -333,21 +344,23 @@ void drawMoveTable(const Board& b) {
 		else extra = 0;
 	}
 
-	while ((int)plyStrings.size() > b.getNumMovesMade() + extra) 
+	while ((int)plyStrings.size() > boardPtr->getNumMovesMade() + extra) 
 		plyStrings.pop_back();
 
-	int lastMove = b.getNumMovesMade()-1+extra;
+	int lastMove = boardPtr->getNumMovesMade()-1+extra;
+	int oPos = 0;
 
 	//If a new move has been made
-	if ((int)plyStrings.size() < b.getNumMovesMade() + extra) {
-		mF2 = b.getLastMove()/100;
-		mT2 = b.getLastMove()%100;
-		if ((b.getPly()-1)%2 == 0)	//Add number in front for white's moves
-			plyStr = std::to_string((b.getPly()-1)/2+1) + ". ";
-		p = b.getPieceMoved(lastMove);
-		if (b.piece[p].getValue() == Q_VAL && b.getPmSq(lastMove) != mT2)
+	if ((int)plyStrings.size() < boardPtr->getNumMovesMade() + extra) {
+		mF2 = boardPtr->getLastMove()/100;
+		mT2 = boardPtr->getLastMove()%100;
+		if ((boardPtr->getPly()-1)%2 == 0)	//Add number in front for white's moves
+			plyStr = std::to_string((boardPtr->getPly()-1)/2+1) + ". ";
+		p = boardPtr->getPieceMoved(lastMove);
+		if (boardPtr->piece[p].getValue() == Q_VAL && 
+		    boardPtr->getPmSq(lastMove) != mT2)
 			plyStr += "Q";
-		else if (b.piece[p].getValue() == K_VAL) {
+		else if (boardPtr->piece[p].getValue() == K_VAL) {
 			if (mF2 == _E1 && (mT2 == _B1 || mT2 == _G1)) { //White castled
 				castling = true;
 				plyStr += (mT2 == _G1) ? "0-0" : "0-0-0";
@@ -359,14 +372,15 @@ void drawMoveTable(const Board& b) {
 			else
 				plyStr += "K";
 		}
-		else if (b.piece[p].getValue() == R_VAL) {
+		else if (boardPtr->piece[p].getValue() == R_VAL) {
 			plyStr += "R";
 			//Check same side and same piecetype, for ambiguous moves
-			otherPiece = !b.getSide() ? (p == 0 ? 7 : 0) : (p == 16 ? 23 : 16);
-			int oPos = b.piece[otherPiece].getPos(), e = 0, small, big;
+			otherPiece = !boardPtr->getSide() ? (p == 0 ? 7 : 0) : (p == 16 ? 23 : 16);
+			oPos = boardPtr->piece[otherPiece].getPos();
+			int e = 0, small, big;
 
-			if (b.piece[otherPiece].getAlive())
-				if (b.validateHozMove(oPos, mT2)) {
+			if (boardPtr->piece[otherPiece].getAlive())
+				if (boardPtr->validateHozMove(oPos, mT2)) {
 					dupMove = true;
 					//Make sure we're not needlessly disambiguating
 					if (oPos%10 == mT2%10)	//Same file
@@ -384,30 +398,30 @@ void drawMoveTable(const Board& b) {
 					}
 				}
 		}
-		else if (b.piece[p].getValue() == B_VAL) 
+		else if (boardPtr->piece[p].getValue() == B_VAL) 
 			plyStr += "B";
-		else if (b.piece[p].getValue() == N_VAL) { 
+		else if (boardPtr->piece[p].getValue() == N_VAL) { 
 			plyStr += "N";
 			//Check same side and same piecetype, for ambiguous moves
-			otherPiece = !b.getSide() ? (p == 1 ? 6 : 1) : (p == 17 ? 22 : 17);
-			if (b.piece[otherPiece].getAlive())
-				if (b.validateKnightMove(b.piece[otherPiece].getPos(), mT2))
+			otherPiece = !boardPtr->getSide() ? (p == wqN ? wkN : wqN) : (p == bqN ? bkN : bqN);
+			if (boardPtr->piece[otherPiece].getAlive())
+				if (boardPtr->validateKnightMove(oPos, mT2))
 					dupMove = true;
 		}
 		if (dupMove) { //If the move was ambiguous, de-ambiguate
-			if (mF2%10 != b.piece[otherPiece].getPos()%10) //Not same file
+			if (mF2%10 != oPos%10) //Not same file
 				plyStr += mF2%10+'a'-1; //so, file is sufficient
 			else 					   //Same file
 				plyStr += mF2/10+'1'-2; //so, rank is sufficient
 		}
-		if (b.getPrevOnMoveTo(lastMove) != empty) { //If move was a capture
+		if (boardPtr->getPrevOnMoveTo(lastMove) != empty) { //If move was a capture
 			//Special case for pawns, display the file of departure
-			if (b.piece[p].getValue() == P_VAL || 
-			    b.getPmSq(b.getNumMovesMade()-1+extra) == mT2)
+			if (boardPtr->piece[p].getValue() == P_VAL || 
+			    boardPtr->getPmSq(boardPtr->getNumMovesMade()-1+extra) == mT2)
 				plyStr += mF2%10+'a'-1;
 			plyStr += "x";
 		}
-		else if (b.piece[p].getValue() == P_VAL)
+		else if (boardPtr->piece[p].getValue() == P_VAL)
 			if (abs(mF2 - mT2) == 9 || abs(mF2 - mT2) == 11) { //En passant
 				plyStr += mF2%10+'a'-1;
 				plyStr += 'x';
@@ -416,11 +430,11 @@ void drawMoveTable(const Board& b) {
 		if (!castling)	//Add moveTo 
 			plyStr += intToSquare(mT2);
 
-		if (b.getPmSq(lastMove) == mT2) //If it was a promotion
+		if (boardPtr->getPmSq(lastMove) == mT2) //If it was a promotion
 			plyStr += "=Q";
 
-		if (b.getSideInCheck())
-			plyStr += b.getSideInCheckmate() ? '#' : '+';
+		if (boardPtr->getSideInCheck())
+			plyStr += boardPtr->getSideInCheckmate() ? '#' : '+';
 
 		plyStrings.push_back(plyStr);	    //Add it to the list of ply-moves
 	}
@@ -434,7 +448,7 @@ void drawMoveTable(const Board& b) {
 	}
 }
 
-void drawTitleScreen(const Board& b) {
+void Display::drawTitleScreen() {
 	SDL_Rect clipSq;
 
 	//Draw the border and background
@@ -453,21 +467,22 @@ void drawTitleScreen(const Board& b) {
 	clipSq = titleTextClips[0];
 	titleTextTexture.render(BXSTART+B_SIZE+224, BYSTART+200, &clipSq);
 	//"Human"
-	if (buttons[2].getInside() || !b.getWhiteIsBot())
+	if (buttons[2].getInside() || !boardPtr->getWhiteIsBot())
 		clipSq = titleTextClips[4];
 	else
 		clipSq = titleTextClips[2];
 	titleTextTexture.render(buttons[2].getX(), buttons[2].getY(), &clipSq);
 	//"Computer"
-	if (buttons[3].getInside() || b.getWhiteIsBot())
+	if (buttons[3].getInside() || boardPtr->getWhiteIsBot())
 		clipSq = titleTextClips[5];
 	else
 		clipSq = titleTextClips[3];
 	titleTextTexture.render(buttons[3].getX(), buttons[3].getY(), &clipSq);
 	//Numbers 1-9
-	if (b.getWhiteIsBot()) {
+	if (boardPtr->getWhiteIsBot()) {
 		for (int i = 1; i < 10; i++) {
-			if (buttons[i+5].getInside() || b.whiteBot.getLevel() == i)
+			if (buttons[i+5].getInside() || 
+			    boardPtr->whiteBot.getLevel() == i)
 				clipSq = titleTextClips[i+14];
 			else
 				clipSq = titleTextClips[i+5];
@@ -481,21 +496,22 @@ void drawTitleScreen(const Board& b) {
 	clipSq = titleTextClips[1];
 	titleTextTexture.render(BXSTART+B_SIZE+224, BYSTART+350, &clipSq);
 	//"Human"
-	if (buttons[4].getInside() || !b.getBlackIsBot())
+	if (buttons[4].getInside() || !boardPtr->getBlackIsBot())
 		clipSq = titleTextClips[4];
 	else
 		clipSq = titleTextClips[2];
 	titleTextTexture.render(buttons[4].getX(), buttons[4].getY(), &clipSq);
 	//"Computer"
-	if (buttons[5].getInside() || b.getBlackIsBot())
+	if (buttons[5].getInside() || boardPtr->getBlackIsBot())
 		clipSq = titleTextClips[5];
 	else
 		clipSq = titleTextClips[3];
 	titleTextTexture.render(buttons[5].getX(), buttons[5].getY(), &clipSq);
 	//Numbers 1-9
-	if (b.getBlackIsBot()) {
+	if (boardPtr->getBlackIsBot()) {
 		for (int i = 1; i < 10; i++) {
-			if (buttons[i+14].getInside() || b.blackBot.getLevel() == i)
+			if (buttons[i+14].getInside() ||
+			    boardPtr->blackBot.getLevel() == i)
 				clipSq = titleTextClips[i+14];
 			else
 				clipSq = titleTextClips[i+5];
@@ -518,4 +534,9 @@ void drawTitleScreen(const Board& b) {
 		clipSq = titleTextClips[25];
 	titleTextTexture.render(buttons[25].getX(), buttons[25].getY(), &clipSq);
 
+}
+
+void Display::handleButtons(SDL_Event* e) {
+	for (int i = 0; i < 26; i++)
+		buttons[i].handleEvent(e);
 }

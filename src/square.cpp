@@ -32,11 +32,11 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 		bool inside = true;
 		if (x < pos.x) 
 			inside = false;
-		else if (x > pos.x + SQ_SIZE)
+		else if (x > pos.x + 75)
 			inside = false;
 		else if (y < pos.y)
 			inside = false;
-		else if (y > pos.y + SQ_SIZE)
+		else if (y > pos.y + 75)
 			inside = false;
 		switch (e->type) {
 			case SDL_MOUSEBUTTONDOWN:

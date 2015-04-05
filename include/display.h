@@ -8,36 +8,52 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+#include <string>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
+#include "button.h"
+#include "ltexture.h"
 
 class Board;
-class Square;
-class Button;
-class LTexture;
 
-extern Button buttons[26];
+class Display {
+	public:
+		Display(Board * b);
+		~Display();
+	
+		void displayBoard(const int& mF = -1, const int& mT = -1);
+		void setButtons();
+		void setSpriteClips();
+		void displayBotText();
+		void updateText();
+		void drawButtons();
+		void drawSquares(const int& mF = -1, const int& mT = -1);
+		void drawPieces(const int& mF = -1, const int& mT = -1);
+		void drawBorder();
+		void drawMoveTable();
+		void drawTitleScreen();
+		void handleButtons(SDL_Event* e);
 
-const int B_SIZE = 600;
-const int SQ_SIZE = 75;
-const int BXSTART = 50;
-const int BYSTART = 25;
+		//ACCESSORS
+		int getBoardXStart() { return BXSTART; };
+		int getBoardYStart() { return BYSTART; };
+		int getSqSize() { return SQ_SIZE; };
+		int getBoardSize() { return B_SIZE; };
+		
+	private:
+		Board * boardPtr;
+		bool sideFlag;
+		const int B_SIZE, SQ_SIZE, BXSTART, BYSTART;
+		SDL_Rect spriteClips[12], buttonClips[6], titleTextClips[27];
+		Button buttons[26];
+		LTexture spriteSheetTexture, buttonTexture, titleTexture,
+			 titleTextTexture, turnText, checkText, moveText,
+			 rankText, fileText;
+		SDL_Color textColor;
+		std::string rankStr, fileStr;
+};
 
-void displayBoard(Board& b, const int& mF = -1, const int& mT = -1);
-void setButtons();
-void setSpriteClips();
-void displayBotText(const Board& b);
-void updateText(const Board& b, bool& sidey);
-void drawButtons(const Board& b);
-void drawSquares(const Board& b, const int& mF = -1, const int& mT = -1);
-void drawPieces(Board& b, const int& mF = -1, const int& mT = -1);
-void drawBorder();
-void drawMoveTable(const Board&);
-void drawTitleScreen(const Board&);
-
-extern SDL_Rect spriteClips[12], buttonClips[6], titleTextClips[27];
-extern LTexture spriteSheetTexture, buttonTexture, titleTexture, titleTextTexture;
 extern Mix_Chunk * mFSound, * mTSound;
 
 #endif

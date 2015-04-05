@@ -8,7 +8,6 @@
 
 /* 
  * ##To-Do List##
- * Make Display a class
  * Add en passants to quiescent search maybe
  * Make sure killer moves are being implemented correctly
  * Write dupMove code for Queens
@@ -22,7 +21,6 @@
 #include "common.h"
 #include "sdl.h"
 #include "board.h"
-#include "display.h"
 
 bool quit = false, muted = false, start = false;
 
@@ -48,6 +46,7 @@ int main(int argc, char* args[]) {
 	Board board;
 //	Board board("r2b1rk1/pbpq1ppp/2pp1n2/5N2/4P3/2N2Q2/PPP2PPP/R1B1R1K1 w - - 5 13");
 //	Board board("6k1/ppp2ppp/8/r7/8/3KN3/8/8 b - - 0 2");
+//	Board board("8/p3R2k/6pp/2p3r1/3pQ3/3P1P2/PPPq2PP/4R1K1 b - - 1 35");
 	std::cout << "Current FEN: " << board.getFEN() << '\n';
 	std::cout << "Current Zobrist: " << board.getZobrist() << '\n';
 
@@ -60,7 +59,7 @@ int main(int argc, char* args[]) {
 					case SDLK_SPACE:
 						if (start) {
 							mF = mT = -1;
-							displayBoard(board, mF, mT);
+							board.updateDisplay(mF, mT);
 							board.botMove();
 						}
 					break;
@@ -69,22 +68,22 @@ int main(int argc, char* args[]) {
 					break;
 					case SDLK_LEFT:
 						board.undoMove();
-						displayBoard(board, mF, mT);
+						board.updateDisplay(mF, mT);
 					break;
 					case SDLK_BACKSPACE:
 						board.restart();
-						displayBoard(board, mF, mT);
+						board.updateDisplay(mF, mT);
 					break;
 				}
 			}
 			board.handleInput(mF, mT, &e);
-			displayBoard(board, mF, mT);
+			board.updateDisplay(mF, mT);
 		}
 		if (start) {
 			if ((board.getSide() && board.getWhiteIsBot()) || 
 			    (!board.getSide() && board.getBlackIsBot())) {
 				board.botMove();
-				displayBoard(board, mF, mT);
+				board.updateDisplay(mF, mT);
 			}
 		}
 		else
