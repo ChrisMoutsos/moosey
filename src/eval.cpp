@@ -183,50 +183,65 @@ int Board::eval() {
 	if (blackCastled) score -= 50;
 
 	//Passed pawns
-	int filesWithBlackPawns[8] = {0}, filesWithWhitePawns[8] = {0};
+	int blackPawnsOnFile[8] = {0}, whitePawnsOnFile[8] = {0};
+	int file = 0;
 	for (int p = wPa; p <= wPh; p++) {
 		if (!piece[p].getAlive()) continue;
-		filesWithWhitePawns[piece[p].getPos()%10-1] = 1;
+		whitePawnsOnFile[piece[p].getPos()%10-1]++;
 	}
 	for (int p = bPa; p <= bPh; p++) {
 		if (!piece[p].getAlive()) continue;
-		filesWithBlackPawns[piece[p].getPos()%10-1] = 1;
+		blackPawnsOnFile[piece[p].getPos()%10-1]++;
 	}
 	for (int p = wPa; p <= wPh; p++) {
 		if (!piece[p].getAlive()) continue;
-		if (filesWithBlackPawns[piece[p].getPos()%10-1] == 0)
-			score += 50;
+		file = piece[p].getPos()%10;
+		if (p == wPa) {
+			if (blackPawnsOnFile[file] == 0 &&
+			    blackPawnsOnFile[file-1] == 0)
+				score += 50;
+		}
+		else if (p == wPh) {
+			if (blackPawnsOnFile[file-1] == 0 &&
+			    blackPawnsOnFile[file-2] == 0)
+				score += 50;
+		}
+		else {
+			if (blackPawnsOnFile[file-2] == 0 &&
+			    blackPawnsOnFile[file-1] == 0 &&
+			    blackPawnsOnFile[file] == 0)
+				score += 50;
+		}
 	}
 	for (int p = bPa; p <= bPh; p++) {
 		if (!piece[p].getAlive()) continue;
-		if (filesWithWhitePawns[piece[p].getPos()%10-1] == 0)
-			score -= 50;
+		file = piece[p].getPos()%10;
+		if (p == bPa) {
+			if (whitePawnsOnFile[file] == 0 &&
+			    whitePawnsOnFile[file-1] == 0)
+				score -= 50;
+		}
+		else if (p == bPh) {
+			if (whitePawnsOnFile[file-1] == 0 &&
+			    whitePawnsOnFile[file-2] == 0)
+				score -= 50;
+		}
+		else {
+			if (whitePawnsOnFile[file-2] == 0 &&
+			    whitePawnsOnFile[file-1] == 0 &&
+			    whitePawnsOnFile[file] == 0)
+				score -= 50;
+		}
 	}
 
 
 	//Doubled pawns
-	int doubled = 0, pos;
-	for (int i = wPa; i <= wPh; i++) {
-		if (!piece[i].getAlive()) continue;
-		pos = piece[i].getPos();
-		for (int j = wPa; j <= wPh; j++) {
-			if (!piece[j].getAlive()) continue;
-			if (j != i && piece[j].getPos()%10 == pos%10) 
-					doubled++;
-		}
+	for (int f = 0; f < 8; f++) {
+		if (whitePawnsOnFile[f] > 1)
+			score -= (whitePawnsOnFile[f]-1)*50;
+		if (blackPawnsOnFile[f] > 1)
+			score += (blackPawnsOnFile[f]-1)*50;
 	}
-	score -= doubled*10;
-	doubled = 0;
-	for (int i = bPa; i <= bPh; i++) {
-		if (!piece[i].getAlive()) continue;
-		pos = piece[i].getPos();
-		for (int j = bPa; j <= bPh; j++) {
-			if (!piece[j].getAlive()) continue;
-			if (j != i && piece[j].getPos()%10 == pos%10) 
-					doubled++;
-		}
-	}
-	score += doubled*10;
 
 	//Open filed rooks
 	for (int j = wqR; j <= bqR; j += (bqR-wqR)) {
@@ -240,7 +255,8 @@ int Board::eval() {
 				checkPiece = board120[r*10+file];
 				if (checkPiece != empty) {
 					if (piece[checkPiece].getColor() != piece[i].getColor())
-						open = false;
+						if (piece[checkPiece].getValue() == P_VAL)
+							open = false;
 					break;
 				}
 			}
@@ -248,7 +264,8 @@ int Board::eval() {
 				checkPiece = board120[r*10+file];
 				if (checkPiece != empty) {
 					if (piece[checkPiece].getColor() != piece[i].getColor())
-						open = false;
+						if (piece[checkPiece].getValue() == P_VAL)
+							open = false;
 					break;
 				}
 			}
