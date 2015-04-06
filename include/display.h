@@ -45,7 +45,7 @@ class Display {
 		Board * boardPtr;
 		bool sideFlag;
 		const int B_SIZE, SQ_SIZE, BXSTART, BYSTART;
-		SDL_Rect spriteClips[12], buttonClips[6], titleTextClips[27];
+		SDL_Rect spriteClips[12], buttonClips[6], titleTextClips[28];
 		Button buttons[26];
 		LTexture spriteSheetTexture, buttonTexture, titleTexture,
 			 titleTextTexture, turnText, checkText, moveText,
