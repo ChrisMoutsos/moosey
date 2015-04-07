@@ -16,6 +16,8 @@ The following features have been implemented.
 - Extended futility pruning
 - Razoring
 - Search extensions (evading check, singular reply, two replies, threat)
+- Zobrist hashing
+- Draw detection
 
 ####In the Future
 - Better move ordering
