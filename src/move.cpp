@@ -27,8 +27,9 @@ void Board::movePiece(int mF, int mT) {
 	movesMade.push_back(mF*100+mT);
 	
 	//Undo last enpassant file in Zobrist key
-	if (moveInfo.size() && moveInfo.back().epSq != 0)
-		zobrist.key ^= zobrist.enPassant[to64(moveInfo.back().epSq)%10-1];
+	if (moveInfo.size() && moveInfo.back().epSq != 0) {
+		zobrist.key ^= zobrist.enPassant[moveInfo.back().epSq%10-1];
+	}
 
 	//Set castling flag appropriately
 	if (mFVal == K_VAL && abs(mF-mT) == 2)
@@ -37,42 +38,46 @@ void Board::movePiece(int mF, int mT) {
 	if (!castling) {	
 		zobrist.key ^= zobrist.piece[type][s][to64(mF)-1];
 
-		if (mFVal == P_VAL ) {
+		if (mFVal == P_VAL) {
 			//If the move is an en passant
 			if (moveInfo.size() && mT == moveInfo.back().epSq)
 				epExtra = s ? -10 : 10; //The offset to the killed pawn from mT
 			//Set potential en passant target square if appropriate
-			if (abs(mF-mT) == 20) {
+			else if (abs(mF-mT) == 20) {
 				localEpSq = s ? mF+10 : mF-10;  //The square the pawn skipped
 				//Update zobrist key with en passant file
-				zobrist.key ^= zobrist.enPassant[to64(mF)-1];
+				zobrist.key ^= zobrist.enPassant[mF%10-1];
 			}
 			localHalfMoveClock = 0;
 		}
-		else if (mFVal == R_VAL) {
+		else if (mFVal == R_VAL && piece[mF].getMoved() == 0) {
 			//Take away castling permissions, update Zobrist key
-			if ((s && mF == _A1) || (!s && mF == _A8)) {
-				if (canCastleZ[s][1]) {
-					zobrist.key ^= zobrist.castling[s][1];
-					canCastleZ[s][1] = false;
-				}
+			if (s && piece[wK].getAlive() && piece[wK].getMoved() == 0) {
+				if (mF == _A1)
+					zobrist.key ^= zobrist.castling[WHITE][1];
+				else if (mF == _H1)
+					zobrist.key ^= zobrist.castling[WHITE][0];
 			}
-			else if ((s && mF == _H1) || (!s && mF == _H8)) {
-				if (canCastleZ[s][0]) {
-					zobrist.key ^= zobrist.castling[s][0];
-					canCastleZ[s][0] = false;
-				}
+			else if (!s && piece[bK].getAlive() && piece[bK].getMoved() == 0) {
+				if (mF == _A8)
+					zobrist.key ^= zobrist.castling[BLACK][1];
+				else if (mF == _H8)
+					zobrist.key ^= zobrist.castling[BLACK][0];
 			}
 		}
-		else if (mFVal == K_VAL) {
+		else if (mFVal == K_VAL && piece[mF].getMoved() == 0) {
 			//Take away castling permissions, update Zobrist key
-			if (canCastleZ[s][0]) {
-				zobrist.key ^= zobrist.castling[s][0];
-				canCastleZ[s][0] = false;
+			if (s) {
+				if (piece[wkR].getAlive() && piece[wkR].getMoved() == 0)
+					zobrist.key ^= zobrist.castling[WHITE][0];
+				if (piece[wqR].getAlive() && piece[wqR].getMoved() == 0)
+					zobrist.key ^= zobrist.castling[WHITE][1];
 			}
-			if (canCastleZ[s][1]) {
-				zobrist.key ^= zobrist.castling[s][1];
-				canCastleZ[s][1] = false;
+			else {
+				if (piece[bkR].getAlive() && piece[bkR].getMoved() == 0)
+					zobrist.key ^= zobrist.castling[BLACK][0];
+				if (piece[bqR].getAlive() && piece[bqR].getMoved() == 0)
+					zobrist.key ^= zobrist.castling[BLACK][1];
 			}
 		}
 
@@ -114,6 +119,23 @@ void Board::movePiece(int mF, int mT) {
 				whiteMaterial -= piece[board120[mT+epExtra]].getValue();
 			else
 				blackMaterial -= piece[board120[mT+epExtra]].getValue();
+
+			if (piece[board120[mT+epExtra]].getValue() == R_VAL &&
+			    piece[board120[mT+epExtra]].getMoved() == 0) {
+				if (s && piece[wK].getAlive() && piece[wK].getMoved() == 0) {
+					if (board120[mT+epExtra] == wqR)
+						zobrist.key ^= zobrist.castling[WHITE][1];
+					else if (board120[mT+epExtra] == wkR)
+						zobrist.key ^= zobrist.castling[WHITE][0];
+				}
+				else if (!s && piece[bK].getAlive() && piece[bK].getMoved() == 0) {
+					if (board120[mT+epExtra] == bqR)
+						zobrist.key ^= zobrist.castling[BLACK][1];
+					else if (board120[mT+epExtra] == bkR)
+						zobrist.key ^= zobrist.castling[BLACK][0];
+				}
+			}
+
 			//Kill the piece
 			zobrist.key ^= zobrist.piece[piece[board120[mT+epExtra]].getType()][!s][to64(mT+epExtra)-1];
 			piece[board120[mT+epExtra]].kill();
@@ -136,31 +158,51 @@ void Board::movePiece(int mF, int mT) {
 
 		//cExtras contains the distance from the king
 		//to the square the rook's moving to,
-		//and to the square the rook's moving from.
+		//to the square the rook's moving from.
 		int cExtras[2];
 		if (castling == KINGSIDE) {
-			cExtras[0] = 1; //rookmT - kingmF
-			cExtras[1] = 3; //emptymT - kingmF
+			cExtras[0] = 1;  //rookmT - kingmF
+			cExtras[1] = 3;  //emptymT - kingmF
+		
+			//Update zobrist key castling permissions
+			zobrist.key ^= zobrist.castling[s][0];
+			if (s) {
+				if (piece[wqR].getAlive() &&
+				    piece[wqR].getMoved() == 0) {
+					zobrist.key ^= zobrist.castling[WHITE][1];
+				}
+			}
+			else {
+				if (piece[bqR].getAlive() &&
+				    piece[bqR].getMoved() == 0) {
+					zobrist.key ^= zobrist.castling[BLACK][1];
+				}
+			}
 		}
 		else {
 			cExtras[0] = -1; //rookmT - kingmF
 			cExtras[1] = -4; //emptymT - kingmF
-		}
 
-		//Update zobrist key
-		//Permissions
-		if (canCastleZ[s][0] && castling == KINGSIDE) {
-			zobrist.key ^= zobrist.castling[s][0];
-			canCastleZ[s][0] = false;
-		}
-		if (canCastleZ[s][1] && castling == QUEENSIDE) {
+			//Update zobrist key castling permissions
 			zobrist.key ^= zobrist.castling[s][1];
-			canCastleZ[s][1] = false;
+			if (s) {
+				if (piece[wkR].getAlive() &&
+				    piece[wkR].getMoved() == 0) {
+					zobrist.key ^= zobrist.castling[WHITE][0];
+				}
+			}
+			else {
+				if (piece[bkR].getAlive() &&
+				    piece[bkR].getMoved() == 0) {
+					zobrist.key ^= zobrist.castling[BLACK][0];
+				}
+			}
 		}
+		//Update zobrist key
 		zobrist.key ^= zobrist.piece[4][s][to64(mF)-1];		   //Remove king
 		zobrist.key ^= zobrist.piece[4][s][to64(mT)-1]; 	   //Place king
 		zobrist.key ^= zobrist.piece[0][s][to64(mF+cExtras[1])-1]; //Remove rook
-		zobrist.key ^= zobrist.piece[0][s][to64(mT+cExtras[0])-1]; //Place rook
+		zobrist.key ^= zobrist.piece[0][s][to64(mF+cExtras[0])-1]; //Place rook
 	
 		//Update board120
 		board120[mT] = board120[mF];		 	    //Move king
@@ -194,18 +236,20 @@ void Board::unmovePiece(int mF, int mT) {
 	int epExtra = 0;
 	bool s = piece[board120[mT]].getColor();
 	int type = piece[board120[mT]].getType();
+	int mTVal = piece[board120[mT]].getValue();
 
 	//Take out recent en passant file in Zobrist key
 	if (moveInfo.back().epSq != 0) {
-		zobrist.key ^= zobrist.enPassant[to64(moveInfo.back().epSq)%10-1];
+		zobrist.key ^= zobrist.enPassant[moveInfo.back().epSq%10-1];
 	}
+
 	//Put back old en passant file in Zobrist key, if there is one
 	if (moveInfo.size() > 1 && moveInfo[moveInfo.size()-2].epSq != 0) {
-		zobrist.key ^= zobrist.enPassant[to64(moveInfo[moveInfo.size()-2].epSq)%10-1];
+		zobrist.key ^= zobrist.enPassant[moveInfo[moveInfo.size()-2].epSq%10-1];
 	}
 
 	//Set castling flag appropriately
-	if (piece[board120[mT]].getValue() == K_VAL && abs(mF-mT) == 2)
+	if (mTVal == K_VAL && abs(mF-mT) == 2)
 			castling = mF < mT ? KINGSIDE : QUEENSIDE;
 
 	if (!castling) {
@@ -213,7 +257,7 @@ void Board::unmovePiece(int mF, int mT) {
 		zobrist.key ^= zobrist.piece[type][s][to64(mF)-1];
 
 		//If we are undoing an enpassant move
-		if (piece[board120[mT]].getValue() == P_VAL && moveInfo.back().prevOnMoveTo == empty) {
+		if (mTVal == P_VAL && moveInfo.back().prevOnMoveTo == empty) {
 			int diffMTMF = abs(mT - mF);
 			if (diffMTMF == 11 || diffMTMF == 9) {
 				epExtra = s ? -10 : 10; //The offset to the dead pawn from mT
@@ -242,6 +286,34 @@ void Board::unmovePiece(int mF, int mT) {
 			piece[board120[mT]].setMoveList(temp);	//Point at new moveList
 			piece[board120[mT]].setMoveListSize(4); //Update moveListSize
 		}	
+		else if (mTVal == R_VAL && piece[board120[mT]].getMoved() == 1) {
+			if (s && piece[wK].getAlive() && piece[wK].getMoved() == 0) {
+				if (board120[mT] == wqR)
+					zobrist.key ^= zobrist.castling[WHITE][1];
+				else if (board120[mT] == wkR)
+					zobrist.key ^= zobrist.castling[WHITE][0];
+			}
+			else if (!s && piece[bK].getAlive() && piece[bK].getMoved() == 0) {
+				if (board120[mT] == bqR)
+					zobrist.key ^= zobrist.castling[BLACK][1];
+				else if (board120[mT] == bkR)
+					zobrist.key ^= zobrist.castling[BLACK][0];
+			}
+		}
+		else if (mTVal == K_VAL && piece[board120[mT]].getMoved() == 1) {
+			if (s) {
+				if (piece[wkR].getAlive() && piece[wkR].getMoved() == 0)
+					zobrist.key ^= zobrist.castling[WHITE][0];
+				if (piece[wqR].getAlive() && piece[wqR].getMoved() == 0)
+					zobrist.key ^= zobrist.castling[WHITE][1];
+			}
+			else {
+				if (piece[bkR].getAlive() && piece[bkR].getMoved() == 0)
+					zobrist.key ^= zobrist.castling[BLACK][0];
+				if (piece[bqR].getAlive() && piece[bqR].getMoved() == 0)
+					zobrist.key ^= zobrist.castling[BLACK][1];
+			}
+		}
 
 		//Put the piece moved back
 		board120[mF] = board120[mT];
@@ -252,8 +324,6 @@ void Board::unmovePiece(int mF, int mT) {
 	
 		//Put whatever was on mT back
 		board120[mT] = moveInfo.back().prevOnMoveTo;
-		if (moveInfo.back().prevOnMoveTo != empty)
-			zobrist.key ^= zobrist.piece[piece[moveInfo.back().prevOnMoveTo].getType()][!s][to64(mT)-1];
 
 		//If we are undoing an enpassant, put the dead pawn back where it was
 		if (epExtra != 0)
@@ -269,29 +339,46 @@ void Board::unmovePiece(int mF, int mT) {
 			else
 				blackMaterial += piece[board120[mT+epExtra]].getValue();
 			zobrist.key ^= zobrist.piece[piece[board120[mT+epExtra]].getType()][!s][to64(mT+epExtra)-1];
-		}
 
-		//Give back castling permissions
-		if (!canCastleZ[s][0] || !canCastleZ[s][1]) {
-			if (piece[board120[mF]].getMoved() == 1) {
-				if (piece[board120[mF]].getValue() == R_VAL) {
-					if ((s && mF == _A1) || (!s && mF == _A8)) {
-						zobrist.key ^= zobrist.castling[s][1];
-						canCastleZ[s][1] = true;
+			if (piece[board120[mT+epExtra]].getType() == R_VAL) {
+				if (piece[board120[mT+epExtra]].getColor() &&
+				    piece[wK].getAlive() && piece[wK].getMoved() == 0) {
+					if (board120[mT+epExtra] == wqR &&
+					    piece[wqR].getMoved() == 0)
+						zobrist.key ^= zobrist.castling[WHITE][1];
+					else if (board120[mT+epExtra] == wkR &&
+						 piece[wkR].getMoved() == 0)
+						zobrist.key ^= zobrist.castling[WHITE][0];
+				}
+				else if (!piece[board120[mT+epExtra]].getColor() &&
+					  piece[bK].getAlive() && piece[bK].getMoved() == 0) {
+					if (board120[mT+epExtra] == bqR &&
+					    piece[bqR].getMoved() == 0)
+						zobrist.key ^= zobrist.castling[BLACK][1];
+					else if (board120[mT+epExtra] == bkR &&
+						 piece[bkR].getMoved() == 0)
+						zobrist.key ^= zobrist.castling[BLACK][0];
+				}
+			}
+			else if (piece[board120[mT+epExtra]].getType() == K_VAL) {
+				if (s && piece[wK].getMoved() == 0) {
+					if (piece[wqR].getAlive() &&
+					    piece[wqR].getMoved() == 0) {
+						zobrist.key ^= zobrist.castling[WHITE][1];
 					}
-					else if ((s && mF == _H1) || (!s && mF == _H8)) {
-						zobrist.key ^= zobrist.castling[s][0];
-						canCastleZ[s][0] = true;
+					if (piece[wkR].getAlive() &&
+					    piece[wkR].getMoved() == 0) {
+						zobrist.key ^= zobrist.castling[WHITE][0];
 					}
 				}
-				else if (piece[board120[mF]].getValue() == K_VAL) {
-					if (piece[board120[mF]-4].getMoved() == 0) {
-						zobrist.key ^= zobrist.castling[s][1];
-						canCastleZ[s][1] = true;
+				else if (!s && piece[bK].getMoved() == 0) {
+					if (piece[bqR].getAlive() &&
+					    piece[bqR].getMoved() == 0) {
+						zobrist.key ^= zobrist.castling[BLACK][1];
 					}
-					if (piece[board120[mF]+3].getMoved() == 0) {
-						zobrist.key ^= zobrist.castling[s][0];
-						canCastleZ[s][0] = true;
+					if (piece[bkR].getAlive() &&
+					    piece[bkR].getMoved() == 0) {
+						zobrist.key ^= zobrist.castling[BLACK][0];
 					}
 				}
 			}
@@ -306,16 +393,30 @@ void Board::unmovePiece(int mF, int mT) {
 		if (castling == KINGSIDE) {
 			cExtras[0] = 1; //rookmT - kingmF
 			cExtras[1] = 3; //emptymT - kingmF
-			//Zobrist key permissoins
+			//Zobrist key permissions
 			zobrist.key ^= zobrist.castling[s][0];
-			canCastleZ[s][0] = true;
+			if (s) {
+				if (piece[wqR].getAlive() && piece[wqR].getMoved() == 0)
+					zobrist.key ^= zobrist.castling[WHITE][1];
+			}
+			else {
+				if (piece[bqR].getAlive() && piece[bqR].getMoved() == 0)
+					zobrist.key ^= zobrist.castling[BLACK][1];
+			}
 		}
 		else {
 			cExtras[0] = -1; //rookmT - kingmF
 			cExtras[1] = -4; //emptymT - kingmF
-			//Zobrist key permissoins
+			//Zobrist key permissions
 			zobrist.key ^= zobrist.castling[s][1];
-			canCastleZ[s][1] = true;
+			if (s) {
+				if (piece[wkR].getAlive() && piece[wkR].getMoved() == 0)
+					zobrist.key ^= zobrist.castling[WHITE][0];
+			}
+			else {
+				if (piece[bkR].getAlive() && piece[bkR].getMoved() == 0)
+					zobrist.key ^= zobrist.castling[BLACK][0];
+			}
 		}
 		
 		//Update zobrist key

@@ -150,8 +150,6 @@ class Board {
 		bool side, whiteCastled, blackCastled;
 		bool whiteIsBot, blackIsBot, flipped;
 		int whiteBotLevel, blackBotLevel;
-		//Used for Zobrist key
-		bool canCastleZ[2][2];
 		//Zobrist hash key
 		Zobrist zobrist;
 		std::vector<int> whiteMoveList, blackMoveList;

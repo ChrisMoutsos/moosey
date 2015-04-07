@@ -272,19 +272,25 @@ bool Board::canCastle(int dir, bool s) {
 int Board::drawCheck() const {
 	int lastPly = movesMade.size();
 
-	if (lastPly < 4)
+	if (lastPly < 3)
 		return false;
 
 	int count = 0;
 
+	//std::cout << "Checking " << moveInfo[lastPly-1].zobrist << '\n';
+	//std::cout << "Current zobrist.... " << zobrist.key << '\n';
 	for (int j = lastPly - 3; j >= lastPly - moveInfo.back().halfMoveClock - 1; j -= 2) {
+	//for (int j = lastPly - 2; j >= 0; j -= 1) {
 		if (j < 0) break;
+	//	std::cout << "against " << moveInfo[j].zobrist << '\n';
 		if (moveInfo[lastPly-1].zobrist == moveInfo[j].zobrist) {
+	//		std::cout << "... MATCH!\n";
 			count++;
 			if (count == 2)
 				return 2;
 		}
 	}
+	//std::cout << "\n\n";
 	
 	return count;
 }

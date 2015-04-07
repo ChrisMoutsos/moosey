@@ -138,9 +138,6 @@ int Bot::think(Board& b, int depth) {
 	if (prinVarLine.move[0] == 0)
 		std::cout << "Stalemate!\n";
 
-	if (bestScore == 0)
-		return -1;
-
 	return prinVarLine.move[0];
 }
 
@@ -161,14 +158,15 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 	}
 
 	//Repetition detection
-/*
-	if (allowNull) {
+	if (allowNull && depthGone) {
 		int drawCheck = b.drawCheck();
-		if (drawCheck == 2) {
+		if (drawCheck) {
 			pline->count = 0;
 			return 0;
 		}
-		if (drawCheck == 1) {
+	}
+/*
+		if (drawCheck == 2) {
 			pline->count = 0;
 			return 0;
 		}

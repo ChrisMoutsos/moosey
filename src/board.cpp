@@ -51,36 +51,51 @@ void Board::initializeZobrist() {
 		pos = to64(piece[p].getPos());
 		switch (piece[p].getValue()) {
 			case R_VAL:
-				zobrist.key ^= zobrist.piece[0][color][pos];
+				zobrist.key ^= zobrist.piece[0][color][pos-1];
 			case N_VAL:
-				zobrist.key ^= zobrist.piece[1][color][pos];
+				zobrist.key ^= zobrist.piece[1][color][pos-1];
 			case B_VAL:
-				zobrist.key ^= zobrist.piece[2][color][pos];
+				zobrist.key ^= zobrist.piece[2][color][pos-1];
 			case Q_VAL:
-				zobrist.key ^= zobrist.piece[3][color][pos];
+				zobrist.key ^= zobrist.piece[3][color][pos-1];
 			case K_VAL:
-				zobrist.key ^= zobrist.piece[4][color][pos];
+				zobrist.key ^= zobrist.piece[4][color][pos-1];
 			case P_VAL:
-				zobrist.key ^= zobrist.piece[5][color][pos];
+				zobrist.key ^= zobrist.piece[5][color][pos-1];
 		}
 	}
 	//Side
 	if (!side)
 		zobrist.key ^= zobrist.side;
 
-	//Castling availibity
+	//Castling availability
 	if (piece[wK].getMoved() == 0) {
-		if (piece[wkR].getMoved() == 0)
-			zobrist.key ^= zobrist.castling[WHITE][0];
-		if (piece[wqR].getMoved() == 0)
-			zobrist.key ^= zobrist.castling[WHITE][1];
+		if (piece[wkR].getMoved() == 0 && piece[wqR].getMoved() == 0) {
+			zobrist.key ^= zobrist.castling[1][2];
+		}
+		else if (piece[wkR].getMoved() == 0) {
+			zobrist.key ^= zobrist.castling[1][0];
+		}
+		else if (piece[wqR].getMoved() == 0) {
+			zobrist.key ^= zobrist.castling[1][1];
+		}
 	}
+	else 
+		zobrist.key ^= zobrist.castling[1][3];
+
 	if (piece[bK].getMoved() == 0) {
-		if (piece[bkR].getMoved() == 0)
-			zobrist.key ^= zobrist.castling[BLACK][0];
-		if (piece[bqR].getMoved() == 0)
-			zobrist.key ^= zobrist.castling[BLACK][1];
+		if (piece[bkR].getMoved() == 0 && piece[bqR].getMoved() == 0) {
+			zobrist.key ^= zobrist.castling[0][2];
+		}
+		else if (piece[bkR].getMoved() == 0) {
+			zobrist.key ^= zobrist.castling[0][0];
+		}
+		else if (piece[bqR].getMoved() == 0) {
+			zobrist.key ^= zobrist.castling[0][1];
+		}
 	}
+	else 
+		zobrist.key ^= zobrist.castling[0][3];
 	
 	//En passant square
 	if (moveInfo.size() && moveInfo.back().epSq != 0)
@@ -119,8 +134,6 @@ void Board::initializeVars() {
 	whiteIsBot = false;
 	blackIsBot = true;
 	whiteCastled = blackCastled = false;
-	canCastleZ[WHITE][0] = canCastleZ[WHITE][1] = true;
-	canCastleZ[BLACK][0] = canCastleZ[BLACK][1] = true;
 	castling = sideInCheck = sideInCheckmate = 0;
 	whiteMaterial = 8*P_VAL + 2*(R_VAL+B_VAL+N_VAL) + Q_VAL + K_VAL;
 	blackMaterial = whiteMaterial;
@@ -321,28 +334,6 @@ void Board::placePieces(std::string FEN) {
 			piece[bqR].decrMoved();
 		index++;
 	}
-	//Update canCastle vars
-	if (piece[wK].getMoved()) {
-		canCastleZ[WHITE][0] = false;
-		canCastleZ[WHITE][1] = false;
-	}
-	else {
-		if (piece[wqR].getMoved())
-			canCastleZ[WHITE][1] = false;
-		if (piece[wkR].getMoved())
-			canCastleZ[WHITE][0] = false;
-	}
-	if (piece[bK].getMoved()) {
-		canCastleZ[BLACK][0] = false;
-		canCastleZ[BLACK][1] = false;
-	}
-	else {
-		if (piece[bqR].getMoved())
-			canCastleZ[BLACK][1] = false;
-		if (piece[bkR].getMoved())
-			canCastleZ[BLACK][0] = false;
-	}
-	
 
 	//Set en passant square
 	int epSq = 0;
@@ -400,8 +391,8 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 			checkCheck(getSide());
 			std::cout << "Current FEN: " << getFEN() << '\n';
 			std::cout << "Current Zobrist: " << zobrist.key << '\n';
-			if (drawCheck())
-				std::cout << "Draw\n";
+			if (drawCheck() == 2)
+				std::cout << "Threefold repetition.\n";
 		}
 		mF = mT = -1;
 	}
@@ -420,14 +411,7 @@ void Board::botMove() {
 	else
 		move = blackBot.think(*this, blackBot.getLevel());
 
-	if (move == -1) {
-		std::cout << "Draw by repetition.\n";
-		sideInCheckmate = 3;
-		return;
-	}
-
 	setMove(move/100, move%100);
-	std::cout << "move: " << move << '\n';
 	movePiece();
 	if (!muted)
 		Mix_PlayChannel(-1, mFSound, 0);
@@ -437,8 +421,11 @@ void Board::botMove() {
 	std::cout << "White material: " << whiteMaterial << " Black material: " << blackMaterial << '\n';
 	std::cout << "Current FEN: " << getFEN() << '\n';
 	std::cout << "Current Zobrist: " << zobrist.key << '\n';
-	if (drawCheck())
-		std::cout << "Draw!\n";
+	if (drawCheck() == 2) {
+		std::cout << "Threefold repetition.\n";
+		sideInCheckmate = 3;
+	}
+	std::cout << "\n";
 }
 
 void Board::changeTurn() {
@@ -447,7 +434,7 @@ void Board::changeTurn() {
 
 void Board::undoMove() {
 	if (movesMade.size() == 0) return;
-	
+
 	//Stalemate
 	if (movesMade.back() == 0) {
 		movesMade.pop_back();
