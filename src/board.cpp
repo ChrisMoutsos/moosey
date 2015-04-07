@@ -389,10 +389,11 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 			changeTurn();
 			genOrderedMoveList();
 			checkCheck(getSide());
-			std::cout << "Current FEN: " << getFEN() << '\n';
+			std::cout << "Current FEN (ply " << ply << ", move " << (ply-1)/2+1 << "): " << getFEN() << '\n';
 			std::cout << "Current Zobrist: " << zobrist.key << '\n';
 			if (drawCheck() == 2)
 				std::cout << "Threefold repetition.\n";
+			std::cout << "-----------------------------------------------------------------------------\n\n";
 		}
 		mF = mT = -1;
 	}
@@ -419,13 +420,13 @@ void Board::botMove() {
 	genOrderedMoveList();
 	checkCheck(side);
 	std::cout << "White material: " << whiteMaterial << " Black material: " << blackMaterial << '\n';
-	std::cout << "Current FEN: " << getFEN() << '\n';
+	std::cout << "Current FEN (ply " << ply << ", move " << (ply-1)/2+1 << "): " << getFEN() << '\n';
 	std::cout << "Current Zobrist: " << zobrist.key << '\n';
 	if (drawCheck() == 2) {
 		std::cout << "Threefold repetition.\n";
 		sideInCheckmate = 3;
 	}
-	std::cout << "\n";
+	std::cout << "-----------------------------------------------------------------------------\n\n";
 }
 
 void Board::changeTurn() {
