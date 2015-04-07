@@ -58,9 +58,30 @@ int main(int argc, char* args[]) {
 							board.updateDisplay(mF, mT);
 							board.botMove();
 						}
+						else start = true;
 					break;
 					case SDLK_m:
 						muted = muted ? 0 : 1;
+					break;
+					case SDLK_w:
+						board.setWhiteIsBot(!board.getWhiteIsBot());
+					break;
+					case SDLK_b:
+						board.setBlackIsBot(!board.getBlackIsBot());
+					break;
+					case SDLK_UP:
+						if (board.whiteBot.getLevel() < 9 &&
+						    board.blackBot.getLevel() < 9) {
+							board.whiteBot.setLevel(board.whiteBot.getLevel()+1);
+							board.blackBot.setLevel(board.blackBot.getLevel()+1);
+						}
+					break;
+					case SDLK_DOWN:
+						if (board.whiteBot.getLevel() > 1 &&
+						    board.blackBot.getLevel() > 1) {
+							board.whiteBot.setLevel(board.whiteBot.getLevel()-1);
+							board.blackBot.setLevel(board.blackBot.getLevel()-1);
+						}
 					break;
 					case SDLK_LEFT:
 						board.undoMove();
