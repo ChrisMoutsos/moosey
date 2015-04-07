@@ -412,6 +412,12 @@ void Board::botMove() {
 	else
 		move = blackBot.think(*this, blackBot.getLevel());
 
+	if (move == 0) {
+		std::cout << "Stalemate!\n";
+		sideInCheckmate = 3;
+		return;
+	}
+
 	setMove(move/100, move%100);
 	movePiece();
 	if (!muted)
