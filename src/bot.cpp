@@ -135,9 +135,6 @@ int Bot::think(Board& b, int depth) {
 	totalTime += diff2.count();
 	std::cout << "Total time elapsed: " << totalTime << '\n';
 
-	if (prinVarLine.move[0] == 0)
-		std::cout << "Stalemate!\n";
-
 	return prinVarLine.move[0];
 }
 
@@ -159,19 +156,11 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 
 	//Repetition detection
 	if (allowNull && depthGone) {
-		int drawCheck = b.drawCheck();
-		if (drawCheck) {
+		if (b.drawCheck()) {
 			pline->count = 0;
 			return 0;
 		}
 	}
-/*
-		if (drawCheck == 2) {
-			pline->count = 0;
-			return 0;
-		}
-	}
-*/
 
 	//Horizon nodes, quiescence search
 	if (depthLeft <= 0) {
