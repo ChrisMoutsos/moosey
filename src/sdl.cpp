@@ -62,7 +62,7 @@ bool init_SDL() {
 				}
 
 				//Initialize SDL_ttf
-				if (!TTF_Init() == -1) {
+				if (TTF_Init() == -1) {
 					printf("SDL_ttf could not be initialized.\n");
 					success = false;
 				}
