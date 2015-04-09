@@ -18,13 +18,13 @@ The following features have been implemented.
 - Search extensions (evading check, singular reply, two replies, threat)
 - Zobrist hashing
 - Draw detection
+- Late move reductions
 
 ####In the Future
 - Better move ordering
 - Transposition tables
 - Static exchange evaluation (attempted, gave up for now)
 - More search extensions
-- Late move reductions
 
 ![Title screenshot](https://raw.githubusercontent.com/ChrisMoutsos/moosey/master/res/titlescreenshot.png)
 ![Screenshot](https://raw.githubusercontent.com/ChrisMoutsos/moosey/master/res/screenshot.png)
