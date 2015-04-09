@@ -301,6 +301,8 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 
 	}
 	
+	int movesSearched = 0;
+
 	//Loop through moves
 	for (size_t i = 0; i < moveList.size(); i++) {
 		vector<int> localPV;
@@ -322,9 +324,18 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 
 		//If we had an alpha cutoff, do a zero-window search (guessing we were right)
 		if (foundPV) {
-			score = -alphaBeta(b, -alpha-1, -alpha, depthLeft-1, depthGone+1, &line, 1, ext%100);
-			if ((score > alpha) && (score < beta)) //If we were wrong
-				score = -alphaBeta(b, -beta, -alpha, depthLeft-1, depthGone+1, &line, 1, ext%100);
+			if (movesSearched >= 4 && b.getPly() > 4 &&
+			    b.getPrevOnMoveTo(b.getNumMovesMade()-1) == empty && 
+			    !b.inCheck(s) && mT != b.getPmSq(b.getNumMovesMade()-1)) {
+				score = -alphaBeta(b, -alpha-1, -alpha, depthLeft-2, depthGone+1, &line, 1, ext%100);
+			}
+			else
+				score = alpha+1;
+			if (score > alpha) {
+				score = -alphaBeta(b, -alpha-1, -alpha, depthLeft-1, depthGone+1, &line, 1, ext%100);
+				if ((score > alpha) && (score < beta)) //If we were wrong
+					score = -alphaBeta(b, -beta, -alpha, depthLeft-1, depthGone+1, &line, 1, ext%100);
+			}
 		}	
 		else
 			score = -alphaBeta(b, -beta, -alpha, depthLeft-1, depthGone+1, &line, 1, ext%100);
@@ -353,6 +364,8 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 			memcpy(pline->move + 1, line.move, line.count * sizeof(int));
 			pline->count = line.count + 1;
 		}
+
+		movesSearched++;
 	}
 	
 	return alpha;
