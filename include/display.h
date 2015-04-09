@@ -14,6 +14,7 @@
 #include <SDL2/SDL_mixer.h>
 #include "button.h"
 #include "ltexture.h"
+#include "square.h"
 
 class Board;
 
@@ -41,6 +42,8 @@ class Display {
 		int getSqSize() { return SQ_SIZE; };
 		int getBoardSize() { return B_SIZE; };
 		
+		Square squares[64];
+
 	private:
 		Board * boardPtr;
 		bool sideFlag;

@@ -11,7 +11,6 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <vector>
-#include "square.h"
 #include "piece.h"
 #include "bot.h"
 #include "zobrist.h"
@@ -136,13 +135,12 @@ class Board {
 		int eval();
 	
 		//DATA
-		Square squares[64];	//For the display
-
 		Piece piece[32];	//The pieces
 
 		Bot whiteBot, blackBot; //The bots
+
+		Display display; 	//The display
 	private:
-		Display display;
 		int board120[120], moveFrom, moveTo, ply;
 		int whiteMaterial, blackMaterial, castling;
 		//For the line below.. 0: none, 1: white, 2: black 

@@ -234,8 +234,8 @@ void Display::drawSquares(const int& mF, const int& mT) {
 			//or color dark
 			else 						
 				SDL_SetRenderDrawColor(renderer, 0, 153, 153, 255);
-			sqPos = {boardPtr->squares[sq].getX(),	//X start
-				 boardPtr->squares[sq].getY(),	//Y start
+			sqPos = {boardPtr->display.squares[sq].getX(),	//X start
+				 boardPtr->display.squares[sq].getY(),	//Y start
 				 SQ_SIZE, SQ_SIZE};	//Width, height of square
 			SDL_RenderFillRect(renderer, &sqPos);
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -252,11 +252,11 @@ void Display::drawPieces(const int& mF, const int& mT) {
 	for (int r = 1; r <= 8; r++) {
 		for (int f = 1; f <= 8; f++) {
 			sq = FR2SQ64(f, r)-1;
-			sqPos = {boardPtr->squares[sq].getX(), 	//X start
-				 boardPtr->squares[sq].getY(), 	//Y start
+			sqPos = {boardPtr->display.squares[sq].getX(), 	//X start
+				 boardPtr->display.squares[sq].getY(), 	//Y start
 				 SQ_SIZE, SQ_SIZE};	//Width, height of square
 		
-			p = boardPtr->squares[sq].getPiece();
+			p = boardPtr->display.squares[sq].getPiece();
 			if (p == wqR || p == wkR)
 				clipSq = spriteClips[wRook];		
 		    	else if (p == wqN || p == wkN)
@@ -292,7 +292,7 @@ void Display::drawPieces(const int& mF, const int& mT) {
 
 			if (p != empty) { 
 				//Save piece being dragged, to rerender on top
-				if (boardPtr->squares[sq].getDragging()) {
+				if (boardPtr->display.squares[sq].getDragging()) {
 					putOnTop = sq;
 					pOTClipSq = clipSq;
 				}

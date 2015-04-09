@@ -106,18 +106,18 @@ void Board::setSquarePositions() {
 	//Set positions of the squares in the display
 	if (!flipped) {
 		for (int i = 0; i < 64; i++) {
-			squares[i].setPos(display.getBoardXStart()+(display.getSqSize()*(i%8)),
+			display.squares[i].setPos(display.getBoardXStart()+(display.getSqSize()*(i%8)),
 					  display.getBoardYStart()+display.getBoardSize()-
 					  (display.getSqSize()*(i/8+1)));
-			squares[i].setSq(i+1);
+			display.squares[i].setSq(i+1);
 		}
 	}
 	else {
 		for (int i = 0; i < 64; i++) {
-			squares[i].setPos(display.getBoardXStart()+display.getBoardSize()
+			display.squares[i].setPos(display.getBoardXStart()+display.getBoardSize()
 					  -(display.getSqSize()*(i%8+1)),
 					  display.getBoardYStart()+(display.getSqSize()*(i/8)));
-			squares[i].setSq(i+1);
+			display.squares[i].setSq(i+1);
 		}
 	}
 }
@@ -125,7 +125,7 @@ void Board::setSquarePositions() {
 void Board::setPiecesOnSquares() {
 	//Update all of the pieces the display squares are holding
 	for (int i = 0; i < 64; i++)
-		squares[i].setPiece(board120[from64(i+1)]);
+		display.squares[i].setPiece(board120[from64(i+1)]);
 }
 
 void Board::initializeVars() {
@@ -378,7 +378,7 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 	display.handleButtons(e);
 
 	for (int i = 0; i < 64; i++)
-		squares[i].handleEvent(e, mF, mT, side);
+		display.squares[i].handleEvent(e, mF, mT, side);
 	
 	if (mF != -1 && mT != -1) {
 		mF = from64(mF);
