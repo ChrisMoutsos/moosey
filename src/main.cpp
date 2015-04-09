@@ -24,8 +24,6 @@
 
 bool quit = false, muted = false, start = false;
 
-void showMoveLists(Board& board);
-
 using namespace std;
 
 int main(int argc, char* args[]) {
@@ -42,6 +40,7 @@ int main(int argc, char* args[]) {
 	SDL_Event e; //Event handler
 
 	Board board;
+	//Board board("r2qk1nr/pp1n1ppp/2p5/2bp4/8/2N2Q1P/PPPPBPP1/R1B2RK1 w kq - 1 9");
 
 	std::cout << "Current FEN (start): " << board.getFEN() << '\n';
 	std::cout << "Current Zobrist (start): " << board.getZobrist() << '\n';

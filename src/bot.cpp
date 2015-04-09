@@ -197,7 +197,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 			}
 			//Extend on nearby checkmates
 			else if (score < -8500)
-				ext += 100;
+				ext += 50;
 		}
 	}
 
@@ -315,9 +315,9 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 		//Pawn push extensions
 		if (b.piece[b[mF]].getValue() == P_VAL) {
 			if (s && (mT/10 == 80 || mT/10 == 90))
-				ext += 100;
+				ext += 50;
 			else if (!s && (mT/10 == 30 || mT/10 == 20))
-				ext += 100;
+				ext += 50;
 		}
 
 		//If we had an alpha cutoff, do a zero-window search (guessing we were right)
