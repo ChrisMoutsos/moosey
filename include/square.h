@@ -22,7 +22,7 @@ class Square {
 	public:
 		Square();
 
-		void handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s);
+		void handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s, int& sound);
 
 		//ACCESSORS
 		int getX() const { return pos.x; };

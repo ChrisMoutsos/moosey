@@ -22,7 +22,7 @@ LTexture::~LTexture() {
 	free();
 }
 
-bool LTexture::loadFromFile(std::string path) {
+bool LTexture::loadFromFile(SDL_Renderer* renderer, std::string path) {
 	free(); //Get rid of old texture
 	SDL_Texture* newTexture = NULL;
 	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
@@ -45,7 +45,7 @@ bool LTexture::loadFromFile(std::string path) {
 	return (texture != NULL);
 }
 
-bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColor, TTF_Font* font) {
+bool LTexture::loadFromRenderedText(SDL_Renderer* renderer, std::string textureText, SDL_Color textColor, TTF_Font* font) {
 	free();	
 	
 	SDL_Surface* textSurface = TTF_RenderText_Blended(font, textureText.c_str(), textColor);
@@ -88,7 +88,7 @@ void LTexture::setAlpha(Uint8 alpha) {
 	SDL_SetTextureAlphaMod(texture, alpha);
 }
 
-void LTexture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip) {
+void LTexture::render(SDL_Renderer* renderer, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip) {
 	SDL_Rect renderQuad = {x, y, width, height};
 	if (clip != NULL) {
 		renderQuad.w = clip->w;

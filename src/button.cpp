@@ -32,7 +32,7 @@ void Button::setSize(int x, int y) {
 	setH(y);
 }
 
-bool Button::handleEvent(SDL_Event* e) {
+bool Button::handleEvent(SDL_Event* e, int& sound) {
 		int x, y;
 		SDL_GetMouseState(&x, &y);
 		inside = true;
@@ -50,10 +50,10 @@ bool Button::handleEvent(SDL_Event* e) {
 					clicking = true;
 					if (!muted) {
 						if (butt == 25 && !start)
-							Mix_PlayChannel(-1, mTSound, 0);
+							sound = 2;
 						else {
 							if ((butt > 1 && !start) || butt < 2)
-								Mix_PlayChannel(-1, mFSound, 0);
+								sound = 1;
 						}
 					}
 					//Restart button

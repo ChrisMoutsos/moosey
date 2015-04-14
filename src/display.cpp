@@ -12,28 +12,146 @@
 #include <vector>
 #include "board.h"
 #include "common.h"
-#include "sdl.h"
 #include "display.h"
 
-Display::Display(Board * b) : boardPtr(b),
-			      B_SIZE(600), SQ_SIZE(75), BXSTART(50), 
-			      BYSTART(25)
+Display::Display(Board * b) : boardPtr(b)
 {
 	textColor = { 0, 0, 0 };
 	sideFlag = !boardPtr->getSide();
 	for (int i = 0; i < 26; i++)
 		buttons[i].setBoardPtr(boardPtr);
-	spriteSheetTexture.loadFromFile("../res/spritesheet2.bmp");
-	buttonTexture.loadFromFile("../res/buttons.bmp");
-	titleTexture.loadFromFile("../res/mooseytitle.bmp");
-	titleTextTexture.loadFromFile("../res/titletext.bmp");
+
+	window = NULL;
+	renderer = NULL;
+	Garamond26 = Garamond28 = Cicero22 = Cicero26 = NULL;
+	mTSound = mFSound = NULL;
+	init_SDL();
+	loadMedia();
 }
 
-Display::~Display() {
+bool Display::init_SDL() {
+	bool success = true;
+	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+		printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
+		success = false;
+	}
+	else {
+		//Set texture filtering to linear
+		if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1"))
+			printf("Warning: Linear texture filtering not enabled!");
+
+		//Create window
+		window = SDL_CreateWindow("Moosey Chess Engine", SDL_WINDOWPOS_UNDEFINED,
+					   SDL_WINDOWPOS_UNDEFINED, SCREEN_W, SCREEN_H, 
+					   SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+
+		if (window == NULL) {
+			printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
+			success = false;
+		}
+		else {
+			//Create vsynced renderer for window
+			renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+			if (renderer == NULL) {
+				printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
+				success = false;
+			}
+			else {
+				//Initialize renderer color
+				SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+
+				//Initialize PNG loading
+				int imgFlags = IMG_INIT_PNG;
+				if(!(IMG_Init(imgFlags) & imgFlags)) {
+					printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+					success = false;
+				}
+
+				//Initialize SDL_ttf
+				if (TTF_Init() == -1) {
+					printf("SDL_ttf could not be initialized.\n");
+					success = false;
+				}
+		
+				if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+					printf("SDL_mixer could not be initialized.\n");
+					success = false;
+				}
+			}
+		}
+	}
+
+	return success;
+}
+
+bool Display::loadMedia() {
+	bool success = true;
+	Garamond28 = TTF_OpenFont("../res/Garamond.ttf", 28);
+	Cicero22 = TTF_OpenFont("../res/Cicero.ttf", 22);
+	Cicero26 = TTF_OpenFont("../res/Cicero.ttf", 26);
+	Garamond26 = TTF_OpenFont("../res/Garamond.ttf", 26);
+
+	if (Garamond28 == NULL || Garamond26 == NULL)
+		success = false;
+	if (Cicero26 == NULL || Cicero22 == NULL)
+		success = false;
+
+	mFSound = Mix_LoadWAV("../res/moveFrom.wav");
+	mTSound = Mix_LoadWAV("../res/moveTo.wav");	
+	if (mFSound == NULL || mTSound == NULL)
+		success = false;
+
+	spriteSheetTexture.loadFromFile(renderer, "../res/spritesheet2.bmp");
+	buttonTexture.loadFromFile(renderer, "../res/buttons.bmp");
+	titleTexture.loadFromFile(renderer, "../res/mooseytitle.bmp");
+	titleTextTexture.loadFromFile(renderer, "../res/titletext.bmp");
+	if (spriteSheetTexture.texture == NULL || buttonTexture.texture == NULL)
+		success = false;
+	if (titleTexture.texture == NULL || titleTextTexture.texture == NULL)
+		success = false;
+	
+	SDL_Surface* icon = IMG_Load("../res/icon.png");	
+	SDL_SetWindowIcon(window, icon);
+
+	return success;
+}
+
+void Display::close_SDL() {
+	//Free textures
 	spriteSheetTexture.free();
 	buttonTexture.free();
 	titleTexture.free();
 	titleTextTexture.free();
+
+	//Free sounds
+	Mix_FreeChunk(mFSound);
+	Mix_FreeChunk(mTSound);
+	mFSound = NULL;
+	mTSound = NULL;
+
+	//Free global font
+	TTF_CloseFont(Garamond26);
+	TTF_CloseFont(Garamond28);
+	TTF_CloseFont(Cicero22);
+	TTF_CloseFont(Cicero26);
+	Garamond26 = NULL;
+	Garamond28 = NULL;
+	Cicero22 = NULL;
+	Cicero26 = NULL;
+
+	//Destroy window	
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	window = NULL;
+	renderer = NULL;
+
+	//Quit SDL subsystems
+	Mix_Quit();
+	TTF_Quit();
+}
+
+Display::~Display() {
+	close_SDL();
 }
 
 void Display::displayBoard(const int& mF, const int& mT) {
@@ -64,21 +182,21 @@ void Display::displayBoard(const int& mF, const int& mT) {
 	if (!boardPtr->getFlipped())
 		for (char i = '8'; i >= '1'; i--) {
 			rankStr = i;
-			rankText.loadFromRenderedText(rankStr, textColor, Cicero26);
-			rankText.render(BXSTART-35, BYSTART+30+75*('8'-i));
+			rankText.loadFromRenderedText(renderer, rankStr, textColor, Cicero26);
+			rankText.render(renderer, BXSTART-35, BYSTART+30+75*('8'-i));
 		}
 	else
 		for (char i = '1'; i <= '8'; i++) {
 			rankStr = i;
-			rankText.loadFromRenderedText(rankStr, textColor, Cicero26);
-			rankText.render(BXSTART-35, BYSTART+30+75*(i-'1'));
+			rankText.loadFromRenderedText(renderer, rankStr, textColor, Cicero26);
+			rankText.render(renderer, BXSTART-35, BYSTART+30+75*(i-'1'));
 		}
 
-	fileText.loadFromRenderedText(fileStr, textColor, Cicero26); //Load file text
+	fileText.loadFromRenderedText(renderer, fileStr, textColor, Cicero26); //Load file text
 
 	//Render all the rest of the text
-	checkText.render(BXSTART+B_SIZE-200, BYSTART+B_SIZE+40);
-	fileText.render(BXSTART+33, BYSTART+B_SIZE+10);
+	checkText.render(renderer, BXSTART+B_SIZE-200, BYSTART+B_SIZE+40);
+	fileText.render(renderer, BXSTART+33, BYSTART+B_SIZE+10);
 
 	//Update screen
 	SDL_RenderPresent(renderer);
@@ -174,8 +292,8 @@ void Display::displayBotText() {
 
 	botStr = boardPtr->getSide() ? "White" : "Black";
 	botStr += " is thinking..";
-	turnText.loadFromRenderedText(botStr, textColor, Garamond26);
-	turnText.render(BXSTART, BYSTART+B_SIZE+40);
+	turnText.loadFromRenderedText(renderer, botStr, textColor, Garamond26);
+	turnText.render(renderer, BXSTART, BYSTART+B_SIZE+40);
 	SDL_RenderPresent(renderer);
 }
 
@@ -193,7 +311,7 @@ void Display::updateText() {
 			else if (boardPtr->getSideInCheck() == 2)
 				checkStr = "Black is in check";
 		}
-		checkText.loadFromRenderedText(checkStr, textColor, Garamond26);
+		checkText.loadFromRenderedText(renderer, checkStr, textColor, Garamond26);
 	}
 }
 
@@ -204,7 +322,7 @@ void Display::drawButtons() {
 			clipSq = buttons[i].getClicking() ? buttonClips[i+4] : buttonClips[i+2];
 		else
 			clipSq = buttonClips[i];
-		buttonTexture.render(buttons[i].getX(), buttons[i].getY(), &clipSq);
+		buttonTexture.render(renderer, buttons[i].getX(), buttons[i].getY(), &clipSq);
 	}
 }
 
@@ -297,7 +415,7 @@ void Display::drawPieces(const int& mF, const int& mT) {
 					pOTClipSq = clipSq;
 				}
 				else	//Every other piece
-					spriteSheetTexture.render(sqPos.x, sqPos.y, &clipSq);
+					spriteSheetTexture.render(renderer, sqPos.x, sqPos.y, &clipSq);
 			}
 		}
 	}
@@ -311,7 +429,7 @@ void Display::drawPieces(const int& mF, const int& mT) {
 			y = BYSTART + SQ_SIZE/2;
 		if (y > BYSTART + B_SIZE - SQ_SIZE/2) 
 			y = BYSTART + B_SIZE - SQ_SIZE/2;
-		spriteSheetTexture.render(x-SQ_SIZE/2, y-SQ_SIZE/2, &pOTClipSq);
+		spriteSheetTexture.render(renderer, x-SQ_SIZE/2, y-SQ_SIZE/2, &pOTClipSq);
 	}
 }
 
@@ -442,8 +560,8 @@ void Display::drawMoveTable() {
 		plyStr = plyStrings[i];	   		    //Load white move
 		if (i+1 < plyStrings.size())		    //If black has moved,
 			plyStr += " " + plyStrings[i+1];    //load their move, too
-		moveText.loadFromRenderedText(plyStr, textColor, Cicero22);
-		moveText.render(BXSTART+(i/42*180)+B_SIZE+40, 
+		moveText.loadFromRenderedText(renderer, plyStr, textColor, Cicero22);
+		moveText.render(renderer, BXSTART+(i/42*180)+B_SIZE+40, 
 				BYSTART+10+((i/2)%21)*30); 
 	}
 }
@@ -460,24 +578,24 @@ void Display::drawTitleScreen() {
 	borderRect = {BXSTART+B_SIZE+24, BYSTART-1, 500, 650};
 	SDL_RenderDrawRect(renderer, &borderRect);
 
-	titleTexture.render(BXSTART+B_SIZE+74, BYSTART);
+	titleTexture.render(renderer, BXSTART+B_SIZE+74, BYSTART);
 
 	//Draw white options
 	//"White:"
 	clipSq = titleTextClips[0];
-	titleTextTexture.render(BXSTART+B_SIZE+224, BYSTART+200, &clipSq);
+	titleTextTexture.render(renderer, BXSTART+B_SIZE+224, BYSTART+200, &clipSq);
 	//"Human"
 	if (buttons[2].getInside() || !boardPtr->getWhiteIsBot())
 		clipSq = titleTextClips[4];
 	else
 		clipSq = titleTextClips[2];
-	titleTextTexture.render(buttons[2].getX(), buttons[2].getY(), &clipSq);
+	titleTextTexture.render(renderer, buttons[2].getX(), buttons[2].getY(), &clipSq);
 	//"Computer"
 	if (buttons[3].getInside() || boardPtr->getWhiteIsBot())
 		clipSq = titleTextClips[5];
 	else
 		clipSq = titleTextClips[3];
-	titleTextTexture.render(buttons[3].getX(), buttons[3].getY(), &clipSq);
+	titleTextTexture.render(renderer, buttons[3].getX(), buttons[3].getY(), &clipSq);
 	//Numbers 1-9
 	if (boardPtr->getWhiteIsBot()) {
 		for (int i = 1; i < 10; i++) {
@@ -486,7 +604,7 @@ void Display::drawTitleScreen() {
 				clipSq = titleTextClips[i+14];
 			else
 				clipSq = titleTextClips[i+5];
-			titleTextTexture.render(buttons[i+5].getX(), 
+			titleTextTexture.render(renderer, buttons[i+5].getX(), 
 						buttons[i+5].getY(), &clipSq);
 		}
 	}
@@ -494,19 +612,19 @@ void Display::drawTitleScreen() {
 	//Draw black options
 	//"Black:"
 	clipSq = titleTextClips[1];
-	titleTextTexture.render(BXSTART+B_SIZE+224, BYSTART+350, &clipSq);
+	titleTextTexture.render(renderer, BXSTART+B_SIZE+224, BYSTART+350, &clipSq);
 	//"Human"
 	if (buttons[4].getInside() || !boardPtr->getBlackIsBot())
 		clipSq = titleTextClips[4];
 	else
 		clipSq = titleTextClips[2];
-	titleTextTexture.render(buttons[4].getX(), buttons[4].getY(), &clipSq);
+	titleTextTexture.render(renderer, buttons[4].getX(), buttons[4].getY(), &clipSq);
 	//"Computer"
 	if (buttons[5].getInside() || boardPtr->getBlackIsBot())
 		clipSq = titleTextClips[5];
 	else
 		clipSq = titleTextClips[3];
-	titleTextTexture.render(buttons[5].getX(), buttons[5].getY(), &clipSq);
+	titleTextTexture.render(renderer, buttons[5].getX(), buttons[5].getY(), &clipSq);
 	//Numbers 1-9
 	if (boardPtr->getBlackIsBot()) {
 		for (int i = 1; i < 10; i++) {
@@ -515,7 +633,7 @@ void Display::drawTitleScreen() {
 				clipSq = titleTextClips[i+14];
 			else
 				clipSq = titleTextClips[i+5];
-			titleTextTexture.render(buttons[i+14].getX(), 
+			titleTextTexture.render(renderer, buttons[i+14].getX(), 
 						buttons[i+14].getY(), &clipSq);
 		}
 	}
@@ -525,18 +643,24 @@ void Display::drawTitleScreen() {
 		clipSq = titleTextClips[27];
 	else
 		clipSq = titleTextClips[24];
-	titleTextTexture.render(buttons[24].getX(), buttons[24].getY(), &clipSq);
+	titleTextTexture.render(renderer, buttons[24].getX(), buttons[24].getY(), &clipSq);
 
 	//"Start"
 	if (buttons[25].getInside())
 		clipSq = titleTextClips[26];
 	else
 		clipSq = titleTextClips[25];
-	titleTextTexture.render(buttons[25].getX(), buttons[25].getY(), &clipSq);
+	titleTextTexture.render(renderer, buttons[25].getX(), buttons[25].getY(), &clipSq);
 
 }
 
 void Display::handleButtons(SDL_Event* e) {
-	for (int i = 0; i < 26; i++)
-		buttons[i].handleEvent(e);
+	int sound = 0;
+	for (int i = 0; i < 26; i++) {
+		buttons[i].handleEvent(e, sound);
+		if (sound == 1)
+			Mix_PlayChannel(-1, mFSound, 0);
+		else if (sound == 2)
+			Mix_PlayChannel(-1, mTSound, 0);
+	}
 }

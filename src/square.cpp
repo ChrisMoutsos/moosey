@@ -26,7 +26,7 @@ void Square::setPos(int x, int y) {
 	pos.y = y;
 }
 
-void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
+void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s, int& sound) {
 		int x, y;
 		SDL_GetMouseState(&x, &y);
 		bool inside = true;
@@ -48,7 +48,7 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 							mF = square; 
 							dragging = true;
 							if (!muted)
-								Mix_PlayChannel(-1, mFSound, 0);
+								sound = 1;
 						}
 				}
 				else if (mF != -1) {
@@ -57,13 +57,13 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 							mF = square; 
 							dragging = true;
 							if (!muted)
-								Mix_PlayChannel(-1, mFSound, 0);
+								sound = 1;
 						}	
 					}
 					else if (square != mF) {
 						mT = square;
 						if (!muted)
-							Mix_PlayChannel(-1, mTSound, 0);
+							sound = 2;
 					}
 					else
 						mT = -1;
@@ -76,7 +76,7 @@ void Square::handleEvent(SDL_Event* e, int& mF, int& mT, const bool& s) {
 					if (square != mF) {
 						mT = square;
 						if (!muted)
-							Mix_PlayChannel(-1, mTSound, 0);
+							sound = 1;
 					}
 					else if (!dragging) {
 						mF = -1;

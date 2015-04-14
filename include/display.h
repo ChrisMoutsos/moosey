@@ -11,14 +11,15 @@
 #include <string>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 #include "button.h"
 #include "ltexture.h"
 #include "square.h"
 
-class Board;
-
 class Display {
+	friend class Board;
+
 	public:
 		Display(Board * b);
 		~Display();
@@ -36,6 +37,11 @@ class Display {
 		void drawTitleScreen();
 		void handleButtons(SDL_Event* e);
 
+		bool init_SDL();
+		bool loadMedia();
+		void close_SDL();
+		SDL_Texture* loadTexture(std::string path);
+
 		//ACCESSORS
 		int getBoardXStart() { return BXSTART; };
 		int getBoardYStart() { return BYSTART; };
@@ -47,7 +53,14 @@ class Display {
 	private:
 		Board * boardPtr;
 		bool sideFlag;
-		const int B_SIZE, SQ_SIZE, BXSTART, BYSTART;
+		const static int B_SIZE = 600, SQ_SIZE = 75, BXSTART = 50, BYSTART = 25;
+		const static int SCREEN_W = 1250;
+		const static int SCREEN_H = 700;
+
+		SDL_Window* window;
+		SDL_Renderer* renderer;
+		TTF_Font* Garamond26, *Garamond28, *Cicero22, *Cicero26;
+		Mix_Chunk* mTSound, *mFSound;
 		SDL_Rect spriteClips[12], buttonClips[6], titleTextClips[28];
 		Button buttons[26];
 		LTexture spriteSheetTexture, buttonTexture, titleTexture,
@@ -57,6 +70,6 @@ class Display {
 		std::string rankStr, fileStr;
 };
 
-extern Mix_Chunk * mFSound, * mTSound;
+//extern Mix_Chunk * mFSound, * mTSound;
 
 #endif

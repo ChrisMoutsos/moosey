@@ -16,7 +16,7 @@ class Button {
 	public:
 		Button();
 
-		bool handleEvent(SDL_Event* e);
+		bool handleEvent(SDL_Event* e, int& sound);
 
 		//ACCESSORS
 		int getX() const { return pos.x; };

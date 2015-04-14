@@ -377,8 +377,14 @@ void Board::placePieces(std::string FEN) {
 void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 	display.handleButtons(e);
 
-	for (int i = 0; i < 64; i++)
-		display.squares[i].handleEvent(e, mF, mT, side);
+	int sound = 0;
+	for (int i = 0; i < 64; i++) {
+		display.squares[i].handleEvent(e, mF, mT, side, sound);
+		if (sound == 1)
+			Mix_PlayChannel(-1, display.mFSound, 0);
+		else if (sound == 2)
+			Mix_PlayChannel(-1, display.mTSound, 0);
+	}
 	
 	if (mF != -1 && mT != -1) {
 		mF = from64(mF);
@@ -421,7 +427,7 @@ void Board::botMove() {
 	setMove(move/100, move%100);
 	movePiece();
 	if (!muted)
-		Mix_PlayChannel(-1, mFSound, 0);
+		Mix_PlayChannel(-1, display.mFSound, 0);
 	changeTurn();
 	genOrderedMoveList();
 	checkCheck(side);

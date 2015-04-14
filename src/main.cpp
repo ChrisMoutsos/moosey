@@ -12,6 +12,8 @@
  * Make sure killer moves are being implemented correctly
  * Write dupMove code for Queens
  * Make sure FEN loading works perfectly
+ * Load everything in Display constructor (aka take loading out of SDL)
+ * Remove unnecessary square_t enums
  * 
  */
 
@@ -19,7 +21,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "common.h"
-#include "sdl.h"
 #include "board.h"
 
 bool quit = false, muted = false, start = false;
@@ -27,6 +28,7 @@ bool quit = false, muted = false, start = false;
 using namespace std;
 
 int main(int argc, char* args[]) {
+/*
 	if (!init_SDL()) {
 		cout << "Failure to initialize SDL.\n";
 		return -1;
@@ -35,6 +37,7 @@ int main(int argc, char* args[]) {
 		cout << "Failure to load media.\n";
 		return -1;
 	}
+*/
 
 	int mF = -1, mT = -1;
 	SDL_Event e; //Event handler
@@ -106,6 +109,5 @@ int main(int argc, char* args[]) {
 			mF = mT = -1;
 	}
 
-	close_SDL();
 	return 0;
 }
