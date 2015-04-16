@@ -479,13 +479,13 @@ void Display::drawMoveTable() {
 		    boardPtr->getPmSq(lastMove) != mT2)
 			plyStr += "Q";
 		else if (boardPtr->piece[p].getValue() == K_VAL) {
-			if (mF2 == _E1 && (mT2 == _B1 || mT2 == _G1)) { //White castled
+			if (mF2 == E1 && (mT2 == B1 || mT2 == G1)) { //White castled
 				castling = true;
-				plyStr += (mT2 == _G1) ? "0-0" : "0-0-0";
+				plyStr += (mT2 == G1) ? "0-0" : "0-0-0";
 			}
-			else if (mF2 == _E8 && (mT2 == _B8 || mT2 == _G8)) { //Black castled
+			else if (mF2 == E8 && (mT2 == B8 || mT2 == G8)) { //Black castled
 				castling = true;
-				plyStr += (mT2 == _G8) ? "0-0" : "0-0-0";
+				plyStr += (mT2 == G8) ? "0-0" : "0-0-0";
 			}
 			else
 				plyStr += "K";

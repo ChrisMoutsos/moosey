@@ -176,8 +176,8 @@ bool Board::validatePawnMove(int mF, int mT, bool s) const {
 		//En passant
 		if (onMT == empty) { 	
 			if (moveInfo.size() > 1 && mT == moveInfo.back().epSq)
-				if ((s && moveInfo.back().epSq > _H5) 
-				   || (!s && moveInfo.back().epSq < _A4))
+				if ((s && moveInfo.back().epSq > H5) 
+				   || (!s && moveInfo.back().epSq < A4))
 					return true;
 			return false;	
 		}

@@ -156,14 +156,14 @@ void Board::placePiece(unsigned int p, unsigned int sq) {
 }
 
 void Board::placePiecesDefault() {
-	for (int i = _A1; i <= _H1; i++)
-		placePiece(i-_A1, i);
-	for (int i = _A2; i <= _H2; i++) 
-		placePiece(i-_A2+8, i);
-	for (int i = _A8; i <= _H8; i++) 
-		placePiece(i-_A8+16, i);
-	for (int i = _A7; i <= _H7; i++) 
-		placePiece(i-_A7+24, i);
+	for (int i = A1; i <= H1; i++)
+		placePiece(i-A1, i);
+	for (int i = A2; i <= H2; i++) 
+		placePiece(i-A2+8, i);
+	for (int i = A8; i <= H8; i++) 
+		placePiece(i-A8+16, i);
+	for (int i = A7; i <= H7; i++) 
+		placePiece(i-A7+24, i);
 }
 
 void Board::initializePieces() {
@@ -247,7 +247,7 @@ void Board::initializePieces() {
 }
 
 void Board::placePieces(std::string FEN) {
-	unsigned int index = 0, sqCounter = _A8, p;
+	unsigned int index = 0, sqCounter = A8, p;
 	int wPIndex = wPa, bPIndex = bPa;
 
 	//Place the pieces
@@ -497,7 +497,7 @@ std::string Board::getFEN() {
 	//Piece positions
 	for (int j = 0; j < 8; j++) {
 		emptyCount = 0;
-		for (int i = _A8 - j*10; i <= _H8 - j*10; i++) {
+		for (int i = A8 - j*10; i <= H8 - j*10; i++) {
 			if (board120[i] == empty)
 				emptyCount++;
 			else {

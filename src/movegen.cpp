@@ -296,16 +296,16 @@ void Board::generateKingMoves(int p, int& counter) {
 
 	if (canCastle(KINGSIDE, s)) { 
 		if (s)
-			piece[p].setInMoveList(counter, _G1);
+			piece[p].setInMoveList(counter, G1);
 		else
-			piece[p].setInMoveList(counter, _G8);
+			piece[p].setInMoveList(counter, G8);
 		counter++;
 	}
 	if (canCastle(QUEENSIDE, s)) { 
 		if (s)
-			piece[p].setInMoveList(counter, _C1);
+			piece[p].setInMoveList(counter, C1);
 		else
-			piece[p].setInMoveList(counter, _C8);
+			piece[p].setInMoveList(counter, C8);
 		counter++;
 	}
 

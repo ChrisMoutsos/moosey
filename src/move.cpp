@@ -53,15 +53,15 @@ void Board::movePiece(int mF, int mT) {
 		else if (mFVal == R_VAL && piece[mF].getMoved() == 0) {
 			//Take away castling permissions, update Zobrist key
 			if (s && piece[wK].getAlive() && piece[wK].getMoved() == 0) {
-				if (mF == _A1)
+				if (mF == A1)
 					zobrist.key ^= zobrist.castling[WHITE][1];
-				else if (mF == _H1)
+				else if (mF == H1)
 					zobrist.key ^= zobrist.castling[WHITE][0];
 			}
 			else if (!s && piece[bK].getAlive() && piece[bK].getMoved() == 0) {
-				if (mF == _A8)
+				if (mF == A8)
 					zobrist.key ^= zobrist.castling[BLACK][1];
-				else if (mF == _H8)
+				else if (mF == H8)
 					zobrist.key ^= zobrist.castling[BLACK][0];
 			}
 		}
