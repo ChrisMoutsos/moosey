@@ -8,12 +8,11 @@
 
 /* 
  * ##To-Do List##
- * Add en passants to quiescent search maybe
- * Make sure killer moves are being implemented correctly
+ * Add en passants to quiescent search
+ * Reimplement killer moves
  * Write dupMove code for Queens
  * Make sure FEN loading works perfectly
- * Load everything in Display constructor (aka take loading out of SDL)
- * Remove unnecessary square_t enums
+ * Transposition table
  * 
  */
 
@@ -28,22 +27,10 @@ bool quit = false, muted = false, start = false;
 using namespace std;
 
 int main(int argc, char* args[]) {
-/*
-	if (!init_SDL()) {
-		cout << "Failure to initialize SDL.\n";
-		return -1;
-	}
-	if (!loadMedia()) {
-		cout << "Failure to load media.\n";
-		return -1;
-	}
-*/
-
 	int mF = -1, mT = -1;
 	SDL_Event e; //Event handler
 
 	Board board;
-	//Board board("r2qk1nr/pp1n1ppp/2p5/2bp4/8/2N2Q1P/PPPPBPP1/R1B2RK1 w kq - 1 9");
 
 	std::cout << "Current FEN (start): " << board.getFEN() << '\n';
 	std::cout << "Current Zobrist (start): " << board.getZobrist() << '\n';
