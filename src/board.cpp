@@ -306,10 +306,14 @@ void Board::placePieces(std::string FEN) {
 			blackMaterial += piece[i].getValue();
 		//Incr pawn's movecount if they have moved
 		if (piece[i].getValue() == P_VAL) {
-			if (i <= wPh && piece[i].getPos()/10 != 3)
-				piece[i].incrMoved();
-			else if (i <= bPh && piece[i].getPos()/10 != 8)
-				piece[i].incrMoved();
+			if (i <= wPh) {
+				if (piece[i].getPos()/10 != 3)
+					piece[i].incrMoved();
+			}
+			else {
+				if (piece[i].getPos()/10 != 8)
+					piece[i].incrMoved();
+			}
 		}
 	}
 
