@@ -437,6 +437,9 @@ void Display::drawMoveTable() {
 	using std::string;
 	using std::vector;
 	static vector<string> plyStrings;
+	vector<int> allOtherAliveQueens;
+	int startPawn, notSameFile = 0, notSameRank = 0;
+	int e = 0, small, big;
 	string plyStr = "";
 	int mF2, mT2, p, otherPiece;
 	bool castling = false, dupMove = false;
@@ -475,9 +478,81 @@ void Display::drawMoveTable() {
 		if ((boardPtr->getPly()-1)%2 == 0)	//Add number in front for white's moves
 			plyStr = std::to_string((boardPtr->getPly()-1)/2+1) + ". ";
 		p = boardPtr->getPieceMoved(lastMove);
+
 		if (boardPtr->piece[p].getValue() == Q_VAL && 
-		    boardPtr->getPmSq(lastMove) != mT2)
+		    boardPtr->getPmSq(lastMove) != mT2) {
 			plyStr += "Q";
+
+			//Check same side pawns, for ambiguous moves
+			startPawn = !boardPtr->getSide() ? wPa : bPa;
+
+			for (int i = startPawn; i <= startPawn+8; i++) {
+				if (!boardPtr->piece[i].getAlive()) continue;
+				if (i == p) continue;
+				if (boardPtr->piece[i].getValue() == Q_VAL) {
+					allOtherAliveQueens.push_back(i);
+				}
+			}
+			//Add the real queen if necessary
+			if (!boardPtr->getSide()) {
+				if (p > wQ && boardPtr->piece[wQ].getAlive()) {
+					allOtherAliveQueens.push_back(wQ);
+				}
+			}
+			else {
+				if (p > bQ && boardPtr->piece[bQ].getAlive()) {
+					allOtherAliveQueens.push_back(bQ);
+				}
+			}
+			//Loop through other queens, checking for ambiguity
+			for (int i = 0; i < (int)allOtherAliveQueens.size(); i++) {
+				oPos = boardPtr->piece[allOtherAliveQueens[i]].getPos();
+				if (!(boardPtr->validateHozMove(oPos, mT2) | 
+				      boardPtr->validateDiagMove(oPos, mT2)))
+					continue;
+
+				dupMove = true;
+
+				//Make sure we're not needlessly disambiguating
+				if (oPos%10 == mT2%10)	//Same file
+					e = 10;
+				else if (oPos/10 == mT2/10) //Same rank
+					e = 1;
+				else if ((oPos-mT2)%11 == 0) { //Positive slope diagonal
+					e = 11;
+				}
+				else if ((oPos-mT2)%9 == 0) { //Negative slope diagonal
+					e = 9;
+				}
+
+				//Loop through the squares between otherPiece
+				//and moveTo, and if any of them are moveFrom,
+				//it's not really an ambiguous move
+				if (e) {
+					big = oPos > mT2 ? oPos : mT2;
+					small = oPos < mT2 ? oPos : mT2;
+					for (int j = small+e; j < big; j += e)
+						if (j == mF2) {
+							dupMove = false;
+							//Erase the queen from the list
+							allOtherAliveQueens.erase(allOtherAliveQueens.begin()+i);
+							i--;
+						}
+				}
+				if (dupMove) {
+					if (mF2%10 != oPos%10) //Not same file
+						notSameFile++;
+					else 			//Same file
+						notSameRank++;
+				}
+			}
+			if (notSameFile) { //need file to differentiate
+				plyStr += mF2%10+'a'-1;
+			}
+			if (notSameRank) { //need rank to differentiate
+				plyStr += mF2/10+'1'-2;
+			}
+		}
 		else if (boardPtr->piece[p].getValue() == K_VAL) {
 			if (mF2 == E1 && (mT2 == B1 || mT2 == G1)) { //White castled
 				castling = true;
@@ -495,7 +570,6 @@ void Display::drawMoveTable() {
 			//Check same side and same piecetype, for ambiguous moves
 			otherPiece = !boardPtr->getSide() ? (p == 0 ? 7 : 0) : (p == 16 ? 23 : 16);
 			oPos = boardPtr->piece[otherPiece].getPos();
-			int e = 0, small, big;
 
 			if (boardPtr->piece[otherPiece].getAlive())
 				if (boardPtr->validateHozMove(oPos, mT2)) {
@@ -527,10 +601,13 @@ void Display::drawMoveTable() {
 					dupMove = true;
 		}
 		if (dupMove) { //If the move was ambiguous, de-ambiguate
-			if (mF2%10 != oPos%10) //Not same file
-				plyStr += mF2%10+'a'-1; //so, file is sufficient
-			else 					   //Same file
-				plyStr += mF2/10+'1'-2; //so, rank is sufficient
+			//Queen deambiguating is done in the Queen's check above
+			if (boardPtr->piece[p].getValue() != Q_VAL) {
+				if (mF2%10 != oPos%10) //Not same file
+					plyStr += mF2%10+'a'-1; //so, file is sufficient
+				else 					   //Same file
+					plyStr += mF2/10+'1'-2; //so, rank is sufficient
+			}
 		}
 		if (boardPtr->getPrevOnMoveTo(lastMove) != empty) { //If move was a capture
 			//Special case for pawns, display the file of departure
