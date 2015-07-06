@@ -22,7 +22,7 @@
 #include "common.h"
 #include "board.h"
 
-bool quit = false, muted = false, start = false;
+bool quit = false, muted = true, start = false;
 
 using namespace std;
 
