@@ -26,6 +26,7 @@ class Piece {
 		int getPos() const { return pos; };
 		bool getColor() const { return color; };
 		int getType() const { return type; };
+		bool getPromoted() const { return promoted; };
 		//Mutators
 		void setInMoveList(int i, int v);
 		void kill() { alive = false; };
