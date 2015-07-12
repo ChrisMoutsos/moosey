@@ -404,6 +404,7 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 			if (drawCheck() == 2)
 				std::cout << "Threefold repetition.\n";
 			std::cout << "-----------------------------------------------------------------------------\n\n";
+			eval(true);
 		}
 		mF = mT = -1;
 	}
@@ -443,6 +444,7 @@ void Board::botMove() {
 		sideInCheckmate = 3;
 	}
 	std::cout << "-----------------------------------------------------------------------------\n\n";
+	eval(true);
 }
 
 void Board::changeTurn() {
@@ -462,6 +464,8 @@ void Board::undoMove() {
 		return;
 	}
 	
+	changeTurn();
+	unmovePiece();
 	changeTurn();
 	unmovePiece();
 	genOrderedMoveList();

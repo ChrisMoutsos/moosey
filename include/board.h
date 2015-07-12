@@ -132,7 +132,7 @@ class Board {
 		void generatePawnMoves(int p, int& counter);
 
 		//EVAL.CPP
-		int eval();
+		int eval(bool verbose = false);
 	
 		//DATA
 		Piece piece[32];	//The pieces
