@@ -18,8 +18,8 @@ int Board::eval(bool verbose) {
 		cout << "Blackmaterial <= ENDGAME_VAL? " << (blackMaterial <= ENDGAME_VAL) << "\n\n";
 	}
 
-	enum eval_t { BISHOPPAIR = 30, CASTLED = 50, CASTLINGRIGHTS = 20, 
-		      PASSEDPAWN = 30, DOUBLEDPAWN = 20, OPENFILEROOK = 20,
+	enum eval_t { BISHOPPAIR = 30, CASTLED = 30, CASTLINGRIGHTS = 0, 
+		      PASSEDPAWN = 30, DOUBLEDPAWN = 10, OPENFILEROOK = 10,
 		      PAWNCHAIN = 5, ISOLATEDPAWN = 20
 	};
 
@@ -45,9 +45,9 @@ int Board::eval(bool verbose) {
 				      5,  5,  5,  5,  5,  5,  5,  5,
 				     20, 20, 20, 20, 20, 20, 20, 20,
 				     30, 30, 30, 30, 30, 30, 30, 30,
+				     35, 35, 35, 35, 35, 35, 35, 35,
 				     40, 40, 40, 40, 40, 40, 40, 40,
-				     60, 60, 60, 60, 60, 60, 60, 60,
-				     80, 80, 80, 80, 80, 80, 80, 80,
+				     50, 50, 50, 50, 50, 50, 50, 50,
 				      0,  0,  0,  0,  0,  0,  0,  0 };
 
 	static int knightTable[64] = { -50,-40,-30,-30,-30,-30,-40,-50,
