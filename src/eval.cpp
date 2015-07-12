@@ -18,8 +18,8 @@ int Board::eval(bool verbose) {
 		cout << "Blackmaterial <= ENDGAME_VAL? " << (blackMaterial <= ENDGAME_VAL) << "\n\n";
 	}
 
-	enum eval_t { BISHOPPAIR = 50, CASTLED = 50, CASTLINGRIGHTS = 50, 
-		      PASSEDPAWN = 50, DOUBLEDPAWN = 50, OPENFILEROOK = 50,
+	enum eval_t { BISHOPPAIR = 30, CASTLED = 50, CASTLINGRIGHTS = 20, 
+		      PASSEDPAWN = 30, DOUBLEDPAWN = 20, OPENFILEROOK = 20,
 		      PAWNCHAIN = 5, ISOLATEDPAWN = 20
 	};
 
@@ -180,7 +180,7 @@ int Board::eval(bool verbose) {
 	for (int i = bqN; i <= bkN; i += bkN-bqN)
 		if (piece[i].getAlive()) {
 			score -= knightTable[reverse[to64(piece[i].getPos())-1]];
-			if (verbose)
+		2if (verbose)
 				cout << "N (" << knightTable[reverse[to64(piece[i].getPos())-1]] << ") ";
 		}
 	for (int i = bqB; i <= bkB; i += bkB-bqB)
@@ -279,22 +279,30 @@ int Board::eval(bool verbose) {
 	}
 	//Ability to castle
 	if (!whiteCastled) {
-		if (piece[wK].getMoved())
+		if (piece[wK].getMoved()) {
 			score -= CASTLINGRIGHTS;
-		else if (piece[wqR].getMoved() && piece[wkR].getMoved())
+			if (verbose)
+				cout << "penalized";
+		}
+		else if (piece[wqR].getMoved() && piece[wkR].getMoved()) {
 			score -= CASTLINGRIGHTS;
-		if (verbose)
-			cout << "penalized";
+			if (verbose)
+				cout << "penalized";
+		}
 	}
 	if (verbose)
 		cout << "\nBlack: ";
 	if (!blackCastled) {
-		if (piece[bK].getMoved())
+		if (piece[bK].getMoved()) {
 			score += CASTLINGRIGHTS;
-		else if (piece[bqR].getMoved() && piece[bkR].getMoved())
+			if (verbose)
+				cout << "penalized";
+		}
+		else if (piece[bqR].getMoved() && piece[bkR].getMoved()) {
 			score += CASTLINGRIGHTS;
-		if (verbose)
-			cout << "penalized";
+			if (verbose)
+				cout << "penalized";
+		}
 	}
 	if (verbose)
 		cout << "\nScore: " << score << "\n\n";
@@ -385,7 +393,7 @@ int Board::eval(bool verbose) {
 			    whitePawnsOnFile[file] == 0) {
 				score -= ISOLATEDPAWN;
 				if (verbose)
-					cout << "Isloated " << file << " file ";
+					cout << "Isolated " << file << " file ";
 			}
 			//Chain
 			if (board120[pos-9] != empty &&
@@ -472,7 +480,7 @@ int Board::eval(bool verbose) {
 			    blackPawnsOnFile[file] == 0) {
 				score += ISOLATEDPAWN;
 				if (verbose)
-					cout << "Isloated " << file << " file ";
+					cout << "Isolated " << file << " file ";
 			}
 			//Chain
 			if (board120[pos+11] != empty &&
