@@ -180,7 +180,7 @@ int Board::eval(bool verbose) {
 	for (int i = bqN; i <= bkN; i += bkN-bqN)
 		if (piece[i].getAlive()) {
 			score -= knightTable[reverse[to64(piece[i].getPos())-1]];
-		2if (verbose)
+		if (verbose)
 				cout << "N (" << knightTable[reverse[to64(piece[i].getPos())-1]] << ") ";
 		}
 	for (int i = bqB; i <= bkB; i += bkB-bqB)
