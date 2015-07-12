@@ -179,6 +179,12 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 	bool inCheck = b.inCheck(s);
 
 	int score;
+
+	//Give extensions
+	while (ext >= 100) {
+		depthLeft++;
+		ext -= 100;
+	}
 	
 	//Null move reduction
 	if (allowNull && !inCheck) {
@@ -327,18 +333,18 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 			if (movesSearched >= 4 && b.getPly() > 4 &&
 			    b.getPrevOnMoveTo(b.getNumMovesMade()-1) == empty && 
 			    !b.inCheck(s) && mT != b.getPmSq(b.getNumMovesMade()-1)) {
-				score = -alphaBeta(b, -alpha-1, -alpha, depthLeft-2, depthGone+1, &line, 1, ext%100);
+				score = -alphaBeta(b, -alpha-1, -alpha, depthLeft-2, depthGone+1, &line, 1, ext-100);
 			}
 			else
 				score = alpha+1;
 			if (score > alpha) {
-				score = -alphaBeta(b, -alpha-1, -alpha, depthLeft-1, depthGone+1, &line, 1, ext%100);
+				score = -alphaBeta(b, -alpha-1, -alpha, depthLeft-1, depthGone+1, &line, 1, ext-100);
 				if ((score > alpha) && (score < beta)) //If we were wrong
-					score = -alphaBeta(b, -beta, -alpha, depthLeft-1, depthGone+1, &line, 1, ext%100);
+					score = -alphaBeta(b, -beta, -alpha, depthLeft-1, depthGone+1, &line, 1, ext-100);
 			}
 		}	
 		else
-			score = -alphaBeta(b, -beta, -alpha, depthLeft-1, depthGone+1, &line, 1, ext%100);
+			score = -alphaBeta(b, -beta, -alpha, depthLeft-1, depthGone+1, &line, 1, ext-100);
 
 		b.unmovePiece();
 		b.changeTurn();
