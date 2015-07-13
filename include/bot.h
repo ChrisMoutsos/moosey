@@ -18,6 +18,14 @@ struct LINE {
 	int move[20];
 };
 
+struct HASHENTRY {
+	unsigned long zKey;
+	//((mF*100+mT)*10000 + abs(score)) * score/(abs)(score)
+	int bestMoveAndScore;
+	//depthLeft*10 plus 0 (exact), 1 (lower), 2 (upper)
+	int depthAndNodeType;
+};
+
 class Bot {
 	public:
 		Bot();
@@ -42,6 +50,9 @@ class Bot {
 		//Killer moves
 		int killers[30][2];
 		int level;
+		//Transposition table
+		const static int TTSIZE = 131072;
+		HASHENTRY transTable[TTSIZE];
 };
 
 #endif
