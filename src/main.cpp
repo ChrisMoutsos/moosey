@@ -33,7 +33,7 @@ int main(int argc, char* args[]) {
 
 	std::cout << "Current FEN (start): " << board.getFEN() << '\n';
 	std::cout << "Current Zobrist (start): " << board.getZobrist() << '\n';
-	board.eval(true);
+//	board.eval(true);
 
 	while (!quit) {
 		while (SDL_PollEvent(&e)) {
