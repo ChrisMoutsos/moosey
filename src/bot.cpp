@@ -83,12 +83,12 @@ int Bot::think(Board& b, int depth) {
 		qNodes = 0;
 
 		//Set aspiration window
-//		alpha = bestScore - asp;
-//		beta = bestScore + asp;
+		alpha = bestScore - asp;
+		beta = bestScore + asp;
 
-//		for (;;) {
+		for (;;) {
 			bestScore = alphaBeta(b, alpha, beta, i, 0, &prinVarLine, 1, 0);
-/*
+
 			if (bestScore <= alpha)  {
 				std::cout << "FAIL LOW DEPTH " << i << "\n";
 				alpha = -CHECKMATE_VAL-1;
@@ -99,10 +99,10 @@ int Bot::think(Board& b, int depth) {
 			}
 			else break;
 		}
-*/
-		//bestMoveSoFar = prinVarLine.move[0];
-		bestMoveSoFar = abs(transTable[int(b.getZobrist()%TTSIZE)].bestMoveAndScore);
-		bestMoveSoFar = bestMoveSoFar/10000;
+
+		bestMoveSoFar = prinVarLine.move[0];
+		//bestMoveSoFar = abs(transTable[int(b.getZobrist()%TTSIZE)].bestMoveAndScore);
+		//bestMoveSoFar = bestMoveSoFar/10000;
 
 		std::cout << "TRANSTABLE INFO\n----------\n";
 		std::cout << "actual zobrist: " << b.getZobrist() << '\n';
@@ -148,8 +148,10 @@ int Bot::think(Board& b, int depth) {
 	totalTime += diff2.count();
 	std::cout << "Total time elapsed: " << totalTime << '\n';
 
-	return bestMoveSoFar;
+	clearTT();
+
 	return prinVarLine.move[0];
+	//return bestMoveSoFar;
 }
 
 int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, LINE* pline, bool allowNull, int ext) {
@@ -182,6 +184,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 	HASHENTRY hLookup, hStorage;
 	hStorage.zKey = b.getZobrist();
 
+/*
 	hLookup = transTable[int(b.getZobrist()%TTSIZE)];
 
 	if (hLookup.zKey == b.getZobrist() && depthGone != 0) {
@@ -234,6 +237,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 			}
 		}
 	}
+*/
 
 	//Horizon nodes, quiescence search
 	if (depthLeft <= 0) {
@@ -269,6 +273,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 			if (score >= beta) { //Fail-high
 				pline->count = 0;
 
+/*
 				//Transposition table storage, lower bound
 				hStorage.bestMoveAndScore = (99*100+99)*10000 + abs(beta);
 				if (beta < 0)
@@ -277,6 +282,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 				hStorage.depthAndNodeType = b.getPly()*10 + 1;
 				transTable[int(hStorage.zKey%TTSIZE)] = hStorage;
 				//std::cout << "(" << mF << " to " << mT << ") Added lowerbound hash to zkey " << hStorage.zKey << '\n';
+*/
 
 				return score;
 			}
@@ -371,11 +377,23 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 		}
 */
 		//then PV in front
-/*
 		std::vector<int>::iterator pvIndex;
 		if (depthGone < oldPrinVarLine.count) {
 			int pvmove = oldPrinVarLine.move[depthGone];
 			if (pvmove != 0 && depthGone < oldPrinVarLine.count) {
+				pvIndex = std::find(moveList.begin(), moveList.end(), pvmove);
+				if (pvIndex != moveList.end()) {
+					temp = *pvIndex;
+					moveList.erase(pvIndex);
+					moveList.insert(moveList.begin()+0, temp);
+				}
+			}
+		}
+/*
+		std::vector<int>::iterator pvIndex;
+		if (hLookup.zKey == b.getZobrist()) {
+			int pvmove = hLookup.bestMoveAndScore/10000;
+			if (pvmove != 9999 && pvmove != 0) {
 				pvIndex = std::find(moveList.begin(), moveList.end(), pvmove);
 				if (pvIndex != moveList.end()) {
 					temp = *pvIndex;
@@ -442,6 +460,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 			}
 
 			//Transposition table storage, lower bound
+/*
 			hStorage.bestMoveAndScore = (mF*100+mT)*10000 + abs(beta);
 			if (beta < 0)
 				hStorage.bestMoveAndScore *= -1;
@@ -450,16 +469,18 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 			transTable[int(hStorage.zKey%TTSIZE)] = hStorage;
 			//std::cout << "(" << mF << " to " << mT << ") Added lowerbound hash to zkey " << hStorage.zKey << '\n';
 
+*/
 			return beta;
 		}
 		if (score > alpha) { //Best so far
 			alpha = score;
 			foundPV = true;
 			//Add the move to the principal variation
-		//	pline->move[0] = mF*100 + mT;
-		//	memcpy(pline->move + 1, line.move, line.count * sizeof(int));
-		//	pline->count = line.count + 1;
+			pline->move[0] = mF*100 + mT;
+			memcpy(pline->move + 1, line.move, line.count * sizeof(int));
+			pline->count = line.count + 1;
 
+/*
 			//Transposition table storage, exact score
 			hStorage.bestMoveAndScore = (mF*100+mT)*10000 + abs(score);
 			if (score < 0)
@@ -468,8 +489,10 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 			hStorage.depthAndNodeType = b.getPly()*10 + 0;
 			transTable[int(hStorage.zKey%TTSIZE)] = hStorage;
 			//std::cout << "(" << mF << " to " << mT << ") Added exact hash to zkey " << hStorage.zKey << '\n';
+*/
 		}
 		else {
+/*
 			if (transTable[int(hStorage.zKey%TTSIZE)].zKey != hStorage.zKey) {
 				//Transposition table storage, upper bound
 				hStorage.bestMoveAndScore = (mF*100+mT)*10000 + abs(alpha);
@@ -480,6 +503,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 				transTable[int(hStorage.zKey%TTSIZE)] = hStorage;
 				//std::cout << "(" << mF << " to " << mT << ") Added upperbound hash to zkey " << hStorage.zKey << '\n';
 			}
+*/
 		}
 
 		movesSearched++;
