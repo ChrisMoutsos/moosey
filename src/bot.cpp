@@ -184,7 +184,6 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 	HASHENTRY hLookup, hStorage;
 	hStorage.zKey = b.getZobrist();
 
-/*
 	hLookup = transTable[int(b.getZobrist()%TTSIZE)];
 
 	if (hLookup.zKey == b.getZobrist() && depthGone != 0) {
@@ -202,12 +201,14 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 //				pline->move[0] = hashMF*100 + hashMT;
 //				memcpy(pline->move + 1, line.move, line.count * sizeof(int));
 //				pline->count = line.count + 1;
+/*
 				if (score2 >= beta) { //Fail-high
 					return beta;
 				}
 				else if (score2 < alpha) { //Fail-low
 					return alpha;
 				}
+*/
 				return score2;
 			}
 			//Lower bound
@@ -216,7 +217,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 				if (hLookup.bestMoveAndScore < 0)
 					score2 *= -1;
 				if (score2 >= beta) { //Fail-high
-					return beta;
+					return score2;
 				}
 				if (score2 > alpha) {
 					alpha = score2;
@@ -228,14 +229,13 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 				if (hLookup.bestMoveAndScore < 0)
 					score2 *= -1;
 				if (score2 <= alpha) { //Fail-low
-					return alpha;
+					return score2;
 				}
 				if (score2 < beta) {
 					beta = score2;
 				}
 			}
 	}
-*/
 
 	//Horizon nodes, quiescence search
 	if (depthLeft <= 0) {
@@ -395,7 +395,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 		b.changeTurn();
 
 		//Pawn push extensions
-		if (b.piece[b[mF]].getValue() == P_VAL) {
+		if (b[mF] != empty && b.piece[b[mF]].getValue() == P_VAL) {
 			if (s && (mT/10 == 80 || mT/10 == 90))
 				ext += 50;
 			else if (!s && (mT/10 == 30 || mT/10 == 20))

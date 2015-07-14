@@ -25,6 +25,7 @@ Display::Display(Board * b) : boardPtr(b)
 	renderer = NULL;
 	Garamond26 = Garamond28 = Cicero22 = Cicero26 = NULL;
 	mTSound = mFSound = NULL;
+	sideFlag = !boardPtr->getSide();
 	init_SDL();
 	loadMedia();
 }
@@ -299,7 +300,7 @@ void Display::displayBotText() {
 
 void Display::updateText() {
 	std::string checkStr = " ";
-	if (sideFlag != boardPtr->getSide() || boardPtr->getNumMovesMade() == 0) {
+	if (boardPtr->getNumMovesMade() == 0 || sideFlag != boardPtr->getSide()) {
 		sideFlag = boardPtr->getSide();
 		if (boardPtr->getSideInCheck()) { //Load check text
 			if (boardPtr->getSideInCheckmate() == 1)
