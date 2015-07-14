@@ -22,7 +22,7 @@ struct HASHENTRY {
 	unsigned long zKey;
 	//((mF*100+mT)*10000 + abs(score)) * score/(abs)(score)
 	int bestMoveAndScore;
-	//depthLeft*10 plus 0 (exact), 1 (lower), 2 (upper)
+	//ply*10 plus 0 (exact), 1 (lower), 2 (upper)
 	int depthAndNodeType;
 };
 
