@@ -50,6 +50,7 @@ class Board {
 		void undoMove();
 		void restart();
 		void updateDisplay(const int& mF, const int& mT);
+		void zobristXorSide() { zobrist.key ^= zobrist.side; };
 		//ACCESSORS
 		int getMoveFrom() const { return moveFrom; };
 		int getMoveTo() const { return moveTo; };
