@@ -40,6 +40,8 @@ class Bot {
 		int getLevel() const { return level; };
 		void setLevel(int d) { level = d; };
 
+		void clearTT();
+
 	private:
 		LINE prinVarLine, oldPrinVarLine;
 		double totalTime;
@@ -52,7 +54,7 @@ class Bot {
 		int level;
 		//Transposition table
 		const static int TTSIZE = 131072;
-		HASHENTRY transTable[TTSIZE];
+		HASHENTRY* transTable;
 };
 
 #endif
