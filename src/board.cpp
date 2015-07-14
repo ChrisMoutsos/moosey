@@ -452,16 +452,12 @@ void Board::changeTurn() {
 }
 
 void Board::undoMove() {
-	std::cout << "Undoing move\n";
-
 	if (movesMade.size() == 0) {
-		std::cout << "No moves done, returning\n";
 		return;
 	}
 
 	//Stalemate
 	if (movesMade.back() == 0) {
-		std::cout << "Stalemate\n";
 		movesMade.pop_back();
 		moveInfo.pop_back();
 		ply--;
@@ -469,7 +465,6 @@ void Board::undoMove() {
 		checkCheck(side);
 		return;
 	}
-	std::cout << "Undoing it!\n";
 	
 	changeTurn();
 	unmovePiece();
