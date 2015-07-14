@@ -369,7 +369,8 @@ void Board::unmovePiece(int mF, int mT) {
 				blackMaterial += piece[board120[mT+epExtra]].getValue();
 			zobrist.key ^= zobrist.piece[piece[board120[mT+epExtra]].getType()][!s][to64(mT+epExtra)-1];
 
-			if (piece[board120[mT]].getValue() == R_VAL && 
+			if (board120[mT] != empty &&
+			    piece[board120[mT]].getValue() == R_VAL && 
 			    piece[board120[mT]].getMoved() == 0) {
 				int eKing = s ? bK : wK;
 				if (piece[eKing].getAlive() && piece[eKing].getMoved() == 0) {
@@ -381,7 +382,8 @@ void Board::unmovePiece(int mF, int mT) {
 					}
 				} 
 			}
-			else if (piece[board120[mT]].getValue() == K_VAL &&
+			else if (board120[mT] != empty &&
+				 piece[board120[mT]].getValue() == K_VAL &&
 				 piece[board120[mT]].getMoved() == 0) {
 				int ekRook = s ? bkR : wkR;
 				int eqRook = s ? bqR : wqR;
