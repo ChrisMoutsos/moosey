@@ -139,11 +139,13 @@ void Board::initializeVars() {
 	whiteMaterial = 8*P_VAL + 2*(R_VAL+B_VAL+N_VAL) + Q_VAL + K_VAL;
 	blackMaterial = whiteMaterial;
 	flipped = false;
+/*
 	numWhiteMoves = numBlackMoves = 0;
 	for (int i = 0; i < 256; i++) {
 		whiteMoveList[i] = 0;
 		blackMoveList[i] = 0;
 	}
+*/
 }
 
 void Board::initializeBitboards() {
@@ -598,7 +600,7 @@ int Board::getFromMoveList(bool s, int i) const {
 }
 
 int Board::getMoveListSize(bool s) const {
-	return s ? numWhiteMoves : numBlackMoves;
+	return s ? int(whiteMoveList.size()) : int(blackMoveList.size());
 }
 
 int Board::getEpSq(int i) const {
@@ -639,20 +641,20 @@ int Board::getLastMove() const {
 //MUTATORS
 void Board::addToMovelist(bool s, int v) {
 	if (s) {
-		whiteMoveList[numWhiteMoves] = v;
-		numWhiteMoves++;
-		whiteMoveList[numWhiteMoves] = 0;
+		whiteMoveList.push_back(v);
 	}
 	else {
-		blackMoveList[numBlackMoves] = v;
-		numBlackMoves++;
-		blackMoveList[numBlackMoves] = 0;
+		blackMoveList.push_back(v);
 	}
 }
 
 void Board::clearMoveList(bool s) {
-	if (s) numWhiteMoves = 0;
-	else numBlackMoves = 0;
+	if (s) {
+		whiteMoveList.clear();
+	}
+	else {
+		blackMoveList.clear();
+	}
 }
 
 //OPERATOR OVERLOADS
