@@ -91,7 +91,7 @@ void Board::movePiece(int mF, int mT) {
 			localPmSq = mT;
 			piece[board120[mF]].setValue(Q_VAL);
 			piece[board120[mF]].setName("Queen");
-			piece[board120[mF]].setType(3);
+			piece[board120[mF]].setType(QUEEN);
 			if (s) {
 				piece[board120[mF]].setAbbr('Q');
 				whiteMaterial += Q_VAL - P_VAL;
@@ -295,7 +295,7 @@ void Board::unmovePiece(int mF, int mT) {
 			//Put a pawn back on mF
 			zobrist.key ^= zobrist.piece[5][s][to64(mF)-1];
 
-			piece[board120[mT]].setType(5);
+			piece[board120[mT]].setType(PAWN);
 			piece[board120[mT]].setValue(P_VAL);
 			piece[board120[mT]].setName("Pawn");
 			if (s) {

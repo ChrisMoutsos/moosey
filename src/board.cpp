@@ -180,49 +180,49 @@ void Board::initializePieces() {
 		piece[wqR+i].setName("Rook");
 		piece[wqR+i].setAbbr('R' + 2*i);
 		piece[wqR+i].setValue(R_VAL);
-		piece[wqR+i].setType(0);
+		piece[wqR+i].setType(ROOK);
 
 		piece[wqN+i].setName("Knight");
 		piece[wqN+i].setAbbr('N' + 2*i);
 		piece[wqN+i].setValue(N_VAL);
-		piece[wqN+i].setType(1);
+		piece[wqN+i].setType(KNIGHT);
 
 		piece[wqB+i].setName("Bishop");
 		piece[wqB+i].setAbbr('B' + 2*i);
 		piece[wqB+i].setValue(B_VAL);
-		piece[wqB+i].setType(2);
+		piece[wqB+i].setType(BISHOP);
 
 		piece[wQ+i].setName("Queen");
 		piece[wQ+i].setAbbr('Q' + 2*i);
 		piece[wQ+i].setValue(Q_VAL);
-		piece[wQ+i].setType(3);
+		piece[wQ+i].setType(QUEEN);
 
 		piece[wK+i].setName("King");
 		piece[wK+i].setAbbr('K' + 2*i);
 		piece[wK+i].setValue(K_VAL);
-		piece[wK+i].setType(4);
+		piece[wK+i].setType(KING);
 
 		piece[wkB+i].setName("Bishop");
 		piece[wkB+i].setAbbr('B' + 2*i);
 		piece[wkB+i].setValue(B_VAL);
-		piece[wkB+i].setType(2);
+		piece[wkB+i].setType(BISHOP);
 
 		piece[wkN+i].setName("Knight");
 		piece[wkN+i].setAbbr('N' + 2*i);
 		piece[wkN+i].setValue(N_VAL);
-		piece[wkN+i].setType(1);
+		piece[wkN+i].setType(KNIGHT);
 
 		piece[wkR+i].setName("Rook");
 		piece[wkR+i].setAbbr('R' + 2*i);
 		piece[wkR+i].setValue(R_VAL);
-		piece[wkR+i].setType(0);
+		piece[wkR+i].setType(ROOK);
 	}
 	for (int s = 0; s <= 16; s += 16) 
 		for (int i = 0; i < 8; i++) { 
 			piece[wPa+i+s].setName("Pawn");
 			piece[wPa+i+s].setAbbr('P' + 2*s);
 			piece[wPa+i+s].setValue(P_VAL);
-			piece[wPa+i+s].setType(5);
+			piece[wPa+i+s].setType(PAWN);
 		}
 
 	//Set colors

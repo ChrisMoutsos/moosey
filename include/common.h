@@ -8,6 +8,8 @@
 #define ENDGAME_VAL 11309 
 #define defaultFEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
+typedef unsigned long long U64;
+
 //GAME CONTROL
 extern bool quit, muted, start;
 
@@ -69,6 +71,9 @@ enum castleside_t { QUEENSIDE = 2, KINGSIDE = 1
 };
 
 enum scores_t { CHECKMATE_VAL = 9999, STALEMATE_VAL = 8000, MATING_VAL = 9000
+};
+
+enum type_t { ROOK = 0, KNIGHT, BISHOP, QUEEN, KING, PAWN
 };
 
 #endif
