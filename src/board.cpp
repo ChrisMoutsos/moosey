@@ -138,6 +138,11 @@ void Board::initializeVars() {
 	whiteMaterial = 8*P_VAL + 2*(R_VAL+B_VAL+N_VAL) + Q_VAL + K_VAL;
 	blackMaterial = whiteMaterial;
 	flipped = false;
+	numWhiteMoves = numBlackMoves = 0;
+	for (int i = 0; i < 256; i++) {
+		whiteMoveList[i] = 0;
+		blackMoveList[i] = 0;
+	}
 }
 
 void Board::emptyBoard() {
@@ -561,17 +566,15 @@ std::string Board::getFEN() {
 
 int Board::getFromMoveList(bool s, int i) const {
 	if (s) {
-		assert (i > -1 && i < (int)whiteMoveList.size());
 		return whiteMoveList[i];
 	}
 	else {
-		assert (i > -1 && i < (int)blackMoveList.size());
 		return blackMoveList[i];
 	}
 }
 
 int Board::getMoveListSize(bool s) const {
-	return s ? (int)whiteMoveList.size() : (int)blackMoveList.size();
+	return s ? numWhiteMoves : numBlackMoves;
 }
 
 int Board::getEpSq(int i) const {
@@ -611,13 +614,19 @@ int Board::getLastMove() const {
 
 //MUTATORS
 void Board::addToMovelist(bool s, int v) {
-	if (s) whiteMoveList.push_back(v);
-	else blackMoveList.push_back(v);
+	if (s) {
+		whiteMoveList[numWhiteMoves] = v;
+		numWhiteMoves++;
+	}
+	else {
+		blackMoveList[numBlackMoves] = v;
+		numBlackMoves++;
+	}
 }
 
 void Board::clearMoveList(bool s) {
-	if (s) whiteMoveList.clear();
-	else blackMoveList.clear();
+	if (s) numWhiteMoves = 0;
+	else numBlackMoves = 0;
 }
 
 //OPERATOR OVERLOADS

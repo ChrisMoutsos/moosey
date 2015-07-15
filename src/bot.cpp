@@ -49,7 +49,7 @@ int Bot::think(Board& b, int depth) {
 	int bestMoveSoFar = 0, bestScore = 0;
 	int alpha = -CHECKMATE_VAL-1, beta = CHECKMATE_VAL+1;
 	int asp = P_VAL/2;
-	vector<int> moveList;
+	int moveList[256];
 
 	//Reset everything if you restart the game
 	if (b.getNumMovesMade() < 2)
@@ -294,18 +294,18 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 
 	bool foundPV = false;
 	int mF, mT;
-	vector<int> moveList;
+	int moveList[256] = { 0 };
 
 	//Generate ordered legal moveList
 	b.genOrderedMoveList(s, moveList);
-	b.cleanMoveList(s, moveList);
-
+	int moveListSize = b.cleanMoveList(s, moveList);
+	
 	//Evading check extension
 	if (inCheck)
 		ext += 75;
 
 	//No legal moves
-	if (moveList.size() == 0) {
+	if (moveListSize == 0) {
 		pline->count = 0;
 		//If we are in checkmate, return bad score
 		if (inCheck)
@@ -318,7 +318,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 		}
 	}
 	//Singular reply
-	else if (moveList.size() == 1) {
+	else if (moveListSize == 1) {
 		//On a root node, quit early
 		if (depthGone == 0) {
 			pline->move[0] = moveList[0];
@@ -330,13 +330,13 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 		ext += 50;
 	}
 	//Only two replies
-	else if (moveList.size() == 2)
+	else if (moveListSize == 2)
 		ext += 25;
 
 	//Frontier nodes: futility pruning
 	if (depthLeft == 1) {
 		if (!inCheck && !(abs(alpha) > MATING_VAL || abs(beta) > MATING_VAL)) {
-			if (b.eval() + B_VAL < alpha && moveList.size() > 0) {
+			if (b.eval() + B_VAL < alpha && moveListSize) {
 				pline->count = 0;
 				return quies(b, alpha, beta, depthGone);
 			}
@@ -345,7 +345,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 	//Pre-frontier nodes: extended futility pruning
 	else if (depthLeft == 2) {
 		if (!inCheck && !(abs(alpha) > MATING_VAL || abs(beta) > MATING_VAL)) {
-			if (b.eval() + R_VAL < alpha && moveList.size() > 0) {
+			if (b.eval() + R_VAL < alpha && moveListSize) {
 				depthLeft--;
 			}
 		}
@@ -353,7 +353,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 	//Pre-pre-frontier nodes: razoring
 	else if (depthLeft == 3) {
 		if (!inCheck && !(abs(alpha) > MATING_VAL || abs(beta) > MATING_VAL)) {
-			if (b.eval() + Q_VAL < alpha && moveList.size() > 0) {
+			if (b.eval() + Q_VAL < alpha && moveListSize) {
 				depthLeft--;
 			}
 		}
@@ -377,18 +377,26 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 		}
 */
 		//then PV in front
-		std::vector<int>::iterator pvIndex;
+		int pvIndex = -1;
 		if (depthGone < oldPrinVarLine.count) {
 			int pvmove = oldPrinVarLine.move[depthGone];
 			if (pvmove != 0 && depthGone < oldPrinVarLine.count) {
-				pvIndex = std::find(moveList.begin(), moveList.end(), pvmove);
-				if (pvIndex != moveList.end()) {
-					temp = *pvIndex;
-					moveList.erase(pvIndex);
-					moveList.insert(moveList.begin()+0, temp);
+				for (int i = 0; i < moveListSize; i++) {
+					if (moveList[i] == pvmove) {
+						pvIndex = i;
+						break;
+					}
+				}
+				if (pvIndex != -1) {
+					temp = moveList[pvIndex];
+					for (int i = 0; i < pvIndex; i++) {
+						moveList[i+1] = moveList[i];
+					}
+					moveList[0] = temp;
 				}
 			}
 		}
+		
 /*
 		std::vector<int>::iterator pvIndex;
 		if (hLookup.zKey == b.getZobrist()) {
@@ -408,8 +416,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 	int movesSearched = 0;
 
 	//Loop through moves
-	for (size_t i = 0; i < moveList.size(); i++) {
-		vector<int> localPV;
+	for (int i = 0; i < moveListSize; i++) {
 		nodes++;
 
 		mF = moveList[i]/100;
@@ -531,7 +538,7 @@ int Bot::quies(Board& b, int alpha, int beta, int depthGone) {
 	if (currEval > alpha)
 		alpha = currEval;
 
-	vector<int> nonQuiesList;
+	int nonQuiesList[256] = { 0 };
 
 	//Get psuedo-legal captures
 	b.getCaptures(s, nonQuiesList);
@@ -540,10 +547,10 @@ int Bot::quies(Board& b, int alpha, int beta, int depthGone) {
 	b.sortCaptures(nonQuiesList);
 
 	//Add promotions to start
-	b.addPromotions(s, nonQuiesList);
+	int nonQuiesListSize = b.addPromotions(s, nonQuiesList);
 	
 	//Loop through the captures/promotions
-	for (size_t i = 0; i < nonQuiesList.size(); i++) {
+	for (int i = 0; i < nonQuiesListSize; i++) {
 		mF = nonQuiesList[i]/100;
 		mT = nonQuiesList[i]%100;
 

@@ -33,6 +33,16 @@ bool Board::legalMove(int mF, int mT, bool s, bool v) {
 	return true;
 }
 
+bool Board::putSelfInCheck(int mF, int mT, bool s) {
+	bool isInCheck;
+
+	movePiece(mF, mT);
+	isInCheck = inCheck(s);
+	unmovePiece(mF, mT);
+
+	return isInCheck;
+}
+
 bool Board::checkCheck(bool s) {
 	//Cleans wML or bML of illegal moves
 
@@ -42,7 +52,7 @@ bool Board::checkCheck(bool s) {
 		return checkCheck(s, blackMoveList);
 }
 
-bool Board::checkCheck(bool s, std::vector<int>& moveList) {
+bool Board::checkCheck(bool s, int* moveList) {
 	//Cleans moveList of illegal moves, sets sideInCheck(mate) appropriately
 
 	sideInCheck = 0;
@@ -51,7 +61,8 @@ bool Board::checkCheck(bool s, std::vector<int>& moveList) {
 	if (inCheck(s)) {
 		sideInCheck = s ? 1 : 2;
 		cleanMoveList(s, moveList);
-		if (moveList.size() == 0) { //Checkmate
+		if ((s && numWhiteMoves == 0) ||
+		    (!s && numBlackMoves == 0)) {
 			sideInCheckmate = s ? 1 : 2;
 			return true;
 		}

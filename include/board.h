@@ -75,7 +75,10 @@ class Board {
 		bool getBlackIsBot() const { return blackIsBot; };
 		bool getFlipped() const { return flipped; };
 		unsigned long getZobrist() const { return zobrist.key; };
-		//MUTATORSS
+		int getNumWhiteMoves() const { return numWhiteMoves; };
+		int getNumBlackMoves() const { return numBlackMoves; };
+		int getNumMoves() const { return side ? numWhiteMoves : numBlackMoves; };
+		//MUTATORS
 		void setMove(int mF, int mT) { moveFrom = mF; moveTo = mT; };
 		void setPly(int newPly) { ply = newPly; };
 		void setSide(bool newSide) { side = newSide; };
@@ -99,6 +102,7 @@ class Board {
 	
 		//LEGAL.CPP
 		bool legalMove(int mF, int mT, bool s, bool v = false);
+		bool putSelfInCheck(int mF, int mT, bool s);
 		bool validateMove(int mF, int mT, bool s);
 		bool validatePawnMove(int mF, int mT, bool s) const;
 		bool validateHozMove(int mF, int mT) const;
@@ -106,24 +110,28 @@ class Board {
 		bool validateKnightMove(int mF, int mT) const;
 		bool validateKingMove(int mF, int mT, bool s);
 		bool checkCheck(bool s);
-		bool checkCheck(bool s, std::vector<int>& moveList);
+		bool checkCheck(bool s, int* moveList);
 		bool inCheck(bool s) const;
 		bool canCastle(int dir, bool s);
 		int drawCheck() const;
 	
 		//MOVEGEN.CPP
-		void genOrderedMoveList();
-		void genOrderedMoveList(bool s, std::vector<int>& moveList);
-		void getCaptures(bool s, std::vector<int>& moveList);
-		void sortCaptures(std::vector<int>& moveList);
+		int perft(int depth);
+		void clearMovelist(int* moveList);
+		int getNonOrderedAllLegalMoves(bool s, int* moveList);
+		int genOrderedMoveList();
+		int genOrderedMoveList(bool s, int* moveList);
+		int genNonOrderedMoveList(bool s, int* moveList);
+		int getCaptures(bool s, int* moveList);
+		void sortCaptures(int* moveList);
 		bool MVVLVA(int i, int j);
-		void addPromotions(bool s, std::vector<int>& moveList);
-		void sortNonCaptures(std::vector<int>& moveList);
+		int addPromotions(bool s, int* moveList);
+		void sortNonCaptures(int* moveList);
 		bool hhSort(bool s, int i, int j);
-		void getNonCaptures(bool s, std::vector<int>& moveList);
-		void removeNonCaptures(bool s, std::vector<int>& moveList);
-		void cleanMoveList(bool s);
-		void cleanMoveList(bool s, std::vector<int>& moveList);
+		int getNonCaptures(bool s, int* moveList);
+		void removeNonCaptures(bool s, int* moveList);
+		int cleanMoveList(bool s);
+		int cleanMoveList(bool s, int* moveList);
 		void generatePieceMoveLists(bool s);
 		void generatePieceMoveListFor(int p);
 		void generateHozMoves(int p, int& counter);
@@ -151,7 +159,8 @@ class Board {
 		int whiteBotLevel, blackBotLevel;
 		//Zobrist hash key
 		Zobrist zobrist;
-		std::vector<int> whiteMoveList, blackMoveList;
+		int whiteMoveList[256], blackMoveList[256];
+		int numWhiteMoves, numBlackMoves;
 		std::vector<int> movesMade; 
 		std::vector<info> moveInfo;
 };
