@@ -52,6 +52,9 @@ int Board::getNonOrderedAllLegalMoves(bool s, int* moveList) {
 
 	moveList[index] = 0;
 
+	if (s) numWhiteMoves = index;
+	else numBlackMoves = index;
+
 	return index;
 }
 
@@ -104,6 +107,9 @@ int Board::genOrderedMoveList(bool s, int* moveList) {
 
 	moveList[i+j] = 0;
 
+	if (s) numWhiteMoves = i+j;
+	else numBlackMoves = i+j;
+
 	return i+j;
 }
 
@@ -126,6 +132,9 @@ int Board::genNonOrderedMoveList(bool s, int* moveList) {
 	}
 
 	moveList[i+j] = 0;
+
+	if (s) numWhiteMoves = i+j;
+	else numBlackMoves = i+j;
 
 	return i+j;
 }
@@ -152,6 +161,9 @@ int Board::getCaptures(bool s, int* moveList) {
 	}	
 
 	moveList[index] = 0;
+
+	if (s) numWhiteMoves = index;
+	else numBlackMoves = index;
 
 	return index;
 }
@@ -203,6 +215,9 @@ int Board::addPromotions(bool s, int* moveList) {
 
 	moveList[index] = 0;
 
+	if (s) numWhiteMoves = index;
+	else numBlackMoves = index;
+
 	return index;
 }
 
@@ -228,6 +243,9 @@ int Board::getNonCaptures(bool s, int* moveList) {
 	}
 
 	moveList[index] = 0;
+
+	if (s) numWhiteMoves = index;
+	else numBlackMoves = index;
 
 	return index;
 }
@@ -280,8 +298,11 @@ void Board::removeNonCaptures(bool s, int* moveList) {
 }
 
 int Board::cleanMoveList(bool s) {
-	int* moveList = side ? whiteMoveList : blackMoveList;
+	int* moveList = s ? whiteMoveList : blackMoveList;
 	int size = cleanMoveList(s, moveList);
+	if (s) numWhiteMoves = size;
+	else numBlackMoves = size;
+	std::cout << s << " moves: " << size << "\n";
 	return size;
 }
 
@@ -305,6 +326,9 @@ int Board::cleanMoveList(bool s, int* moveList) {
 		} 
 		i++;
 	}
+
+	if (s) numWhiteMoves = i;
+	else numBlackMoves = i;
 
 	return i;
 }

@@ -49,7 +49,7 @@ int Bot::think(Board& b, int depth) {
 	int bestMoveSoFar = 0, bestScore = 0;
 	int alpha = -CHECKMATE_VAL-1, beta = CHECKMATE_VAL+1;
 	int asp = P_VAL/2;
-	int moveList[256];
+	int moveList[256] = { 0 };
 
 	//Reset everything if you restart the game
 	if (b.getNumMovesMade() < 2)
@@ -284,7 +284,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 				//std::cout << "(" << mF << " to " << mT << ") Added lowerbound hash to zkey " << hStorage.zKey << '\n';
 */
 
-				return score;
+				return beta;
 			}
 			//Extend on nearby checkmates
 			else if (score < -MATING_VAL)
@@ -389,8 +389,8 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 				}
 				if (pvIndex != -1) {
 					temp = moveList[pvIndex];
-					for (int i = 0; i < pvIndex; i++) {
-						moveList[i+1] = moveList[i];
+					for (int i = pvIndex; i > 0; i--) {
+							moveList[i] = moveList[i-1];
 					}
 					moveList[0] = temp;
 				}
@@ -486,6 +486,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 			pline->move[0] = mF*100 + mT;
 			memcpy(pline->move + 1, line.move, line.count * sizeof(int));
 			pline->count = line.count + 1;
+			//std::cout << "BEST MOVE SO FAR!: " << mF << " to " << mT << '\n';
 
 /*
 			//Transposition table storage, exact score

@@ -87,6 +87,8 @@ void Board::movePiece(int mF, int mT) {
 		if (mFVal == P_VAL && ((s && mT/10 == 9) || (!s && mT/10 == 2))) {
 			//Put a queen on mT
 			zobrist.key ^= zobrist.piece[3][s][to64(mT)-1];
+			bb.pieces[s][QUEEN] |= bb.sq[to64(mT)-1];
+			bb.allPieces[s] |= bb.sq[to64(mT)-1];
 
 			localPmSq = mT;
 			piece[board120[mF]].setValue(Q_VAL);
@@ -113,8 +115,11 @@ void Board::movePiece(int mF, int mT) {
 				piece[board120[mF]].setInMoveList(i, 0);
 		}
 		//Non-promotion, just put piece on mT
-		else
+		else {
 			zobrist.key ^= zobrist.piece[type][s][to64(mT)-1];
+			bb.pieces[s][piece[board120[mF]].getType()] |= bb.sq[to64(mT)-1];
+			bb.allPieces[s] |= bb.sq[to64(mT)-1];
+		}
 
 		//If move is a capture
 		if (board120[mT+epExtra] != empty) {
@@ -162,6 +167,8 @@ void Board::movePiece(int mF, int mT) {
 
 			//Kill the piece
 			zobrist.key ^= zobrist.piece[piece[board120[mT+epExtra]].getType()][!s][to64(mT+epExtra)-1];
+			bb.pieces[!s][piece[board120[mT+epExtra]].getType()] &= ~bb.sq[to64(mT+epExtra)-1];
+			bb.allPieces[!s] &= ~bb.sq[to64(mT+epExtra)-1];
 			piece[board120[mT+epExtra]].kill();
 			piece[board120[mT+epExtra]].setPos(null);
 			if (epExtra != 0)
@@ -171,6 +178,8 @@ void Board::movePiece(int mF, int mT) {
 		}
 	
 		//Move the piece
+		bb.pieces[s][piece[board120[mF]].getType()] &= ~bb.sq[to64(mF)-1];
+		bb.allPieces[s] &= ~bb.sq[to64(mF)-1];
 		board120[mT] = board120[mF];
 		piece[board120[mT]].setPos(mT);
 		piece[board120[mT]].incrMoved();
@@ -223,19 +232,27 @@ void Board::movePiece(int mF, int mT) {
 			}
 		}
 		//Update zobrist key
-		zobrist.key ^= zobrist.piece[4][s][to64(mF)-1];		   //Remove king
-		zobrist.key ^= zobrist.piece[4][s][to64(mT)-1]; 	   //Place king
-		zobrist.key ^= zobrist.piece[0][s][to64(mF+cExtras[1])-1]; //Remove rook
-		zobrist.key ^= zobrist.piece[0][s][to64(mF+cExtras[0])-1]; //Place rook
+		zobrist.key ^= zobrist.piece[KING][s][to64(mF)-1];	      //Remove king
+		zobrist.key ^= zobrist.piece[KING][s][to64(mT)-1]; 	      //Place king
+		zobrist.key ^= zobrist.piece[ROOK][s][to64(mF+cExtras[1])-1]; //Remove rook
+		zobrist.key ^= zobrist.piece[ROOK][s][to64(mF+cExtras[0])-1]; //Place rook
 	
 		//Update board120
 		board120[mT] = board120[mF];		 	    //Move king
 		piece[board120[mT]].setPos(mT); 
 		piece[board120[mT]].incrMoved();
+		bb.pieces[s][KING] &= ~bb.sq[to64(mF)-1];
+		bb.pieces[s][KING] |= bb.sq[to64(mT)-1];
+		bb.allPieces[s] &= ~bb.sq[to64(mF)-1];
+		bb.allPieces[s] |= bb.sq[to64(mT)-1];
 
 		board120[mF+cExtras[0]] = board120[mF+cExtras[1]];  //Move rook
 		piece[board120[mF+cExtras[0]]].setPos(mF+cExtras[0]);
 		piece[board120[mF+cExtras[0]]].incrMoved();
+		bb.pieces[s][ROOK] &= ~bb.sq[to64(mF+cExtras[1])-1];
+		bb.pieces[s][ROOK] |= bb.sq[to64(mF+cExtras[0])-1];
+		bb.allPieces[s] &= ~bb.sq[to64(mF+cExtras[1])-1];
+		bb.allPieces[s] |= bb.sq[to64(mF+cExtras[0])-1];
 
 		board120[mF] = empty;				    //Empty old king sq
 		board120[mF+cExtras[1]] = empty;		    //Empty old rook sq
@@ -277,8 +294,6 @@ void Board::unmovePiece(int mF, int mT) {
 			castling = mF < mT ? KINGSIDE : QUEENSIDE;
 
 	if (!castling) {
-		zobrist.key ^= zobrist.piece[type][s][to64(mT)-1];
-		zobrist.key ^= zobrist.piece[type][s][to64(mF)-1];
 
 		//If we are undoing an enpassant move
 		if (mTVal == P_VAL && moveInfo.back().prevOnMoveTo == empty) {
@@ -289,11 +304,15 @@ void Board::unmovePiece(int mF, int mT) {
 			}
 		}
 		//If we are undoing a promotion
-		else if (mT == moveInfo.back().pmSq) {
-			//Take queen off mF
-			zobrist.key ^= zobrist.piece[type][s][to64(mF)-1];
+		if (mT == moveInfo.back().pmSq) {
+			//Take queen off mT
+			zobrist.key ^= zobrist.piece[type][s][to64(mT)-1];
+			bb.pieces[s][QUEEN] &= ~bb.sq[to64(mT)-1];
+			bb.allPieces[s] &= ~bb.sq[to64(mT)-1];
 			//Put a pawn back on mF
 			zobrist.key ^= zobrist.piece[5][s][to64(mF)-1];
+			bb.pieces[s][PAWN] |= bb.sq[to64(mF)-1];
+			bb.allPieces[s] |= bb.sq[to64(mF)-1];
 
 			piece[board120[mT]].setType(PAWN);
 			piece[board120[mT]].setValue(P_VAL);
@@ -314,6 +333,14 @@ void Board::unmovePiece(int mF, int mT) {
 			piece[board120[mT]].setMoveList(temp);
 			piece[board120[mT]].setMoveListSize(4);
 		}	
+		else { //Not unpromoting
+			zobrist.key ^= zobrist.piece[type][s][to64(mT)-1];
+			zobrist.key ^= zobrist.piece[type][s][to64(mF)-1];
+			bb.pieces[s][piece[board120[mT]].getType()] &= ~bb.sq[to64(mT)-1];
+			bb.pieces[s][piece[board120[mT]].getType()] |= bb.sq[to64(mF)-1];
+			bb.allPieces[s] &= ~bb.sq[to64(mT)-1];
+			bb.allPieces[s] |= bb.sq[to64(mF)-1];
+		}
 		//If unmoving a rook who only moved once
 		if (mTVal == R_VAL && piece[board120[mT]].getMoved() == 1) {
 			int king = s ? wK : bK;
@@ -368,6 +395,8 @@ void Board::unmovePiece(int mF, int mT) {
 			else
 				blackMaterial += piece[board120[mT+epExtra]].getValue();
 			zobrist.key ^= zobrist.piece[piece[board120[mT+epExtra]].getType()][!s][to64(mT+epExtra)-1];
+			bb.pieces[!s][piece[board120[mT+epExtra]].getType()] |= bb.sq[to64(mT+epExtra)-1];
+			bb.allPieces[!s] |= bb.sq[to64(mT+epExtra)-1];
 
 			if (board120[mT] != empty &&
 			    piece[board120[mT]].getValue() == R_VAL && 
@@ -445,12 +474,20 @@ void Board::unmovePiece(int mF, int mT) {
 		zobrist.key ^= zobrist.piece[0][s][to64(mF+cExtras[1])-1]; //Place rook
 	
 		//Move the king back
+		bb.pieces[s][KING] &= ~bb.sq[to64(mT)-1];
+		bb.pieces[s][KING] |= bb.sq[to64(mF)-1];
+		bb.allPieces[s] &= ~bb.sq[to64(mT)-1];
+		bb.allPieces[s] |= bb.sq[to64(mF)-1];
 		board120[mF] = board120[mT];
 		piece[board120[mF]].setPos(mF);
 		piece[board120[mF]].decrMoved();
 		board120[mT] = empty;
 
 		//Move the rook back
+		bb.pieces[s][ROOK] &= ~bb.sq[to64(mF+cExtras[0])-1];
+		bb.pieces[s][ROOK] |= bb.sq[to64(mF+cExtras[1])-1];
+		bb.allPieces[s] &= ~bb.sq[to64(mF+cExtras[0])-1];
+		bb.allPieces[s] |= bb.sq[to64(mF+cExtras[1])-1];
 		board120[mF+cExtras[1]] = board120[mF+cExtras[0]];
 		piece[board120[mF+cExtras[1]]].setPos(mF+cExtras[1]);
 		piece[board120[mF+cExtras[1]]].decrMoved();	

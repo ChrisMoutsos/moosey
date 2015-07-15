@@ -18,6 +18,7 @@ Board::Board() : display(this) {
 	placePiecesDefault();	
 	initializeZobrist();
 	setSquarePositions();
+	initializeBitboards();
 	display.setSpriteClips();	
 	display.setButtons();
 }
@@ -142,6 +143,20 @@ void Board::initializeVars() {
 	for (int i = 0; i < 256; i++) {
 		whiteMoveList[i] = 0;
 		blackMoveList[i] = 0;
+	}
+}
+
+void Board::initializeBitboards() {
+	int pos, t;
+	for (int s = BLACK; s <= WHITE; s++) {
+		for (int p = bqR-(s*16); p<= bPh-(s*16); p++) {
+			if (piece[p].getAlive()) {
+				pos = to64(piece[p].getPos())-1;
+				t = piece[p].getType();
+				bb.pieces[s][t] |= bb.sq[pos];
+				bb.allPieces[s] |= bb.sq[pos];
+			}
+		}
 	}
 }
 
@@ -411,6 +426,15 @@ void Board::handleInput(int& mF, int& mT, SDL_Event* e) {
 				std::cout << "Threefold repetition.\n";
 			std::cout << "-----------------------------------------------------------------------------\n\n";
 			//eval(true);
+/*
+			std::cout << "bitboards\n--------------------------------\n";
+			std::cout << "allWhite: " << bb.allPieces[WHITE] << " allBlack: " << bb.allPieces[BLACK] << '\n';
+			for (int t = ROOK; t <= PAWN; t++) {
+				std::cout << "t: " << t << '\n';
+				std::cout << "black: " << bb.pieces[BLACK][t] << " white: " << bb.pieces[WHITE][t] << '\n';
+			}
+			std::cout << '\n';
+*/
 		}
 		mF = mT = -1;
 	}
@@ -617,10 +641,12 @@ void Board::addToMovelist(bool s, int v) {
 	if (s) {
 		whiteMoveList[numWhiteMoves] = v;
 		numWhiteMoves++;
+		whiteMoveList[numWhiteMoves] = 0;
 	}
 	else {
 		blackMoveList[numBlackMoves] = v;
 		numBlackMoves++;
+		blackMoveList[numBlackMoves] = 0;
 	}
 }
 

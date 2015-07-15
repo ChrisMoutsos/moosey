@@ -15,6 +15,7 @@
 #include "bot.h"
 #include "zobrist.h"
 #include "display.h"
+#include "bitboards.h"
 
 //For moveInfo vector
 struct info {
@@ -43,6 +44,7 @@ class Board {
 		void placePieces(std::string FEN);	
 		void initializePieces();
 		void initializeZobrist();
+		void initializeBitboards();
 		void handleInput(int& mF, int& mT, SDL_Event* e);
 		void setSquarePositions();
 		void setPiecesOnSquares();
@@ -163,6 +165,7 @@ class Board {
 		int numWhiteMoves, numBlackMoves;
 		std::vector<int> movesMade; 
 		std::vector<info> moveInfo;
+		Bitboards bb;
 };
 
 #endif
