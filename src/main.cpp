@@ -36,7 +36,6 @@ int main(int argc, char* args[]) {
 	std::cout << "Current Zobrist (start): " << board.getZobrist() << '\n';
 //	board.eval(true);
 
-/*
 	typedef std::chrono::duration<float> fsec;
 	fsec diff;
 	int nodes;
@@ -44,13 +43,12 @@ int main(int argc, char* args[]) {
 	for (int i = 1; i <= 10; i++) {
 		auto beginTime = std::chrono::high_resolution_clock::now();
 		nodes = board.perft(i);
-		std::cout << "board.perf(" << i << "): " << nodes << "\n";
+		std::cout << "board.perft(" << i << "): " << nodes << "\n";
 		auto endTime = std::chrono::high_resolution_clock::now();
 		diff = endTime - beginTime;
 		std::cout << "Took: " << diff.count() << " seconds" << '\n';
 		std::cout << "Nodes/sec: " << nodes/diff.count() << '\n';
 	}
-*/
 
 	while (!quit) {
 		while (SDL_PollEvent(&e)) {

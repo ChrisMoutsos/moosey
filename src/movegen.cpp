@@ -45,7 +45,6 @@ int Board::getNonOrderedAllLegalMoves(bool s, std::vector<int>& moveList) {
 			mT = piece[i].getFromMoveList(j);
 			if (mT == 0) break;
 			if (putSelfInCheck(mF, mT, s)) continue;
-			moveList[index] = mF*100+mT;
 			moveList.push_back(mF*100+mT);
 		}
 	}
