@@ -18,6 +18,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <chrono>
 #include "common.h"
 #include "board.h"
 
@@ -34,6 +35,22 @@ int main(int argc, char* args[]) {
 	std::cout << "Current FEN (start): " << board.getFEN() << '\n';
 	std::cout << "Current Zobrist (start): " << board.getZobrist() << '\n';
 //	board.eval(true);
+
+/*
+	typedef std::chrono::duration<float> fsec;
+	fsec diff;
+	int nodes;
+	std::cout << "Perftesting....";
+	for (int i = 1; i <= 10; i++) {
+		auto beginTime = std::chrono::high_resolution_clock::now();
+		nodes = board.perft(i);
+		std::cout << "board.perf(" << i << "): " << nodes << "\n";
+		auto endTime = std::chrono::high_resolution_clock::now();
+		diff = endTime - beginTime;
+		std::cout << "Took: " << diff.count() << " seconds" << '\n';
+		std::cout << "Nodes/sec: " << nodes/diff.count() << '\n';
+	}
+*/
 
 	while (!quit) {
 		while (SDL_PollEvent(&e)) {
