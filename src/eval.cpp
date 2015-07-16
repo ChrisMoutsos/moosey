@@ -518,7 +518,7 @@ int Board::eval(bool verbose) {
 	if (verbose)
 		cout << "Score: " << score << "\n\n";
 
-	//Semi open filed rooks
+	//Open filed rooks
 	if (verbose)
 		cout << "Open filed rooks\n----------\n";
 	for (int j = wqR; j <= bqR; j += (bqR-wqR)) {
@@ -531,7 +531,7 @@ int Board::eval(bool verbose) {
 			for (int r = rank+1; r <= 9; r++) { //Up
 				checkPiece = board120[r*10+file];
 				if (checkPiece != empty) {
-					if (piece[checkPiece].getColor() != piece[i].getColor())
+				//	if (piece[checkPiece].getColor() != piece[i].getColor())
 						if (piece[checkPiece].getValue() == P_VAL) {
 							open = false;
 							break;
@@ -541,7 +541,7 @@ int Board::eval(bool verbose) {
 			for (int r = rank-1; r >= 2; r--) { //Down
 				checkPiece = board120[r*10+file];
 				if (checkPiece != empty) {
-					if (piece[checkPiece].getColor() != piece[i].getColor())
+					//if (piece[checkPiece].getColor() != piece[i].getColor())
 						if (piece[checkPiece].getValue() == P_VAL) {
 							open = false;
 							break;
