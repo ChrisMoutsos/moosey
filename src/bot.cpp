@@ -103,13 +103,15 @@ int Bot::think(Board& b, int depth) {
 		bestMoveSoFar = prinVarLine.move[0];
 		//bestMoveSoFar = abs(transTable[int(b.getZobrist()%TTSIZE)].bestMoveAndScore);
 		//bestMoveSoFar = bestMoveSoFar/10000;
-
+		
 		std::cout << "TRANSTABLE INFO\n----------\n";
 		std::cout << "actual zobrist: " << b.getZobrist() << '\n';
 		std::cout << "entry at TT zobrist..\nkey: " << transTable[int(b.getZobrist()%TTSIZE)].zKey;
 		std::cout << "\nbestMoveAndScore: " << transTable[int(b.getZobrist()%TTSIZE)].bestMoveAndScore;
 		std::cout << "\ndepthAndNodeType: " << transTable[int(b.getZobrist()%TTSIZE)].depthAndNodeType;
 		std::cout << "\n\n";
+
+		//clearTT();
 
 		auto endTime3 = std::chrono::high_resolution_clock::now();
 		fsec diff3 = endTime3 - beginTime1;
@@ -167,7 +169,8 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 	//If our king is dead, return bad score
 	if ((s && !b.piece[wK].getAlive()) || (!s && !b.piece[bK].getAlive())) {
 		pline->count = 0;
-		return -CHECKMATE_VAL + depthGone-1;
+		storeTTEntry(b, 9999, depthLeft, -CHECKMATE_VAL + depthGone - 1, 0);
+		return -CHECKMATE_VAL + depthGone - 1;
 	}
 
 	//Repetition detection
@@ -180,29 +183,31 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 
 	LINE line;
 
+	//Useful to know this for later	
+	bool inCheck = b.inCheck(s);
+
 	//Transposition table look-up
-	HASHENTRY hLookup, hStorage;
-	hStorage.zKey = b.getZobrist();
 
-/*
-	hLookup = transTable[int(b.getZobrist()%TTSIZE)];
+	HASHENTRY hashEntry = getTTEntry(b.getZobrist());
 
-	if (hLookup.zKey == b.getZobrist() && depthGone != 0) {
-		//std::cout << "hLookup.zKey: " << hLookup.zKey << '\n';
-		//std::cout << "hLookup.bestMoveAndScore: " << hLookup.bestMoveAndScore << '\n';
-		//std::cout << "hLookup.depthAndNodeType: " << hLookup.depthAndNodeType << "\n\n";
-		if (hLookup.depthAndNodeType/10 >= b.getPly()+depthLeft) {
-			if (hLookup.depthAndNodeType%10 == 0) {
-				//std::cout << "EXACT MATCH\n";
+	if (hashEntry.zKey == b.getZobrist() && depthGone != 0) {
+		int hashMF = abs(hashEntry.bestMoveAndScore / 1000) / 100;
+		int hashMT = abs(hashEntry.bestMoveAndScore / 1000) % 100;
+
+		if (hashEntry.depthAndNodeType / 10 >= depthLeft) {
+			if (hashEntry.depthAndNodeType % 10 == 0) {
+				int score2 = hashEntry.bestMoveAndScore % 10000;
+			//	std::cout << "hashEntry.zKey: " << hashEntry.zKey << "\n";
+			//	std::cout << "hashEntry.depthAndNodeType: " << hashEntry.depthAndNodeType << "\n";
+			//	std::cout << "hashEntry.bestMoveAndScore: " << hashEntry.bestMoveAndScore << "\n";
+			//	std::cout << "score2: " << score2 << "\n";
+			
 				//Add the move to the principal variation
-				int hashMF = (abs(hLookup.bestMoveAndScore)/10000)/100;
-				int hashMT = (hLookup.bestMoveAndScore/10000)%100;
-				int score2 = hLookup.bestMoveAndScore%10000;
-				if (hLookup.bestMoveAndScore < 0)
-					score2 *= -1;
-//				pline->move[0] = hashMF*100 + hashMT;
-//				memcpy(pline->move + 1, line.move, line.count * sizeof(int));
-//				pline->count = line.count + 1;
+				line.count = 0;
+				pline->move[0] = hashMF * 100 + hashMT;
+				memcpy(pline->move + 1, line.move, line.count * sizeof(int));
+				pline->count =  line.count + 1;
+
 				if (score2 >= beta) { //Fail-high
 					return beta;
 				}
@@ -212,46 +217,44 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 				return score2;
 			}
 			//Lower bound
-			else if (hLookup.depthAndNodeType%10 == 1) {
-				int score2 = hLookup.bestMoveAndScore%10000;
-				if (hLookup.bestMoveAndScore < 0)
-					score2 *= -1;
+			else if (hashEntry.depthAndNodeType % 10 == 1) {
+				int score2 = hashEntry.bestMoveAndScore % 10000;
+
 				if (score2 >= beta) { //Fail-high
 					return score2;
 				}
 				if (score2 > alpha) {
-					alpha = score2;
+					//alpha = score2;
 				}
 			}
 			//Upper bound
-			else if (hLookup.depthAndNodeType%10 == 2) {
-				int score2 = hLookup.bestMoveAndScore%10000;
-				if (hLookup.bestMoveAndScore < 0)
-					score2 *= -1;
+			else if (hashEntry.depthAndNodeType % 10 == 2) {
+				int score2 = hashEntry.bestMoveAndScore % 10000;
+
 				if (score2 <= alpha) { //Fail-low
 					return score2;
 				}
 				if (score2 < beta) {
-					beta = score2;
+					//beta = score2;
 				}
 			}
 		}
 	}
-*/
+
 
 	//Horizon nodes, quiescence search
 	if (depthLeft <= 0) {
 		//If we're in check, search a little further
-		if (allowNull && b.inCheck(s))
-			return alphaBeta(b, alpha, beta, 1, depthGone, pline, 0, 0); 
+		if (allowNull && b.inCheck(s)) {
+			return alphaBeta(b, alpha, beta, 1, depthGone, pline, 0, 0);
+		}
 
 		//Otherwise, do a quiescence search
 		pline->count = 0;
-		return quies(b, alpha, beta, depthGone);
+		int v = quies(b, alpha, beta, depthGone);
+		//storeTTEntry(b, 9999, 0, v, 0);
+		return v;
 	}
-
-	//Useful to know this for later	
-	bool inCheck = b.inCheck(s);
 
 	int score;
 
@@ -272,18 +275,6 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 			b.zobristXorSide();
 			if (score >= beta) { //Fail-high
 				pline->count = 0;
-
-/*
-				//Transposition table storage, lower bound
-				hStorage.bestMoveAndScore = (99*100+99)*10000 + abs(beta);
-				if (beta < 0)
-					hStorage.bestMoveAndScore *= -1;
-//				hStorage.depthAndNodeType = depthLeft*10 + 1;
-				hStorage.depthAndNodeType = b.getPly()*10 + 1;
-				transTable[int(hStorage.zKey%TTSIZE)] = hStorage;
-				//std::cout << "(" << mF << " to " << mT << ") Added lowerbound hash to zkey " << hStorage.zKey << '\n';
-*/
-
 				return score;
 			}
 			//Extend on nearby checkmates
@@ -307,12 +298,19 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 	if (moveList.size() == 0) {
 		pline->count = 0;
 		//If we are in checkmate, return bad score
-		if (inCheck)
-			return -CHECKMATE_VAL + depthGone-1;
+		if (inCheck) {
+			storeTTEntry(b, 9999, depthLeft, -CHECKMATE_VAL + depthGone - 1, 0);
+
+			return -CHECKMATE_VAL + depthGone - 1;
+		}
 		//Only favor stalemate if we're losing
 		else {
 			if (b.getWhiteMaterial() >= b.getBlackMaterial()) {
-				return s ? -STALEMATE_VAL : STALEMATE_VAL;
+				int v = s ? -STALEMATE_VAL : STALEMATE_VAL;
+
+				storeTTEntry(b, 9999, depthLeft, v, 0);
+
+				return v;
 			}
 		}
 	}
@@ -322,6 +320,9 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 		if (depthGone == 0) {
 			pline->move[0] = moveList[0];
 			pline->count = 1;
+
+			storeTTEntry(b, moveList[0], depthLeft, -STALEMATE_VAL, 0);
+
 			return -STALEMATE_VAL;
 		}	
 
@@ -375,6 +376,23 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 			}
 		}
 */
+		
+		
+		//Hash move
+		
+		std::vector<int>::iterator pvIndex2;
+		if (hashEntry.zKey == b.getZobrist()) {
+			int pvmove = hashEntry.bestMoveAndScore / 10000;
+			if (pvmove != 9999 && pvmove != 0) {
+				pvIndex2 = std::find(moveList.begin(), moveList.end(), pvmove);
+				if (pvIndex2 != moveList.end()) {
+					temp = *pvIndex2;
+					moveList.erase(pvIndex2);
+					moveList.insert(moveList.begin()+0, temp);
+				}
+			}
+		}
+		
 		//then PV in front
 		std::vector<int>::iterator pvIndex;
 		if (depthGone < oldPrinVarLine.count) {
@@ -384,25 +402,10 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 				if (pvIndex != moveList.end()) {
 					temp = *pvIndex;
 					moveList.erase(pvIndex);
-					moveList.insert(moveList.begin()+0, temp);
-				}	
-			}
-		}
-		
-/*
-		std::vector<int>::iterator pvIndex;
-		if (hLookup.zKey == b.getZobrist()) {
-			int pvmove = hLookup.bestMoveAndScore/10000;
-			if (pvmove != 9999 && pvmove != 0) {
-				pvIndex = std::find(moveList.begin(), moveList.end(), pvmove);
-				if (pvIndex != moveList.end()) {
-					temp = *pvIndex;
-					moveList.erase(pvIndex);
-					moveList.insert(moveList.begin()+0, temp);
+					moveList.insert(moveList.begin() + 0, temp);
 				}
 			}
 		}
-*/
 	}
 	
 	int movesSearched = 0;
@@ -457,18 +460,9 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 				}
 */
 			}
-
 			//Transposition table storage, lower bound
-/*
-			hStorage.bestMoveAndScore = (mF*100+mT)*10000 + abs(beta);
-			if (beta < 0)
-				hStorage.bestMoveAndScore *= -1;
-			//hStorage.depthAndNodeType = depthLeft*10 + 1;
-			hStorage.depthAndNodeType = b.getPly()*10 + 1;
-			transTable[int(hStorage.zKey%TTSIZE)] = hStorage;
-			//std::cout << "(" << mF << " to " << mT << ") Added lowerbound hash to zkey " << hStorage.zKey << '\n';
+			storeTTEntry(b, mF * 100 + mT, depthLeft, beta, 1);
 
-*/
 			return beta;
 		}
 		if (score > alpha) { //Best so far
@@ -478,32 +472,14 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 			pline->move[0] = mF*100 + mT;
 			memcpy(pline->move + 1, line.move, line.count * sizeof(int));
 			pline->count = line.count + 1;
-			//std::cout << "BEST MOVE SO FAR!: " << mF << " to " << mT << '\n';
 
-/*
 			//Transposition table storage, exact score
-			hStorage.bestMoveAndScore = (mF*100+mT)*10000 + abs(score);
-			if (score < 0)
-				hStorage.bestMoveAndScore *= -1;
-		//	hStorage.depthAndNodeType = depthLeft*10 + 0;
-			hStorage.depthAndNodeType = b.getPly()*10 + 0;
-			transTable[int(hStorage.zKey%TTSIZE)] = hStorage;
-			//std::cout << "(" << mF << " to " << mT << ") Added exact hash to zkey " << hStorage.zKey << '\n';
-*/
+			storeTTEntry(b, mF * 100 + mT, depthLeft, score, 0);
 		}
 		else {
-/*
-			if (transTable[int(hStorage.zKey%TTSIZE)].zKey != hStorage.zKey) {
-				//Transposition table storage, upper bound
-				hStorage.bestMoveAndScore = (mF*100+mT)*10000 + abs(alpha);
-				if (alpha < 0)
-					hStorage.bestMoveAndScore *= -1;
-				//hStorage.depthAndNodeType = depthLeft*10 + 2;
-				hStorage.depthAndNodeType = b.getPly()*10 + 2;
-				transTable[int(hStorage.zKey%TTSIZE)] = hStorage;
-				//std::cout << "(" << mF << " to " << mT << ") Added upperbound hash to zkey " << hStorage.zKey << '\n';
+			if (transTable[int(b.getZobrist() % TTSIZE)].zKey != b.getZobrist()) {
+				storeTTEntry(b, mF * 100 + mT, depthLeft, alpha, 2);
 			}
-*/
 		}
 
 		movesSearched++;
@@ -525,8 +501,9 @@ int Bot::quies(Board& b, int alpha, int beta, int depthGone) {
 	int score, mF, mT;
 	
 	//If standing pat is too good
-	if (currEval >= beta)
+	if (currEval >= beta) {
 		return beta;
+	}
 	//If standing pat is the best option
 	if (currEval > alpha)
 		alpha = currEval;
@@ -576,6 +553,8 @@ int Bot::quies(Board& b, int alpha, int beta, int depthGone) {
 		if (score > alpha) { //Best so far
 			alpha = score;
 		}
+		else {
+		}
 	}
 	
 	return alpha;
@@ -595,4 +574,20 @@ void Bot::clearTT() {
 	for (int i = 0; i < TTSIZE; i++) {
 		transTable[i] = clear;
 	}
+}
+
+void Bot::storeTTEntry(Board& b, int move, int depthLeft, int score, int nodeType) {
+	unsigned long zobrist = b.getZobrist();
+
+	if (transTable[int(zobrist%TTSIZE)].depthAndNodeType/10 <= b.getPly()) {
+		HASHENTRY storage;
+		storage.zKey = zobrist;
+		storage.bestMoveAndScore = move * 10000 + abs(score);
+		storage.depthAndNodeType = depthLeft * 10 + nodeType;
+		transTable[int(zobrist%TTSIZE)] = storage;
+	}
+}
+
+HASHENTRY Bot::getTTEntry(unsigned long long key) {
+	return transTable[int(key%TTSIZE)];
 }
