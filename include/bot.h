@@ -9,7 +9,7 @@
 #define SEARCH_H
 
 #include <vector>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 class Board;
 
@@ -40,6 +40,9 @@ class Bot {
 		int getLevel() const { return level; };
 		void setLevel(int d) { level = d; };
 
+
+		void storeTTEntry(Board& b, int move, int depthLeft, int score, int nodeType);
+		HASHENTRY getTTEntry(unsigned long long key);
 		void clearTT();
 
 	private:
@@ -53,7 +56,7 @@ class Bot {
 		int killers[30][2];
 		int level;
 		//Transposition table
-		const static int TTSIZE = 131072;
+		const static int TTSIZE = 2*2*2*1048576;
 		HASHENTRY* transTable;
 };
 
