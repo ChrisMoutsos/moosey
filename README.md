@@ -19,10 +19,11 @@ The following features have been implemented.
 - Zobrist hashing
 - Draw detection
 - Late move reductions
+- Transposition tables
 
 ####In the Future
+- Bitboard move generation and other things
 - Better move ordering
-- Transposition tables
 - Static exchange evaluation (attempted, gave up for now)
 - More search extensions
 
