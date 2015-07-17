@@ -49,7 +49,7 @@ int Board::getNonOrderedAllLegalMoves(bool s, std::vector<int>& moveList) {
 		}
 	}
 
-	return (moveList.size());
+	return int(moveList.size());
 }
 
 void Board::genOrderedMoveList() {
@@ -221,7 +221,7 @@ void Board::cleanMoveList(bool s, std::vector<int>& moveList) {
 
 	int mF, mT, size;
 
-	size = moveList.size();
+	size = int(moveList.size());
 	for (int i = 0; i < size; i++) {
 		mF = moveList[i]/100;
 		mT = moveList[i]%100;
