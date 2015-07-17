@@ -629,7 +629,7 @@ int Board::getMoveMade(int i) const {
 }
 
 int Board::getNumMovesMade() const {
-	return movesMade.size();
+	return int(movesMade.size());
 }
 
 int Board::getLastMove() const {
