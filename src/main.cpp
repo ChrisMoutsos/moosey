@@ -6,15 +6,6 @@
  ---------------------------------
 */
 
-/* 
- * ##To-Do List##
- * Add en passants to quiescent search
- * Reimplement killer moves
- * Make sure FEN loading works perfectly
- * Transposition table
- * 
- */
-
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -41,7 +32,7 @@ int main(int argc, char* args[]) {
 	fsec diff;
 	int nodes;
 	std::cout << "Perftesting....";
-	for (int i = 1; i <= 10; i++) {
+	for (int i = 1; i <= 6; i++) {
 		auto beginTime = std::chrono::high_resolution_clock::now();
 		nodes = board.perft(i);
 		std::cout << "board.perft(" << i << "): " << nodes << "\n";
@@ -51,7 +42,9 @@ int main(int argc, char* args[]) {
 		std::cout << "Nodes/sec: " << nodes/diff.count() << '\n';
 	}
 	*/
+	
 
+	
 
 	while (!quit) {
 		while (SDL_PollEvent(&e)) {

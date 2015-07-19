@@ -7,7 +7,6 @@
 
 #include <iostream>
 #include <algorithm>
-#include <SDL2/SDL.h>
 #include "common.h"
 #include "display.h"
 #include "board.h"
@@ -65,6 +64,8 @@ void Board::genOrderedMoveList(bool s, std::vector<int>& moveList) {
 
 	moveList.clear();
 	std::vector<int> captures, nonCaptures;
+
+	generatePieceMoveLists(s);
 		
 	getCaptures(s, captures);
 	getNonCaptures(s, nonCaptures);
@@ -93,6 +94,8 @@ void Board::getCaptures(bool s, std::vector<int>& moveList) {
 	//Put every capture for side s in moveList
 
 	moveList.clear();
+
+	int mF, mT;
 	int startP, endP, enemyStartP, enemyEndP;
 	startP = s ? wqR : bqR;
 	endP = s ? wPh : bPh;
@@ -101,34 +104,52 @@ void Board::getCaptures(bool s, std::vector<int>& moveList) {
 
 	for (int i = startP; i <= endP; i++) {
 		if (!piece[i].getAlive()) continue;
-		for (int j = enemyStartP; j <= enemyEndP; j++) {
-			if (!piece[j].getAlive()) continue;
-			if (validateMove(piece[i].getPos(), piece[j].getPos(), s)) {
-				moveList.push_back(piece[i].getPos()*100 + piece[j].getPos());
-			}
-		}
-	}	
-}
-
-void Board::sortCaptures(std::vector<int>& moveList) {
-	bool sorted = false;
-	int temp;
-	while (!sorted) {
-		sorted = true;
-		for (int i = 0; i < (int)moveList.size() - 1; i++) {
-			if (!MVVLVA(moveList[i], moveList[i+1])) {
-				temp = moveList[i];
-				moveList[i] = moveList[i+1];
-				moveList[i+1] = temp;
-				sorted = false;
-			}
+		//generatePieceMoveListFor(i);
+		mF = piece[i].getPos();
+		for (int j = 0; j < piece[i].getMoveListSize(); j++) {
+			mT = piece[i].getFromMoveList(j);
+			if (mT == 0) break;
+			if (board120[mT] == empty) continue;
+			moveList.push_back(mF * 100 + mT);
 		}
 	}
 }
 
-bool Board::MVVLVA(int i, int j) {
-	return (piece[board120[i%100]].getValue() - piece[board120[i/100]].getValue()/10
-		 >= piece[board120[j%100]].getValue() - piece[board120[j/100]].getValue()/10);
+void Board::generateCaptures(bool s, std::vector<int>& moveList) {
+	generateCapturePieceMoveLists(s);
+
+	int mF, mT;
+	int startP, endP, enemyStartP, enemyEndP;
+	startP = s ? wqR : bqR;
+	endP = s ? wPh : bPh;
+	enemyStartP = s ? bqR : wqR;
+	enemyEndP = s ? bPh : wPh;
+
+	for (int i = startP; i <= endP; i++) {
+		if (!piece[i].getAlive()) continue;
+		mF = piece[i].getPos();
+		for (int j = 0; j < piece[i].getMoveListSize(); j++) {
+			mT = piece[i].getFromMoveList(j);
+			if (mT == 0) break;
+			if (board120[mT] == empty) continue;
+			moveList.push_back(mF * 100 + mT);
+		}
+	}
+}
+
+void Board::sortCaptures(std::vector<int>& moveList) {
+	struct MVVLVA {
+		MVVLVA(Board* b) : b(b) {}
+		bool operator()(int i, int j) {
+			return (b->piece[b->board120[i % 100]].getValue() - b->piece[b->board120[i / 100]].getValue() / 10
+				>= b->piece[b->board120[j % 100]].getValue() - b->piece[b->board120[j / 100]].getValue() / 10);
+		};
+	private:
+		Board* b;
+	};
+
+
+	std::sort(moveList.begin(), moveList.end(), MVVLVA(this));
 }
 
 void Board::addPromotions(bool s, std::vector<int>& moveList) {
@@ -152,48 +173,43 @@ void Board::getNonCaptures(bool s, std::vector<int>& moveList) {
 	//Put every noncapture for side s in moveList
 
 	moveList.clear();
-	int startP, endP, mF, mT;
+
+	int mF, mT;
+	int startP, endP, enemyStartP, enemyEndP;
 	startP = s ? wqR : bqR;
 	endP = s ? wPh : bPh;
+	enemyStartP = s ? bqR : wqR;
+	enemyEndP = s ? bPh : wPh;
 
 	for (int i = startP; i <= endP; i++) {
 		if (!piece[i].getAlive()) continue;
-		generatePieceMoveListFor(i);
 		mF = piece[i].getPos();
 		for (int j = 0; j < piece[i].getMoveListSize(); j++) {
 			mT = piece[i].getFromMoveList(j);
 			if (mT == 0) break;
 			if (board120[mT] != empty) continue;
-			moveList.push_back(mF*100+mT);
+			moveList.push_back(mF * 100 + mT);
 		}
 	}
 }
 
 void Board::sortNonCaptures(std::vector<int>& moveList) {
-	bool sorted = false, s;
-	int temp;
-	while (!sorted) {
-		sorted = true;
-		if (moveList.size() > 0)
-			s = piece[board120[moveList[0]/100]].getColor();
-		for (int i = 0; i < (int)moveList.size() - 1; i++) {
-			if (!hhSort(s, moveList[i], moveList[i+1])) {
-				temp = moveList[i];
-				moveList[i] = moveList[i+1];
-				moveList[i+1] = temp;
-				sorted = false;
-			}
-		}
-	}
-}
+	struct hhSort {
+		hhSort(Board* b) : b(b) {}
+		bool operator()(int i, int j) {
+			if (b->getSide())
+				return (b->whiteBot.getFromHH(to64((i / 100) - 1), to64((i % 100) - 1))
+				>= b->whiteBot.getFromHH(to64((j / 100) - 1), to64((j % 100) - 1)));
+			else
+				return (b->blackBot.getFromHH(to64((i / 100) - 1), to64((i % 100) - 1))
+				>= b->blackBot.getFromHH(to64((j / 100) - 1), to64((j % 100) - 1)));
+		};
+	private:
+		Board* b;
+	};
 
-bool Board::hhSort(bool s, int i, int j) {
-	if (s)
-		return (whiteBot.getFromHH(to64((i/100)-1), to64((i%100)-1)) 
-			>= whiteBot.getFromHH(to64((j/100)-1), to64((j%100)-1)));
-	else
-		return (blackBot.getFromHH(to64((i/100)-1), to64((i%100)-1)) 
-			>= blackBot.getFromHH(to64((j/100)-1), to64((j%100)-1)));
+
+	std::sort(moveList.begin(), moveList.end(), hhSort(this));
 }
 
 void Board::removeNonCaptures(bool s, std::vector<int>& moveList) {
@@ -233,6 +249,191 @@ void Board::cleanMoveList(bool s, std::vector<int>& moveList) {
 	}
 }
 
+void Board::generateCapturePieceMoveLists(bool s) {
+	int startP, endP;
+	startP = s ? wqR : bqR;
+	endP = s ? wPh : bPh;
+	for (int i = startP; i <= endP; i++)
+		generateCapturePieceMoveListFor(i);
+}
+
+void Board::generateCapturePieceMoveListFor(int p) {
+	//Generates moves for an individual piece, stores them in the pieces moveList
+
+	int counter = 0;
+	if (piece[p].getAlive()) {
+		if (piece[p].getValue() == R_VAL)
+			generateHozCaptures(p, counter);
+		else if (piece[p].getValue() == B_VAL)
+			generateDiagCaptures(p, counter);
+		else if (piece[p].getValue() == N_VAL)
+			generateKnightCaptures(p, counter);
+		else if (piece[p].getValue() == Q_VAL) {
+			generateHozCaptures(p, counter);
+			generateDiagCaptures(p, counter);
+		}
+		else if (piece[p].getValue() == K_VAL)
+			generateKingCaptures(p, counter);
+		else if (piece[p].getValue() == P_VAL)
+			generatePawnCaptures(p, counter);
+	}
+	for (int i = counter; i < piece[p].getMoveListSize(); i++) //Empty the rest of the moveList
+		piece[p].setInMoveList(i, 0);
+}
+
+void Board::generateHozCaptures(int p, int& counter) {
+	bool s = piece[p].getColor();
+	int pos63 = to64(piece[p].getPos()) - 1;
+
+	U64 attackBB, blockBB;
+	int blockSq, dirIncr;
+	for (int dir = NORTH; dir <= WEST; dir += 2) {
+		switch (dir) {
+		case NORTH:
+			dirIncr = 8;
+			break;
+		case EAST:
+			dirIncr = 1;
+			break;
+		case SOUTH:
+			dirIncr = -8;
+			break;
+		case WEST:
+			dirIncr = -1;
+			break;
+		}
+		attackBB = bb.rayAttacks[dir][pos63];
+		blockBB = attackBB & (bb.allPieces[WHITE] | bb.allPieces[BLACK]);
+
+		//If no blocker, change direction
+		if (!blockBB) continue;
+
+		//If there was a blocker, find out who it was
+		if (dir == WEST || dir == SOUTH) {
+			blockSq = bb.bitScanReverse(blockBB);
+		}
+		else {
+			blockSq = bb.bitScanForward(blockBB);
+		}
+
+		//If the blocker is your own piece, change direction
+		if (bb.allPieces[s] & bb.sq[blockSq]) {
+			continue;
+		}
+		//Else, it's a catpure, add to the movelist
+		piece[p].setInMoveList(counter, from64(blockSq + 1));
+		counter++;
+	}
+}
+
+void Board::generateDiagCaptures(int p, int& counter) {
+	bool s = piece[p].getColor();
+	int pos63 = to64(piece[p].getPos()) - 1;
+
+	U64 attackBB, blockBB;
+	int blockSq, dirIncr;
+	for (int dir = NORTHEAST; dir <= NORTHWEST; dir += 2) {
+		switch (dir) {
+		case NORTHEAST:
+			dirIncr = 9;
+			break;
+		case NORTHWEST:
+			dirIncr = 7;
+			break;
+		case SOUTHEAST:
+			dirIncr = -7;
+			break;
+		case SOUTHWEST:
+			dirIncr = -9;
+			break;
+		}
+		attackBB = bb.rayAttacks[dir][pos63];
+		blockBB = attackBB & (bb.allPieces[WHITE] | bb.allPieces[BLACK]);
+
+		//If there's no blocker, change direction
+		if (!blockBB) continue;
+
+		//If there was a blocker, find out who it was
+		if (dir == SOUTHWEST || dir == SOUTHEAST) {
+			blockSq = bb.bitScanReverse(blockBB);
+		}
+		else {
+			blockSq = bb.bitScanForward(blockBB);
+		}
+
+		//If the blocker is your own piece, change direction
+		if (bb.allPieces[s] & bb.sq[blockSq]) {
+			continue;
+		}
+		//Else, it's a catpure, add to the movelist
+		piece[p].setInMoveList(counter, from64(blockSq + 1));
+		counter++;
+	}
+}
+
+void Board::generateKnightCaptures(int p, int& counter) {
+	bool s = piece[p].getColor();
+	int pos63 = to64(piece[p].getPos()) - 1;
+
+	U64 attackBB;
+	int extra;
+	attackBB = bb.knightAttacks[pos63] & bb.allPieces[!s];
+	for (int i = 1; i <= 8; i++) {
+		if (!attackBB) break;
+		extra = i == 1 ? 17 : i == 2 ? 10 : i == 3 ? -6 : i == 4 ? -15 : i == 5 ? -17 : i == 6 ? -10 : i == 7 ? 6 : 15;
+		if (!(pos63 + extra < 64 && pos63 + extra >= 0))
+			continue;
+		if (bb.queryBit(pos63 + extra, attackBB)) {
+			piece[p].setInMoveList(counter, from64(pos63 + extra + 1));
+			counter++;
+			bb.unsetBit(pos63 + extra, attackBB);
+		}
+	}
+}
+
+void Board::generateKingCaptures(int p, int& counter) {
+	bool s = piece[p].getColor();
+	int pos63 = to64(piece[p].getPos()) - 1;
+
+	int extra;
+	U64 attackBB;
+	attackBB = bb.kingAttacks[pos63] & bb.allPieces[!s];
+	for (int i = 1; i <= 8; i++) {
+		if (!attackBB) break;
+		extra = i == 1 ? 1 : i == 2 ? -1 : i == 3 ? 8 : i == 4 ? -8 : i == 5 ? 9 : i == 6 ? -9 : i == 7 ? 7 : -7;
+		if (!(pos63 + extra < 64 && pos63 + extra >= 0))
+			continue;
+		if (bb.queryBit(pos63 + extra, attackBB)) {
+			piece[p].setInMoveList(counter, from64(pos63 + extra + 1));
+			counter++;
+			bb.unsetBit(pos63 + extra, attackBB);
+		}
+	}
+}
+
+void Board::generatePawnCaptures(int p, int& counter) {
+	bool s = piece[p].getColor();
+	int pos63 = to64(piece[p].getPos()) - 1;
+
+	//Get attacking moves
+	U64 attackBB = bb.pawnAttacks[s][pos63];
+	U64 enemyBB = bb.allPieces[!s];
+
+	if (moveInfo.size() && moveInfo.back().epSq != 0) {
+		enemyBB |= bb.sq[to64(moveInfo.back().epSq) - 1];
+	}
+	attackBB &= enemyBB;
+
+	int attSq;
+
+	while (attackBB) {
+		attSq = bb.bitScanForward(attackBB);
+		piece[p].setInMoveList(counter, from64(attSq + 1));
+		counter++;
+		bb.unsetBit(attSq, attackBB);
+	}
+}
+
 void Board::generatePieceMoveLists(bool s) {
 	int startP, endP;
 	startP = s ? wqR : bqR;
@@ -267,70 +468,146 @@ void Board::generatePieceMoveListFor(int p) {
 
 void Board::generateHozMoves(int p, int& counter) {
 	bool s = piece[p].getColor();
-	int i, d, posIndex;
+	int pos63 = to64(piece[p].getPos()) - 1;
 
-	for (int c = 1; c <= 4; c++) {
-		d = c==1 ? -1 : c==2 ? 1 : c==3 ? -10 : 10;
-		i = 1;
-		posIndex = piece[p].getPos()+d*i;
-		while (board120[posIndex] != invalid) {
-			if (validateMove(piece[p].getPos(), posIndex, s)) {
-				piece[p].setInMoveList(counter, posIndex);
-                	       	counter++;
+	U64 attackBB, blockBB;
+	int blockSq, sq, dirIncr;
+	for (int dir = NORTH; dir <= WEST; dir += 2) {
+		switch (dir) {
+		case NORTH:
+			dirIncr = 8;
+			break;
+		case EAST:
+			dirIncr = 1;
+			break;
+		case SOUTH:
+			dirIncr = -8;
+			break;
+		case WEST:
+			dirIncr = -1;
+			break;
+		}
+		attackBB = bb.rayAttacks[dir][pos63];
+		blockBB = attackBB & (bb.allPieces[WHITE] | bb.allPieces[BLACK]);
+		//If there was a blocker, cut off the rest
+		if (blockBB) {
+			if (dir == WEST || dir == SOUTH) {
+				blockSq = bb.bitScanReverse(blockBB);
 			}
-			i++;
-			posIndex = piece[p].getPos()+d*i;
+			else {
+				blockSq = bb.bitScanForward(blockBB);
+			}
+			attackBB ^= bb.rayAttacks[dir][blockSq];
+			//If the blocker is your own piece, unset it
+			if (bb.allPieces[s] & bb.sq[blockSq]) {
+				bb.unsetBit(blockSq, attackBB);
+			}
+		}
+		//Add each move to the movelist
+		sq = pos63;
+		while (attackBB) {
+			//if (bb.queryBit(sq, attackBB)) {
+			if (bb.queryBit(sq, attackBB)) {
+				bb.unsetBit(sq, attackBB);
+				piece[p].setInMoveList(counter, from64(sq+1));
+				counter++;
+			}
+			sq += dirIncr;
 		}
 	}
 }
 
-
 void Board::generateDiagMoves(int p, int& counter) {
 	bool s = piece[p].getColor();
-	int d, i, posIndex, pOMT;
+	int pos63 = to64(piece[p].getPos()) - 1;
 
-	for (int c = 1; c <= 4; c++) {
-		d = c==1 ? -11 : c==2 ? -9 : c==3 ? 11 : 9;
-		i = 1;
-		posIndex = piece[p].getPos()+d*i;
-		pOMT = board120[posIndex];
-		
-		while (pOMT != invalid) { 
-			if (validateMove(piece[p].getPos(), posIndex, s)) {
-				piece[p].setInMoveList(counter, posIndex);
-                        	counter++;
+	U64 attackBB, blockBB;
+	int blockSq, sq, dirIncr;
+	for (int dir = NORTHEAST; dir <= NORTHWEST; dir += 2) {
+		switch (dir) {
+		case NORTHEAST:
+			dirIncr = 9;
+			break;
+		case NORTHWEST:
+			dirIncr = 7;
+			break;
+		case SOUTHEAST:
+			dirIncr = -7;
+			break;
+		case SOUTHWEST:
+			dirIncr = -9;
+			break;
+		}
+		attackBB = bb.rayAttacks[dir][pos63];
+		blockBB = attackBB & (bb.allPieces[WHITE] | bb.allPieces[BLACK]);
+		//If there was a blocker, cut off the rest
+		if (blockBB) {
+			if (dir == SOUTHWEST || dir == SOUTHEAST) {
+				blockSq = bb.bitScanReverse(blockBB);
 			}
-			i++;
-                        posIndex = piece[p].getPos()+d*i;
-			pOMT = board120[posIndex];
-                }
+			else {
+				blockSq = bb.bitScanForward(blockBB);
+			}
+			attackBB ^= bb.rayAttacks[dir][blockSq];
+			//If the blocker is your own piece, unset it
+			if (bb.allPieces[s] & bb.sq[blockSq]) {
+				bb.unsetBit(blockSq, attackBB);
+			}
+		}
+		//Add each move to the movelist
+		sq = pos63;
+		while (attackBB) {
+			//if (bb.queryBit(sq, attackBB)) {
+			if (bb.queryBit(sq, attackBB)) {
+				bb.unsetBit(sq, attackBB);
+				piece[p].setInMoveList(counter, from64(sq + 1));
+				counter++;
+			}
+					sq += dirIncr;
+		}
 	}
+	
 }
 
 void Board::generateKnightMoves(int p, int& counter) {
 	bool s = piece[p].getColor();
-	int extra, mT;
+	int pos63 = to64(piece[p].getPos()) - 1;
+	
+	U64 attackBB;
+	int extra;
+	attackBB = bb.knightAttacks[pos63] & ~bb.allPieces[s];
 	for (int i = 1; i <= 8; i++) {
-		extra = i==1 ? 8 : i==2 ? -8 : i==3 ? 12 : i==4 ? -12 : i==5 ? 19 : i==6 ? -19 : i==7 ? 21 : -21;
-		mT = piece[p].getPos() + extra;
-		if (validateMove(piece[p].getPos(), mT, s)) {
-			piece[p].setInMoveList(counter, mT);
-			counter++;	
+		if (!attackBB) break;
+		extra = i == 1 ? 17 : i == 2 ? 10 : i == 3 ? -6 : i == 4 ? -15 : i == 5 ? -17 : i == 6 ? -10 : i == 7 ? 6 : 15;
+		if (!(pos63 + extra < 64 && pos63 + extra >= 0)) 
+			continue;
+		if (bb.queryBit(pos63 + extra, attackBB)) {
+			piece[p].setInMoveList(counter, from64(pos63 + extra + 1));
+			counter++;
+			bb.unsetBit(pos63 + extra, attackBB);
 		}
 	}
 }
 
 void Board::generateKingMoves(int p, int& counter) {
 	bool s = piece[p].getColor();
-	int extra, mT;
-        for (int i = 1; i <= 8; i++) {
-                extra = i==1 ? 1 : i==2 ? -1 : i==3 ? 10 : i==4 ? -10 : i==5 ? 11 : i==6 ? -11 : i==7 ? 9 : -9;
-		mT = piece[p].getPos() + extra;
-                if (validateMove(piece[p].getPos(), mT, s)) {
-                        piece[p].setInMoveList(counter, mT);
-                        counter++;
-                }
-        }
+	int pos63 = to64(piece[p].getPos()) - 1;
+
+	int extra;
+	U64 attackBB;
+	attackBB = bb.kingAttacks[pos63] & ~bb.allPieces[s];
+	for (int i = 1; i <= 8; i++) {
+		if (!attackBB) break;
+		extra = i == 1 ? 1 : i == 2 ? -1 : i == 3 ? 8 : i == 4 ? -8 : i == 5 ? 9 : i == 6 ? -9 : i == 7 ? 7 : -7;
+		if (!(pos63 + extra < 64 && pos63 + extra >= 0)) 
+			continue;
+		if (bb.queryBit(pos63 + extra, attackBB)) {
+			piece[p].setInMoveList(counter, from64(pos63 + extra + 1));
+			counter++;
+			bb.unsetBit(pos63 + extra, attackBB);
+		}
+	}
+
 	
 	if ((s && whiteCastled) || (!s && blackCastled)) return;
 
@@ -353,14 +630,41 @@ void Board::generateKingMoves(int p, int& counter) {
 
 void Board::generatePawnMoves(int p, int& counter) {
 	bool s = piece[p].getColor();
-	int extra, mT;
-        for (int i = 1; i <= 4; i++) {
-                extra = i==1 ? 10 : i==2 ? 20 : i==3 ? 11 : 9;
-		extra = s ? extra : -extra;
-		mT = piece[p].getPos() + extra;
-                if (validateMove(piece[p].getPos(), mT, s)) {
-                        piece[p].setInMoveList(counter, mT);
-                        counter++;
-                }
-        }
+	int pos63 = to64(piece[p].getPos()) - 1;
+	
+	//Get attacking moves
+	U64 attackBB = bb.pawnAttacks[s][pos63];
+	U64 enemyBB = bb.allPieces[!s];
+
+	if (moveInfo.size() && moveInfo.back().epSq != 0) {
+		enemyBB |= bb.sq[to64(moveInfo.back().epSq) - 1];
+	}
+	attackBB &= enemyBB;
+
+	int attSq;
+	
+	while (attackBB) {
+		attSq = bb.bitScanForward(attackBB);
+		piece[p].setInMoveList(counter, from64(attSq + 1));
+		counter++;
+		bb.unsetBit(attSq, attackBB);
+	}
+
+
+	//Get forward moves
+	U64 allPieces = bb.allPieces[s] | bb.allPieces[!s];
+	int step = s ? 8 : -8;
+	if (pos63 + step < 64 && pos63 + step >= 0) {
+		if (bb.sq[pos63 + step] & ~(allPieces)) {
+			piece[p].setInMoveList(counter, from64(pos63 + step + 1));
+			counter++;
+			if (piece[p].getMoved() == 0 && 
+				pos63 + step * 2 < 64 && pos63 + step * 2 >= 0) {
+				if (bb.sq[pos63 + step * 2] & ~(allPieces)) {
+					piece[p].setInMoveList(counter, from64(pos63 + step * 2 + 1));
+					counter++;
+				}
+			}
+		}
+	}
 }

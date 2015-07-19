@@ -511,7 +511,7 @@ int Bot::quies(Board& b, int alpha, int beta, int depthGone) {
 	vector<int> nonQuiesList;
 
 	//Get psuedo-legal captures
-	b.getCaptures(s, nonQuiesList);
+	b.generateCaptures(s, nonQuiesList);
 
 	//Order the captures by MVVLVA
 	b.sortCaptures(nonQuiesList);

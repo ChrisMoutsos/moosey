@@ -280,7 +280,7 @@ bool Board::canCastle(int dir, bool s) {
 }
 
 int Board::drawCheck() const {
-	int lastPly = movesMade.size();
+	int lastPly = int(movesMade.size());
 
 	if (lastPly < 3)
 		return false;
