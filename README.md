@@ -20,9 +20,9 @@ The following features have been implemented.
 - Draw detection
 - Late move reductions
 - Transposition tables
+- Bitboards for move generation
 
 ####In the Future
-- Bitboard move generation and other things
 - Better move ordering
 - Static exchange evaluation (attempted, gave up for now)
 - More search extensions
