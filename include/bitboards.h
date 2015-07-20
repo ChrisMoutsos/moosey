@@ -13,9 +13,9 @@ class Bitboards {
 		void setBit(unsigned int bit, U64& bb);
 		void unsetBit(unsigned int bit, U64& bb);
 		void flipBit(unsigned int bit, U64& bb);
-		bool queryBit(unsigned int bit, U64& bb);
-		int bitScanForward(U64& bb);
-		int bitScanReverse(U64& bb);
+		bool queryBit(unsigned int bit, U64& bb) const;
+		int bitScanForward(U64& bb) const;
+		int bitScanReverse(U64& bb) const;
 
 	private:
 		//Holds step increment (64) for each direction

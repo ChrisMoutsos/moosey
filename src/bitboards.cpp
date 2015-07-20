@@ -208,13 +208,12 @@ Bitboards::Bitboards() {
 	}
 
 	//Pawn moves
-	int f, r;
+	int f;
 	for (int s = 0; s < 64; s++) {
 		pawnAttacks[WHITE][s] = 0;
 		pawnAttacks[BLACK][s] = 0;
 		if (s < 8 || s > 55) continue;
 		f = from64(s + 1) % 10;
-		r = from64(s + 1) / 10;
 		if (f != 1) {
 			pawnAttacks[WHITE][s] |= sq[s + 7];
 			pawnAttacks[BLACK][s] |= sq[s - 9];
@@ -238,11 +237,11 @@ void Bitboards::flipBit(unsigned int bit, U64& bb) {
 	bb ^= sq[bit];
 }
 
-bool Bitboards::queryBit(unsigned int bit, U64& bb) {
+bool Bitboards::queryBit(unsigned int bit, U64& bb) const {
 	return ((bb & sq[bit]) != 0);
 }
 
-int Bitboards::bitScanForward(U64& bb) {
+int Bitboards::bitScanForward(U64& bb) const {
 	int b = 0;
 	while (!queryBit(b, bb)) {
 		b++;
@@ -250,7 +249,7 @@ int Bitboards::bitScanForward(U64& bb) {
 	return b;
 }
 
-int Bitboards::bitScanReverse(U64& bb) {
+int Bitboards::bitScanReverse(U64& bb) const {
 	int b = 63;
 	while (!queryBit(b, bb)) {
 		b--;
