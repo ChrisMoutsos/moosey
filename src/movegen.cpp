@@ -32,7 +32,7 @@ int Board::perft(int depth) {
 }
 
 int Board::getNonOrderedAllLegalMoves(bool s, std::vector<int>& moveList) {
-	int startP, endP, mF, mT, index = 0;
+	int startP, endP, mF, mT;
 	startP = s ? wqR : bqR;
 	endP = s ? wPh : bPh;
 
@@ -95,12 +95,9 @@ void Board::getCaptures(bool s, std::vector<int>& moveList) {
 
 	moveList.clear();
 
-	int mF, mT;
-	int startP, endP, enemyStartP, enemyEndP;
+	int mF, mT, startP, endP;
 	startP = s ? wqR : bqR;
 	endP = s ? wPh : bPh;
-	enemyStartP = s ? bqR : wqR;
-	enemyEndP = s ? bPh : wPh;
 
 	for (int i = startP; i <= endP; i++) {
 		if (!piece[i].getAlive()) continue;
@@ -118,12 +115,9 @@ void Board::getCaptures(bool s, std::vector<int>& moveList) {
 void Board::generateCaptures(bool s, std::vector<int>& moveList) {
 	generateCapturePieceMoveLists(s);
 
-	int mF, mT;
-	int startP, endP, enemyStartP, enemyEndP;
+	int mF, mT, startP, endP;
 	startP = s ? wqR : bqR;
 	endP = s ? wPh : bPh;
-	enemyStartP = s ? bqR : wqR;
-	enemyEndP = s ? bPh : wPh;
 
 	for (int i = startP; i <= endP; i++) {
 		if (!piece[i].getAlive()) continue;
@@ -174,12 +168,9 @@ void Board::getNonCaptures(bool s, std::vector<int>& moveList) {
 
 	moveList.clear();
 
-	int mF, mT;
-	int startP, endP, enemyStartP, enemyEndP;
+	int mF, mT, startP, endP;
 	startP = s ? wqR : bqR;
 	endP = s ? wPh : bPh;
-	enemyStartP = s ? bqR : wqR;
-	enemyEndP = s ? bPh : wPh;
 
 	for (int i = startP; i <= endP; i++) {
 		if (!piece[i].getAlive()) continue;
@@ -286,22 +277,9 @@ void Board::generateHozCaptures(int p, int& counter) {
 	int pos63 = to64(piece[p].getPos()) - 1;
 
 	U64 attackBB, blockBB;
-	int blockSq, dirIncr;
+	int blockSq;
+
 	for (int dir = NORTH; dir <= WEST; dir += 2) {
-		switch (dir) {
-		case NORTH:
-			dirIncr = 8;
-			break;
-		case EAST:
-			dirIncr = 1;
-			break;
-		case SOUTH:
-			dirIncr = -8;
-			break;
-		case WEST:
-			dirIncr = -1;
-			break;
-		}
 		attackBB = bb.rayAttacks[dir][pos63];
 		blockBB = attackBB & (bb.allPieces[WHITE] | bb.allPieces[BLACK]);
 
@@ -331,22 +309,9 @@ void Board::generateDiagCaptures(int p, int& counter) {
 	int pos63 = to64(piece[p].getPos()) - 1;
 
 	U64 attackBB, blockBB;
-	int blockSq, dirIncr;
+	int blockSq;
+
 	for (int dir = NORTHEAST; dir <= NORTHWEST; dir += 2) {
-		switch (dir) {
-		case NORTHEAST:
-			dirIncr = 9;
-			break;
-		case NORTHWEST:
-			dirIncr = 7;
-			break;
-		case SOUTHEAST:
-			dirIncr = -7;
-			break;
-		case SOUTHWEST:
-			dirIncr = -9;
-			break;
-		}
 		attackBB = bb.rayAttacks[dir][pos63];
 		blockBB = attackBB & (bb.allPieces[WHITE] | bb.allPieces[BLACK]);
 
