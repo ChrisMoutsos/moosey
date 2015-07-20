@@ -21,6 +21,10 @@ Bot::Bot() {
 	clearTT();
 }
 
+Bot::~Bot() {
+	delete [] transTable;
+}
+
 void Bot::reset() {
 	prinVarLine.count = 0;
 	oldPrinVarLine.count = 0;

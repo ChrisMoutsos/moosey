@@ -72,62 +72,67 @@ bool Board::checkCheck(bool s, std::vector<int>& moveList) {
 bool Board::inCheck(bool s) const {
 	//Statically looks at a position and tells you if side s is in check
 
-	int kPos, pIndex, i, v, d;
-	
 	//If the king is dead, you're most likely in check
 	if (s && !piece[wK].getAlive()) return true;
 	if (!s && !piece[bK].getAlive()) return true;
 
-	kPos = s ? piece[wK].getPos() : piece[bK].getPos();
+	int kPos, kPos63, blockSq;
+	U64 kingRay, blockBB;
 
-	// Search ranks/files/diagonals for appropriate piece.
-	for (int c = 1; c <= 8; c++) {	//Checking eight directions
-		//Pick the appropriate direction depending on which check we're on
-		d = c==1 ? L : c==2 ? R : c==3 ? U : c==4 ? D : c==5 ? UL : c==6 ? UR : c==7 ? DL : DR;
-		i = 1;
-		pIndex = kPos+d*i;
-		while (board120[pIndex] != invalid) {
-			//If square is empty, continue in that direction
-			if (board120[pIndex] == empty) {
-				i++;
-				pIndex = kPos+d*i;
-				continue; 
-			}
-			//If we run into a piece of our own color, change direction
-			if (piece[board120[pIndex]].getColor() == s) 
-				break;
-			//If we run into a piece of enemy color, check its type
-			v = piece[board120[pIndex]].getValue();
-			if (v == Q_VAL)		//Queen on hoz or diag
+	kPos = s ? piece[wK].getPos() : piece[bK].getPos();
+	kPos63 = to64(kPos) - 1;
+
+	//Search for knights
+	if (bb.pieces[!s][KNIGHT] & bb.knightAttacks[kPos63])
+		return true;
+
+	//Search for all pieces but knights
+	for (int d = NORTH; d <= NORTHWEST; d++) {
+		kingRay = bb.rayAttacks[d][kPos63];
+		blockBB = kingRay & (bb.allPieces[WHITE] | bb.allPieces[BLACK]);
+		//If there's no piece on that ray, change direction
+		if (!blockBB) 
+			continue;
+		//If there was a piece, get the square
+		//if (blockBB > bb.sq[kPos63]) ? 
+		if (d == NORTH || d == NORTHEAST || d == NORTHWEST || d == EAST) {
+			blockSq = bb.bitScanForward(blockBB);
+		}
+		else if (d == SOUTH || d == SOUTHEAST || d == SOUTHWEST || d == WEST) {
+			blockSq = bb.bitScanReverse(blockBB);
+		}
+		//If it's the same color as the king, change direction
+		if (bb.sq[blockSq] & bb.allPieces[s])
+			continue;
+		//If it's an enemy piece, check its type
+		switch (piece[board120[from64(blockSq+1)]].getType()) {
+		case QUEEN:
+			return true;
+		case ROOK:
+			//If direction is horizontal
+			if (d%2 == 0)
 				return true;
-			if (c >= 1 && c <= 4) {
-				if (v == R_VAL) //Rook on hoz
-					return true;
-			} 
-			else if (v == B_VAL)    //Bishop on diag
+			else continue;
+		case BISHOP:
+			//If direction is diagonal
+			if (d%2 == 1)
 				return true;
-			if (i == 1) {		//First square from king in direction d
-				if (c >= 5 && v == P_VAL) { //Pawns
-					if (!s != (d==UL || d==UR))
-						return true;
-				}
-				if (v == K_VAL) //Can't be next to a king
-					return true;
-			}
-			break;			 //Change direction
+			else continue;
+		case PAWN:
+			if (bb.pawnAttacks[!s][blockSq] & bb.sq[kPos63])
+				return true;
+			else continue;
+		case KING:
+			if (bb.kingAttacks[blockSq] & bb.sq[kPos63])
+				return true;
+			else continue;
+		default:
+			continue;
 		}
 	}
-	
-	// Search the knight squares around the king for a knight.
-	for (int c = 1; c <= 8; c++) {
-		d = c==1 ? K1 : c==2 ? K2 : c==3 ? K3 : c==4 ? K4 : c==5 ? K5 : c==6 ? K6 : c==7 ? K7 : K8;
-		pIndex = kPos + d; 
-		if (board120[pIndex] == empty || board120[pIndex] == invalid) continue;
-		if (piece[board120[pIndex]].getColor() == s) continue;
-		if (piece[board120[pIndex]].getValue() == N_VAL) return true;
-	}
 
-	return false; //Not in check
+	//Not in check
+	return false;
 }
 
 bool Board::validateMove(int mF, int mT, bool s) {
