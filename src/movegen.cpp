@@ -136,14 +136,14 @@ void Board::sortCaptures(std::vector<int>& moveList) {
 		MVVLVA(Board* b) : b(b) {}
 		bool operator()(int i, int j) {
 			return (b->piece[b->board120[i % 100]].getValue() - b->piece[b->board120[i / 100]].getValue() / 10
-				>= b->piece[b->board120[j % 100]].getValue() - b->piece[b->board120[j / 100]].getValue() / 10);
+				> b->piece[b->board120[j % 100]].getValue() - b->piece[b->board120[j / 100]].getValue() / 10);
 		};
 	private:
 		Board* b;
-	};
+	} MVVLVAsorter(this);
 
 
-	std::sort(moveList.begin(), moveList.end(), MVVLVA(this));
+	std::sort(moveList.begin(), moveList.end(), MVVLVAsorter);
 }
 
 void Board::addPromotions(bool s, std::vector<int>& moveList) {
@@ -187,20 +187,21 @@ void Board::getNonCaptures(bool s, std::vector<int>& moveList) {
 void Board::sortNonCaptures(std::vector<int>& moveList) {
 	struct hhSort {
 		hhSort(Board* b) : b(b) {}
-		bool operator()(int i, int j) {
+		bool operator() (int i, int j) {
+			//std::cout << "i: " << i << " j: " << j << '\n';
 			if (b->getSide())
-				return (b->whiteBot.getFromHH(to64((i / 100) - 1), to64((i % 100) - 1))
-				>= b->whiteBot.getFromHH(to64((j / 100) - 1), to64((j % 100) - 1)));
+				return (b->whiteBot.getFromHH(to64(i / 100) - 1, to64(i % 100) - 1)
+				> b->whiteBot.getFromHH(to64(j / 100) - 1, to64(j % 100) - 1));
 			else
-				return (b->blackBot.getFromHH(to64((i / 100) - 1), to64((i % 100) - 1))
-				>= b->blackBot.getFromHH(to64((j / 100) - 1), to64((j % 100) - 1)));
+				return (b->blackBot.getFromHH(to64(i / 100) - 1, to64(i % 100) - 1)
+				> b->blackBot.getFromHH(to64(j / 100) - 1, to64(j % 100) - 1));
 		};
 	private:
 		Board* b;
-	};
+	} hhSorter(this);
 
 
-	std::sort(moveList.begin(), moveList.end(), hhSort(this));
+	std::sort(moveList.begin(), moveList.end(), hhSorter);
 }
 
 void Board::removeNonCaptures(bool s, std::vector<int>& moveList) {

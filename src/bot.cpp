@@ -565,8 +565,8 @@ int Bot::quies(Board& b, int alpha, int beta, int depthGone) {
 }
 
 int Bot::getFromHH(int mF, int mT) {
-	assert(mF > -1 && mF < 65);
-	assert(mT > -1 && mT < 65);
+	assert(mF > -1 && mF < 64);
+	assert(mT > -1 && mT < 64);
 	return hh[mF][mT];
 }
 
