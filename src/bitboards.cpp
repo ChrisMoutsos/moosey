@@ -53,18 +53,8 @@ Bitboards::Bitboards() {
 		rayAttacks[SOUTH][s] = south;
 
 	}
+	
 	//East
-	/*
-	U64 east;
-	for (int r = 8; r >= 1; r--) {
-		east = 0xFE00000000000000;
-		east >>= (8 - r) * 8;
-		for (int f = 1; f <= 8; f++) {
-			rayAttacks[EAST][FR2SQ64(f, r) - 1] = east;
-			east <<= 1;
-		}
-	}
-	*/
 	U64 east;
 	for (int f = 1; f <= 8; f++) {
 		east = 0xFF00000000000000;
@@ -79,17 +69,6 @@ Bitboards::Bitboards() {
 	}
 
 	//West
-	/*
-	U64 west;
-	for (int r = 8; r >= 1; r--) {
-		west = 0x7F00000000000000;
-		west >>= (r - 8) * 8;
-		for (int f = 8; f >= 1; f--) {
-			rayAttacks[WEST][FR2SQ64(f, r) - 1] = west;
-			west >>= 1;
-		}
-	}
-	*/
 	U64 west;
 	for (int f = 8; f >= 1; f--) {
 		west = 0xFF00000000000000;
