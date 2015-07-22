@@ -188,7 +188,6 @@ void Board::sortNonCaptures(std::vector<int>& moveList) {
 	struct hhSort {
 		hhSort(Board* b) : b(b) {}
 		bool operator() (int i, int j) {
-			//std::cout << "i: " << i << " j: " << j << '\n';
 			if (b->getSide())
 				return (b->whiteBot.getFromHH(to64(i / 100) - 1, to64(i % 100) - 1)
 				> b->whiteBot.getFromHH(to64(j / 100) - 1, to64(j % 100) - 1));
