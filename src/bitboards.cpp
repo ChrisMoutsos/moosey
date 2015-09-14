@@ -232,7 +232,7 @@ int Bitboards::bitScanForward(U64& bb) const {
 		25, 14, 19, 9, 13, 8, 7, 6
 	};
 	const U64 debruijn64 = 0x03f79d71b4cb0a89;
-	return index64[((bb & -long long(bb)) * debruijn64) >> 58];
+	return index64[((bb & -bb) * debruijn64) >> 58];
 }
 
 int Bitboards::bitScanReverse(U64& bb) const {
