@@ -106,7 +106,7 @@ void Board::getCaptures(bool s, std::vector<int>& moveList) {
 		for (int j = 0; j < piece[i].getMoveListSize(); j++) {
 			mT = piece[i].getFromMoveList(j);
 			if (mT == 0) break;
-			if (board120[mT] == empty) continue;
+			if (board120[mT] == none) continue;
 			moveList.push_back(mF * 100 + mT);
 		}
 	}
@@ -125,7 +125,7 @@ void Board::generateCaptures(bool s, std::vector<int>& moveList) {
 		for (int j = 0; j < piece[i].getMoveListSize(); j++) {
 			mT = piece[i].getFromMoveList(j);
 			if (mT == 0) break;
-			if (board120[mT] == empty) continue;
+			if (board120[mT] == none) continue;
 			moveList.push_back(mF * 100 + mT);
 		}
 	}
@@ -178,7 +178,7 @@ void Board::getNonCaptures(bool s, std::vector<int>& moveList) {
 		for (int j = 0; j < piece[i].getMoveListSize(); j++) {
 			mT = piece[i].getFromMoveList(j);
 			if (mT == 0) break;
-			if (board120[mT] != empty) continue;
+			if (board120[mT] != none) continue;
 			moveList.push_back(mF * 100 + mT);
 		}
 	}
@@ -209,7 +209,7 @@ void Board::removeNonCaptures(bool s, std::vector<int>& moveList) {
 	for (size_t i = 0; i < moveList.size(); i++) {
 		move = moveList[i];
 		mT = move%100;
-		if (board120[mT] == empty) {
+		if (board120[mT] == none) {
 			moveList.erase(moveList.begin()+i);
 			i--;
 		}

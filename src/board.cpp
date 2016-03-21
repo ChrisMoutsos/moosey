@@ -169,7 +169,7 @@ void Board::emptyBoard() {
 		else if (i%10 == 0 || i%10 == 9)
 			board120[i] = invalid;
 		else
-			board120[i] = empty;
+			board120[i] = none;
 	}
 }
 
@@ -538,7 +538,7 @@ std::string Board::getFEN() {
 	for (int j = 0; j < 8; j++) {
 		emptyCount = 0;
 		for (int i = A8 - j*10; i <= H8 - j*10; i++) {
-			if (board120[i] == empty)
+			if (board120[i] == none)
 				emptyCount++;
 			else {
 				if (emptyCount > 0) {

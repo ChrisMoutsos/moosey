@@ -122,7 +122,7 @@ void Board::movePiece(int mF, int mT) {
 		}
 
 		//If move is a capture
-		if (board120[mT+epExtra] != empty) {
+		if (board120[mT+epExtra] != none) {
 			//Update material
 			if (!s) 
 				whiteMaterial -= piece[board120[mT+epExtra]].getValue();
@@ -172,7 +172,7 @@ void Board::movePiece(int mF, int mT) {
 			piece[board120[mT+epExtra]].kill();
 			piece[board120[mT+epExtra]].setPos(null);
 			if (epExtra != 0)
-				board120[mT+epExtra] = empty;
+				board120[mT+epExtra] = none;
 	
 			localHalfMoveClock = 0;
 		}
@@ -183,7 +183,7 @@ void Board::movePiece(int mF, int mT) {
 		board120[mT] = board120[mF];
 		piece[board120[mT]].setPos(mT);
 		piece[board120[mT]].incrMoved();
-		board120[mF] = empty;
+		board120[mF] = none;
 	}
 	else { //Castling
 		if (s) whiteCastled = true;
@@ -254,8 +254,8 @@ void Board::movePiece(int mF, int mT) {
 		bb.allPieces[s] &= ~bb.sq[to64(mF+cExtras[1])-1];
 		bb.allPieces[s] |= bb.sq[to64(mF+cExtras[0])-1];
 
-		board120[mF] = empty;				    //Empty old king sq
-		board120[mF+cExtras[1]] = empty;		    //Empty old rook sq
+		board120[mF] = none;				    //Empty old king sq
+		board120[mF+cExtras[1]] = none;		    //Empty old rook sq
 
 		castling = 0;
 		localHalfMoveClock = 0;
@@ -296,7 +296,7 @@ void Board::unmovePiece(int mF, int mT) {
 	if (!castling) {
 
 		//If we are undoing an enpassant move
-		if (mTVal == P_VAL && moveInfo.back().prevOnMoveTo == empty) {
+		if (mTVal == P_VAL && moveInfo.back().prevOnMoveTo == none) {
 			int diffMTMF = abs(mT - mF);
 			if (diffMTMF == 11 || diffMTMF == 9) {
 				//Set epExtra to the offset to the dead pawn from mT
@@ -386,7 +386,7 @@ void Board::unmovePiece(int mF, int mT) {
 			board120[mT+epExtra] = mT%10 - 1 + (!s ? wPa : bPa);
 		
 		//If we are undoing a capture or an en passant
-		if (epExtra != 0 || board120[mT] != empty) { 
+		if (epExtra != 0 || board120[mT] != none) { 
 			//Put it back and unkill it
 			piece[board120[mT+epExtra]].setPos(mT+epExtra);
 			piece[board120[mT+epExtra]].unkill();
@@ -398,7 +398,7 @@ void Board::unmovePiece(int mF, int mT) {
 			bb.pieces[!s][piece[board120[mT+epExtra]].getType()] |= bb.sq[to64(mT+epExtra)-1];
 			bb.allPieces[!s] |= bb.sq[to64(mT+epExtra)-1];
 
-			if (board120[mT] != empty &&
+			if (board120[mT] != none &&
 			    piece[board120[mT]].getValue() == R_VAL && 
 			    piece[board120[mT]].getMoved() == 0) {
 				int eKing = s ? bK : wK;
@@ -411,7 +411,7 @@ void Board::unmovePiece(int mF, int mT) {
 					}
 				} 
 			}
-			else if (board120[mT] != empty &&
+			else if (board120[mT] != none &&
 				 piece[board120[mT]].getValue() == K_VAL &&
 				 piece[board120[mT]].getMoved() == 0) {
 				int ekRook = s ? bkR : wkR;
@@ -481,7 +481,7 @@ void Board::unmovePiece(int mF, int mT) {
 		board120[mF] = board120[mT];
 		piece[board120[mF]].setPos(mF);
 		piece[board120[mF]].decrMoved();
-		board120[mT] = empty;
+		board120[mT] = none;
 
 		//Move the rook back
 		bb.pieces[s][ROOK] &= ~bb.sq[to64(mF+cExtras[0])-1];
@@ -491,7 +491,7 @@ void Board::unmovePiece(int mF, int mT) {
 		board120[mF+cExtras[1]] = board120[mF+cExtras[0]];
 		piece[board120[mF+cExtras[1]]].setPos(mF+cExtras[1]);
 		piece[board120[mF+cExtras[1]]].decrMoved();	
-		board120[mF+cExtras[0]] = empty;
+		board120[mF+cExtras[0]] = none;
 
 		castling = 0;
 	}

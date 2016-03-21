@@ -425,7 +425,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 		b.changeTurn();
 
 		//Pawn push extensions
-		if (b[mF] != empty && b.piece[b[mF]].getValue() == P_VAL) {
+		if (b[mF] != none && b.piece[b[mF]].getValue() == P_VAL) {
 			if (s && (mT/10 == 80 || mT/10 == 90))
 				ext += 50;
 			else if (!s && (mT/10 == 30 || mT/10 == 20))
@@ -435,7 +435,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 		//If we had an alpha cutoff, do a zero-window search (guessing we were right)
 		if (foundPV) {
 			if (movesSearched >= 4 && b.getPly() > 4 &&
-			    b.getPrevOnMoveTo(b.getNumMovesMade()-1) == empty && 
+			    b.getPrevOnMoveTo(b.getNumMovesMade()-1) == none && 
 			    !b.inCheck(s) && mT != b.getPmSq(b.getNumMovesMade()-1)) {
 				score = -alphaBeta(b, -alpha-1, -alpha, depthLeft-2, depthGone+1, &line, 1, ext-100);
 			}
@@ -455,7 +455,7 @@ int Bot::alphaBeta(Board& b, int alpha, int beta, int depthLeft, int depthGone, 
 
 		if (score >= beta) { //Fail-high
 			//If it wasn't a capture, update HH table and killer moves
-			if (b[mT] == empty) {
+			if (b[mT] == none) {
 				hh[to64(mF)-1][to64(mT)-1] += depthGone*depthGone;
 /*
 				if (killers[depthGone][0] != mF*100+mT) {
@@ -530,7 +530,7 @@ int Bot::quies(Board& b, int alpha, int beta, int depthGone) {
 
 		//Futility (AKA delta) pruning
 		if (b.getWhiteMaterial() > ENDGAME_VAL && b.getBlackMaterial() > ENDGAME_VAL)
-			if (b[mT] != empty && b.piece[b[mT]].getValue() + 1.2*P_VAL + currEval <= alpha)
+			if (b[mT] != none && b.piece[b[mT]].getValue() + 1.2*P_VAL + currEval <= alpha)
 				if (!b.inCheck(s)) 
 					continue;
 

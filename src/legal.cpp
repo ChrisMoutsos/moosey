@@ -141,10 +141,10 @@ bool Board::validateMove(int mF, int mT, bool s) {
 	int onMF = board120[mF], onMT = board120[mT], value = piece[onMF].getValue();
 
 	//Moving empty square, to null square, or invalid square
-	if (onMF == -1 || mT == 0 || board120[mT] == invalid) 
+	if (onMF == none || mT == null || board120[mT] == invalid) 
 		return false;
 	//Trying to capture your own piece
-	if (onMT != empty && piece[onMF].getColor() == piece[onMT].getColor()) 
+	if (onMT != none && piece[onMF].getColor() == piece[onMT].getColor()) 
 		return false;
 	//Trying to move enemy piece
 	if (piece[onMF].getColor() != s) 
@@ -178,18 +178,18 @@ bool Board::validatePawnMove(int mF, int mT, bool s) const {
 		return false;
 
 	//Moving forward one square
-	if (diff == 10 && onMT == empty)
+	if (diff == 10 && onMT == none)
 		return true;
 	//Moving forward two squares
-	if (diff == 20 && onMT == empty) {
-		if (board120[mF+extra] == empty && piece[onMF].getMoved() == 0) 
+	if (diff == 20 && onMT == none) {
+		if (board120[mF+extra] == none && piece[onMF].getMoved() == 0) 
 			return true;
 		else return false;
 	}
 	//Attacking
 	if (diff == 9 || diff == 11) {	
 		//En passant
-		if (onMT == empty) { 	
+		if (onMT == none) { 	
 			if (moveInfo.size() > 1 && mT == moveInfo.back().epSq)
 				if ((s && moveInfo.back().epSq > H5) 
 				   || (!s && moveInfo.back().epSq < A4))
@@ -207,12 +207,12 @@ bool Board::validateHozMove(int mF, int mT) const {
 
 	if ((mT - mF)%10 == 0) { //Moving up/down file
 		for (int i = small+10; i < big; i+=10)
-			if (board120[i] != empty) return false;
+			if (board120[i] != none) return false;
 		return true;
 	}
 	else if (mF/10 == mT/10) { //Move left/right across rank
 		for (int i = small+1; i < big; i++)
-			if (board120[i] != empty) return false;
+			if (board120[i] != none) return false;
 		return true;
 	}
 	else return false;	
@@ -225,7 +225,7 @@ bool Board::validateDiagMove(int mF, int mT) const {
 	temp = diff%11 == 0 ? 11 : diff%9 == 0 ? 9 : 0;
 	if (!temp) return false; //Not moving diagonally
 	for (int j = small+temp; j < big; j+=temp)
-		if (board120[j] != empty) return false;
+		if (board120[j] != none) return false;
 	return true;
 }
 
@@ -267,9 +267,9 @@ bool Board::canCastle(int dir, bool s) {
 	if (piece[k].getMoved() || piece[r].getMoved()) return false;
 
 	for (int i = 1; i <= 2; i++)	//Verify it's empty between K and R
-		if (board120[piece[k].getPos()+i*c] != empty) return false;
+		if (board120[piece[k].getPos()+i*c] != none) return false;
 	if (dir == QUEENSIDE)
-		if (board120[piece[k].getPos()-3] != empty) return false;
+		if (board120[piece[k].getPos()-3] != none) return false;
 
 	if (inCheck(s)) return false; //Make sure not currently in check
 

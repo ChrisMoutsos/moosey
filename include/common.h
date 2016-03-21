@@ -40,7 +40,7 @@ inline std::string intToSquare(int square) { //Board120 to A1, etc
 enum side_t { BLACK = 0, WHITE = 1 
 };
 
-enum square2_t { empty = -1, null = 0, invalid = -99,
+enum square2_t { none = -1, null = 0, invalid = -99,
 		 A1 = 21, B1, C1, D1, E1, F1, G1, H1,
                  A2 = 31, B2, C2, D2, E2, F2, G2, H2,
                  A3 = 41, B3, C3, D3, E3, F3, G3, H3,

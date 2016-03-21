@@ -29,6 +29,6 @@ int Piece::getFromMoveList(int i) const {
 
 //MUTATORS
 void Piece::setInMoveList(int i, int v) {
-	assert (i > -1 && i < moveListSize);
+//	assert (i > -1 && i < moveListSize);
 	moveList[i] = v;
 }

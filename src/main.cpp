@@ -27,7 +27,7 @@ int main(int argc, char* args[]) {
 	std::cout << "Current Zobrist (start): " << board.getZobrist() << '\n';
 //	board.eval(true);
 
-	/*
+/*
 	typedef std::chrono::duration<float> fsec;
 	fsec diff;
 	int nodes;
@@ -41,8 +41,7 @@ int main(int argc, char* args[]) {
 		std::cout << "Took: " << diff.count() << " seconds" << '\n';
 		std::cout << "Nodes/sec: " << nodes/diff.count() << '\n';
 	}
-	*/
-	
+*/	
 
 	
 

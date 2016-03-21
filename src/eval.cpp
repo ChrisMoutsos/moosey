@@ -348,7 +348,7 @@ int Board::eval(bool verbose) {
 					cout << "Isolated a-file ";
 			}
 			//Chain
-			if (board120[pos-9] != empty &&
+			if (board120[pos-9] != none &&
 			    piece[board120[pos-9]].getValue() == P_VAL) {
 				score += PAWNCHAIN;
 				if (verbose)
@@ -371,7 +371,7 @@ int Board::eval(bool verbose) {
 					cout << "Isolated h-file ";
 			}
 			//Chain
-			if (board120[pos-11] != empty &&
+			if (board120[pos-11] != none &&
 			    piece[board120[pos-11]].getValue() == P_VAL) {
 				score += PAWNCHAIN;
 				if (verbose)
@@ -396,13 +396,13 @@ int Board::eval(bool verbose) {
 					cout << "Isolated " << file << " file ";
 			}
 			//Chain
-			if (board120[pos-9] != empty &&
+			if (board120[pos-9] != none &&
 			    piece[board120[pos-9]].getValue() == P_VAL) {
 				score += PAWNCHAIN;
 				if (verbose)
 					cout << "Chain " << file << " file ";
 			}
-			if (board120[pos-11] != empty &&
+			if (board120[pos-11] != none &&
 			    piece[board120[pos-11]].getValue() == P_VAL) {
 				score += PAWNCHAIN;
 				if (verbose)
@@ -435,7 +435,7 @@ int Board::eval(bool verbose) {
 					cout << "Isolated a-file ";
 			}
 			//Chain
-			if (board120[pos+11] != empty &&
+			if (board120[pos+11] != none &&
 			    piece[board120[pos+11]].getValue() == P_VAL) {
 				score -= PAWNCHAIN;
 				if (verbose)
@@ -458,7 +458,7 @@ int Board::eval(bool verbose) {
 					cout << "Isolated h-file ";
 			}
 			//Chain
-			if (board120[pos+9] != empty &&
+			if (board120[pos+9] != none &&
 			    piece[board120[pos+9]].getValue() == P_VAL) {
 				score -= PAWNCHAIN;
 				if (verbose)
@@ -483,13 +483,13 @@ int Board::eval(bool verbose) {
 					cout << "Isolated " << file << " file ";
 			}
 			//Chain
-			if (board120[pos+11] != empty &&
+			if (board120[pos+11] != none &&
 			    piece[board120[pos+11]].getValue() == P_VAL) {
 				score -= PAWNCHAIN;
 				if (verbose)
 					cout << "Chain " << file << " File ";
 			}
-			if (board120[pos+9] != empty &&
+			if (board120[pos+9] != none &&
 			    piece[board120[pos+9]].getValue() == P_VAL) {
 				score -= PAWNCHAIN;
 				if (verbose)
@@ -530,7 +530,7 @@ int Board::eval(bool verbose) {
 			int checkPiece;
 			for (int r = rank+1; r <= 9; r++) { //Up
 				checkPiece = board120[r*10+file];
-				if (checkPiece != empty) {
+				if (checkPiece != none ) {
 				//	if (piece[checkPiece].getColor() != piece[i].getColor())
 						if (piece[checkPiece].getValue() == P_VAL) {
 							open = false;
@@ -540,7 +540,7 @@ int Board::eval(bool verbose) {
 			}
 			for (int r = rank-1; r >= 2; r--) { //Down
 				checkPiece = board120[r*10+file];
-				if (checkPiece != empty) {
+				if (checkPiece != none) {
 					//if (piece[checkPiece].getColor() != piece[i].getColor())
 						if (piece[checkPiece].getValue() == P_VAL) {
 							open = false;

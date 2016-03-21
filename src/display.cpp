@@ -409,7 +409,7 @@ void Display::drawPieces(const int& mF, const int& mT) {
 					clipSq = spriteClips[bQueen];
 			}		
 
-			if (p != empty) { 
+			if (p != none) { 
 				//Save piece being dragged, to rerender on top
 				if (boardPtr->display.squares[sq].getDragging()) {
 					putOnTop = sq;
@@ -610,7 +610,7 @@ void Display::drawMoveTable() {
 					plyStr += mF2/10+'1'-2; //so, rank is sufficient
 			}
 		}
-		if (boardPtr->getPrevOnMoveTo(lastMove) != empty) { //If move was a capture
+		if (boardPtr->getPrevOnMoveTo(lastMove) != none) { //If move was a capture
 			//Special case for pawns, display the file of departure
 			if (boardPtr->piece[p].getValue() == P_VAL || 
 			    boardPtr->getPmSq(boardPtr->getNumMovesMade()-1+extra) == mT2)
