@@ -28,6 +28,7 @@ Display::Display(Board * b) : boardPtr(b)
 	sideFlag = !boardPtr->getSide();
 	init_SDL();
 	loadMedia();
+	frameCounter = FRAME_REFRESH_RATE;
 }
 
 bool Display::init_SDL() {
@@ -200,7 +201,11 @@ void Display::displayBoard(const int& mF, const int& mT) {
 	fileText.render(renderer, BXSTART+33, BYSTART+B_SIZE+10);
 
 	//Update screen
-	SDL_RenderPresent(renderer);
+	if (frameCounter > FRAME_REFRESH_RATE) {
+		SDL_RenderPresent(renderer);
+		frameCounter = 0;
+	}
+	frameCounter++;
 }
 
 void Display::setButtons() {

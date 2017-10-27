@@ -56,6 +56,8 @@ class Display {
 		const static int B_SIZE = 600, SQ_SIZE = 75, BXSTART = 50, BYSTART = 25;
 		const static int SCREEN_W = 1250;
 		const static int SCREEN_H = 700;
+		int frameCounter;
+		const static int FRAME_REFRESH_RATE = 8;
 
 		SDL_Window* window;
 		SDL_Renderer* renderer;
